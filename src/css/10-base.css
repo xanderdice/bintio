@@ -1,0 +1,140 @@
+/* ==========================================================================
+   Base: reposicion, tipografia, capas de luz.
+   ========================================================================== */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* La lista desplegada de un <select> la pinta el sistema, no esta hoja: si el
+   documento no declara de que color es, Windows la abre en blanco y el texto
+   claro se pierde dentro. Esto es lo unico que lo arregla de verdad; el color
+   de <option> de mas abajo es el cinturon por si el navegador es viejo.
+   El tema claro lo vuelve a poner en "light" en 90-themes.css. */
+html { color-scheme: dark; }
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #0a0d13;
+    background: var(--bg-0);
+    color: #b6c2d6;
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    font-family: var(--ui);
+    font-size: 14px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+    overscroll-behavior: none;
+}
+
+/* Lo que se copia, se compara o se dicta va SIEMPRE en monoespaciada, aunque
+   el resto de la interfaz no lo este: en una huella o en una llave, una l y
+   un 1 que se parezcan son un fallo de seguridad, no de estilo. */
+.code, .key-grid, .mono-break, #peer-fp, #me-fingerprint { font-family: var(--mono); }
+
+/* Lineas de barrido: la firma de PCSE. Se encienden con --scan, que solo
+   sube el acabado terminal, y se apagan desde ajustes. */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 9000;
+    pointer-events: none;
+    background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .13) 0 1px, transparent 1px 3px);
+    opacity: calc(.5 * var(--scan));
+}
+
+/* Acumulacion de luz: dos copias borrosas y aclaradas de lo que hay debajo.
+   Donde dos elementos encendidos se tocan, la luz SUMA; eso no lo hace una
+   sombra por elemento. */
+.bloom-layer {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 400;
+    pointer-events: none;
+    mix-blend-mode: screen;
+}
+.bloom-layer--core {
+    -webkit-backdrop-filter: blur(3px) brightness(1.45) saturate(.92);
+    backdrop-filter: blur(3px) brightness(1.45) saturate(.92);
+    opacity: calc(.22 * var(--bloom) * var(--haze));
+}
+.bloom-layer--halo {
+    -webkit-backdrop-filter: blur(16px) brightness(1.7) saturate(.85);
+    backdrop-filter: blur(16px) brightness(1.7) saturate(.85);
+    opacity: calc(.14 * var(--bloom) * var(--haze));
+}
+body[data-bloom="off"] .bloom-layer { display: none; }
+body[data-bloom="soft"] .bloom-layer--halo { display: none; }
+
+.bloom-ambient {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 401;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    opacity: calc(.28 * var(--bloom) * var(--haze));
+    background:
+        radial-gradient(52% 34% at 50% 0%, rgba(var(--ice), .10), transparent 70%),
+        radial-gradient(36% 30% at 0% 46%, rgba(var(--ice), .07), transparent 72%),
+        radial-gradient(36% 30% at 100% 46%, rgba(var(--ice), .07), transparent 72%),
+        radial-gradient(60% 26% at 50% 100%, rgba(var(--ice), .06), transparent 74%);
+}
+body[data-bloom="off"] .bloom-ambient { display: none; }
+
+/* Un parpadeo raro y lento. Solo en el marco, nunca sobre el texto de una
+   conversacion: leer no debe cansar. El acabado de casa no parpadea; el
+   nombre de la animacion viene en --flicker, que de serie vale "none". */
+#menubar, #statusbar {
+    animation: var(--flicker) 7s steps(1) infinite;
+}
+@keyframes flicker {
+    0%, 91%, 100% { opacity: 1; }
+    91.5% { opacity: .94; }
+    92% { opacity: 1; }
+    92.6% { opacity: .97; }
+}
+
+/* Menos movimiento, de verdad.
+
+   Dos cosas que estaban mal y que juntas hacian lo contrario de lo que se
+   pedia:
+
+     - El selector era "*", que NO casa pseudoelementos, y las cuatro
+       animaciones del proyecto (el barrido, el parpadeo, el punto que respira
+       y el aro que late) viven todas en ::before o ::after. No se apagaba
+       ninguna.
+     - Y lo que si alcanzaba se le ponia una duracion de una milesima. Una
+       animacion infinita a 0,001 s no se para: da mil vueltas por segundo.
+       El parpadeo lento del marco se convertia en un estroboscopio, que es
+       exactamente lo que no puede pasarle a quien pide menos movimiento.
+
+   Por eso aqui se quita la animacion entera en vez de acelerarla. */
+@media (prefers-reduced-motion: reduce) {
+    .bloom-ambient { display: none; }
+    *, *::before, *::after {
+        animation: none !important;
+        transition-duration: .001s !important;
+    }
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+    background: var(--surface-hi);
+    border-radius: var(--radius-pill);
+    border: 2px solid transparent;
+    background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(var(--ice), .34); background-clip: content-box; }
+
+::selection { background: rgba(var(--ice), .3); color: rgb(var(--ice-hot)); }
+
+a { color: rgb(var(--ice-hot)); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.hidden { display: none !important; }
+.dim { color: var(--text-dim); }
+.hot { color: rgb(var(--ice-hot)); }
+.mono-break { word-break: break-all; }

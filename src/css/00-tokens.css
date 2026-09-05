@@ -1,0 +1,259 @@
+/* ==========================================================================
+   BINTIO - variables de tema.
+
+   El tema de casa se llama BINTIO y es de escaparate: tinta casi negra, neon
+   de cian y magenta, tipografia de interfaz y esquinas suaves. Es lo primero
+   que ve alguien que todavia no sabe lo que hace esto, y tiene que decir
+   "esto es serio" antes de que lea una sola linea. El neon pone el caracter;
+   que no haya ni una luz de mas es lo que lo mantiene comercial.
+
+   Hay dos ACABADOS, y se cambian con un atributo en <html>:
+
+       data-skin="studio"    el de casa. Plano, limpio, sombras negras y luz
+                             medida. Es lo que sale tambien si el atributo no
+                             esta puesto: el acabado comercial es el suelo,
+                             no una opcion.
+       data-skin="terminal"  el acabado CRT de los demas temas: monoespaciada,
+                             versalitas, esquinas rectas y fosforo.
+
+   El color entero sale de cuatro numeros:
+       --ice      el acento (se sigue llamando asi porque lo usan los siete
+                  temas y los cientos de reglas que ya estaban escritas)
+       --ice-hot  el acento encendido, casi blanco: titulos y remates
+       --ember    el segundo acento, el que cierra los degradados
+       --deep     el azul de fondo de esos mismos degradados
+
+   Un tema nuevo siguen siendo ocho lineas al final de 90-themes.css.
+
+   Cada color lleva delante un valor fijo de reserva para los navegadores sin
+   variables CSS: veran la aplicacion en gris oscuro, pero la veran.
+   ========================================================================== */
+
+:root {
+    /* ------------------------------------------------------------ acento
+       Cian electrico y magenta: los dos colores del neon de toda la vida,
+       pero sobre tinta y con la mano quieta. Lo que hace que esto siga
+       pareciendo un producto y no una feria es que el color solo aparece
+       donde hay que mirar; el resto es negro azulado y aire. */
+    --ice: 56, 189, 248;
+    --ice-hot: 224, 249, 255;
+    --ember: 244, 114, 182;
+    --deep: 30, 58, 168;
+
+    /* --------------------------------------------------------- ambientes */
+    --bg-0: #06070f;
+    --bg-1: #0a0d1a;
+    --bg-2: #101527;
+    --bg-3: #182038;
+
+    /* ------------------------------------------------------------ trazos
+       Hilos tenidos de cian, muy bajos de tono: perfilan sin encenderse. El
+       acento entero se guarda para lo que hay que mirar. */
+    --line: rgba(120, 190, 240, .16);
+    --line-mid: rgba(120, 190, 240, .28);
+    --line-hot: rgba(56, 189, 248, .7);
+
+    /* ------------------------------------------------------------- texto */
+    --text: #b9c8dc;
+    --text-dim: #8093ad;
+    --text-hot: #f4faff;
+
+    /* --------------------------------------------------------- superficies
+       Los paneles no son transparentes del todo: llevan su propio negro para
+       que el ambiente del fondo no se les meta debajo del texto. */
+    --panel-bg: rgba(10, 14, 26, .86);
+    --block-bg: rgba(14, 19, 34, .82);
+    --surface: rgba(120, 190, 240, .06);
+    --surface-hi: rgba(120, 190, 240, .13);
+    --field-bg: rgba(120, 190, 240, .05);
+
+    /* El texto que va ENCIMA del acento, no al lado. Es la unica pareja de
+       colores de la interfaz que no se puede dejar al azar del tema: sobre el
+       azul solido del boton principal, blanco puro da 5.2:1 en la parte mas
+       clara del degradado y cumple sin discusion. */
+    --on-accent: #fff;
+
+    /* ------------------------------------------------------------- estado */
+    --ok: 45, 226, 168;
+    --danger: 255, 92, 122;
+    --warn: 255, 196, 84;
+
+    /* --------------------------------------------------------- tipografia
+       La monoespaciada deja de ser la fuente de TODO y pasa a ser lo que
+       siempre debio ser: la de las claves, las huellas y los codigos, donde
+       confundir un caracter cuesta caro. Lo que se lee, se lee con la
+       tipografia del sistema.
+
+       Cuatro grupos, y cada acabado los define enteros:
+         --ui        la fuente de la interfaz
+         --micro-*   etiquetas, botones, estados, pies de mensaje
+         --title-*   titulos de panel y de bloque
+         --brand-*   la marca, que siempre va espaciada */
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    --mono: ui-monospace, "Cascadia Mono", "SF Mono", Consolas, Menlo, "DejaVu Sans Mono", monospace;
+    --ui: var(--sans);
+    --micro-case: none;
+    --micro-track: .02em;
+    --title-case: none;
+    --title-track: .01em;
+    --brand-track: .2em;
+    --pt-size: 12px;
+    --h2-size: 14px;
+    --btn-size: 12.5px;
+
+    /* ------------------------------------------------------------ medidas
+       El acabado comercial respira mas: barra mas alta, mas aire dentro de
+       los bloques y esquinas de verdad. El terminal las aprieta otra vez. */
+    --bar-h: 50px;
+    --head-h: 38px;
+    --btn-h: 34px;
+    --status-h: 30px;
+    --gap: 10px;
+    --pad: 18px;
+    --radius: 10px;
+    --radius-sm: 7px;
+    --radius-pill: 999px;
+
+    /* El logo. Lo rellena tools/build.js con la imagen ya incrustada, y se
+       declara aqui para que la hoja valga por si sola: sin esta linea, abrir
+       src/index.html a pelo dejaba dos huecos sin explicacion. Es una
+       variable y no un <img> repetido porque asi la imagen viaja UNA vez en
+       la pagina aunque se pinte en varios sitios. */
+    --logo: none;
+
+    /* ------------------------------------------------------------- luces
+       --bloom    multiplica TODA la luz de la interfaz (ajustes: completos,
+                  suaves, apagados).
+       --sheen    los barridos que cruzan el cromado.
+       --haze     cuanta neblina de color flota por encima de todo.
+       --scan     las lineas de barrido.
+       --flicker  el nombre de la animacion de parpadeo, o "none".
+
+       De casa se queda encendida la neblina y el halo del acento; lo que no
+       vuelve son las lineas de barrido, el parpadeo y los barridos de luz,
+       que es lo que separa "neon" de "monitor viejo". */
+    --bloom: 1;
+    --sheen: 0;
+    --haze: .6;
+    --scan: 0;
+    --flicker: none;
+
+    --glow-s: 0 0 10px rgba(56, 189, 248, .3);
+    --glow-m: 0 0 18px rgba(56, 189, 248, .26), 0 0 5px rgba(224, 249, 255, .24);
+    --glow-l: 0 0 34px rgba(56, 189, 248, .28), 0 0 12px rgba(224, 249, 255, .26);
+    --text-glow: 0 0 12px rgba(56, 189, 248, .35);
+    --text-glow-hot: 0 0 18px rgba(224, 249, 255, .32), 0 0 40px rgba(56, 189, 248, .3);
+
+    /* Sombras negras, no de color: es media distancia entre una demo y un
+       producto. Las tres son la misma sombra a tres alturas. */
+    --shadow-s: 0 1px 2px rgba(0, 0, 0, .4);
+    --shadow-m: 0 8px 24px rgba(0, 0, 0, .42);
+    --shadow-l: 0 20px 50px rgba(0, 0, 0, .5);
+
+    /* El aro de foco NO va multiplicado por --bloom a proposito: apagar los
+       efectos no puede apagar la accesibilidad. */
+    --ring: 0 0 0 3px rgba(56, 189, 248, .4);
+}
+
+/* Todo lo que se deriva del acento se recalcula aqui abajo. Asi un tema solo
+   tiene que cambiar --ice y --ice-hot: las luces, los degradados y el cromado
+   le siguen solos.
+
+   Va en un segundo bloque a proposito: el de arriba son los valores fijos de
+   reserva, y este los pisa en cuanto el navegador entiende var(). */
+:root {
+    --line-hot: rgba(var(--ice), .7);
+
+    --glow-s: 0 0 10px rgba(var(--ice), calc(.3 * var(--bloom)));
+    --glow-m: 0 0 18px rgba(var(--ice), calc(.26 * var(--bloom))), 0 0 5px rgba(var(--ice-hot), calc(.24 * var(--bloom)));
+    --glow-l: 0 0 34px rgba(var(--ice), calc(.28 * var(--bloom))), 0 0 12px rgba(var(--ice-hot), calc(.26 * var(--bloom)));
+    --text-glow: 0 0 12px rgba(var(--ice), calc(.35 * var(--bloom)));
+    --text-glow-hot: 0 0 18px rgba(var(--ice-hot), calc(.32 * var(--bloom))), 0 0 40px rgba(var(--ice), calc(.3 * var(--bloom)));
+    --ring: 0 0 0 3px rgba(var(--ice), .4);
+
+    /* Piezas de cromado reutilizadas por 70-flourish.css. */
+    --bevel: inset 0 1px 0 rgba(var(--ice-hot), .07);
+    --sunk: inset 0 1px 2px rgba(0, 0, 0, .3);
+    --grad-chrome: linear-gradient(180deg, rgba(var(--ice-hot), .05), rgba(var(--ice-hot), .015));
+
+    /* El azul del boton principal: una capa de luz encima de un azul profundo
+       solido, y no un degradado del claro al oscuro. Se hace asi para que el
+       texto blanco tenga contraste de sobra tambien en el borde de arriba,
+       que es donde un degradado normal se queda corto. */
+    --grad-hot:
+        linear-gradient(180deg, rgba(var(--ice), .38), rgba(var(--ice), 0) 78%),
+        linear-gradient(180deg, rgb(var(--deep)), rgb(var(--deep)));
+}
+
+/* ==========================================================================
+   ACABADO TERMINAL
+
+   Los seis temas de siempre. Aqui no se toca ni un color: solo se devuelven
+   la monoespaciada, las versalitas, las esquinas rectas y las luces de
+   fosforo que el acabado de casa apaga. Un tema elige su acabado en una
+   linea de 61-ui-theme.js, no en la hoja de estilos.
+   ========================================================================== */
+:root[data-skin="terminal"] {
+    --line: rgba(var(--ice), .18);
+    --line-mid: rgba(var(--ice), .34);
+    --line-hot: rgba(var(--ice), .66);
+    --surface: rgba(var(--ice), .06);
+    --surface-hi: rgba(var(--ice), .14);
+    --field-bg: rgba(0, 0, 0, .35);
+    --on-accent: rgb(var(--ice-hot));
+
+    --ui: var(--mono);
+    --micro-case: uppercase;
+    --micro-track: .16em;
+    --title-case: uppercase;
+    --title-track: .24em;
+    --brand-track: .34em;
+    --pt-size: 10px;
+    --h2-size: 11px;
+    --btn-size: 10.5px;
+
+    --bar-h: 40px;
+    --head-h: 30px;
+    --btn-h: 30px;
+    --status-h: 26px;
+    --gap: 6px;
+    --pad: 16px;
+    --radius: 2px;
+    --radius-sm: 2px;
+    --radius-pill: 2px;
+
+    --sheen: 1;
+    --haze: 1;
+    --scan: 1;
+    --flicker: flicker;
+
+    --text-glow: 0 0 10px rgba(var(--ice), calc(.3 * var(--bloom)));
+    --text-glow-hot: 0 0 16px rgba(var(--ice-hot), calc(.4 * var(--bloom))), 0 0 34px rgba(var(--ice), calc(.24 * var(--bloom)));
+
+    --bevel: inset 0 1px 0 rgba(var(--ice-hot), calc(.14 * var(--bloom)));
+    --sunk: inset 0 1px 3px rgba(0, 0, 0, .55);
+    --grad-chrome: linear-gradient(180deg, rgba(var(--ice), .14), rgba(var(--ice), .03) 52%, rgba(0, 0, 0, .28));
+    /* El boton principal lleva una capa OPACA debajo del velo de color. Sin
+       ella el velo se mezclaba con lo que hubiera detras -panel, bloque, hoja-
+       y el texto quedaba a merced del sitio: en matrix daba 3,9:1, por debajo
+       del minimo legible. Con la capa opaca el resultado no depende de donde
+       este el boton, y el peor de los seis temas de terminal sube a 5,2:1. */
+    --grad-hot:
+        linear-gradient(180deg, rgba(var(--ice), .42), rgba(var(--deep), .55)),
+        linear-gradient(180deg, var(--bg-0), var(--bg-0));
+}
+
+body[data-bloom="soft"] { --bloom: .55; --sheen: 0; --flicker: none; }
+body[data-bloom="off"] { --bloom: 0; --sheen: 0; --scan: 0; --flicker: none; }
+body.no-scanlines { --scan: 0; }
+
+/* Menos movimiento: se apagan los barridos y el parpadeo, no la luz. Quien
+   pide menos movimiento no esta pidiendo una interfaz mas fea.
+
+   El selector lleva el atributo a proposito. Una media query NO suma
+   especificidad, asi que un ":root" a secas (0,1,0) pierde contra el
+   ":root[data-skin=terminal]" de mas arriba (0,2,0) y esto no apagaba
+   absolutamente nada en los siete temas de terminal. */
+@media (prefers-reduced-motion: reduce) {
+    :root, :root[data-skin] { --sheen: 0; --flicker: none; }
+}

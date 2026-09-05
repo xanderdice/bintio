@@ -1,0 +1,521 @@
+/* ==========================================================================
+   Acabado.
+
+   Todo lo que hace que BINTIO parezca un producto y no una practica. Va en un
+   fichero aparte porque no es estructura: si esto se borra entero, la
+   aplicacion sigue funcionando y se ve exactamente igual de ordenada, solo
+   que mas plana.
+
+   Dos mitades, y no se mezclan:
+
+     ESTUDIO   el acabado de casa. Sombras negras, un hilo de luz arriba, un
+               ambiente muy suave detras y el boton principal en azul solido.
+               Nada se mueve salvo dos puntos que respiran.
+
+     TERMINAL  el cromado CRT de los otros seis temas: biseles, barridos,
+               tejido de fondo, fosforo y corchetes encendidos. Cuelga entero
+               de :root[data-skin="terminal"], asi que no roza al de casa.
+
+   Dos reglas de oro, en las dos mitades:
+
+     1. Ni un color escrito a mano. Todo sale de --ice, --ice-hot, --ember y
+        --deep, asi que el acabado cambia de color con el tema y no hay que
+        tocar nada.
+
+     2. Nada se apaga con "display:none" repartido por medio fichero. Los
+        barridos van multiplicados por --sheen y los brillos por --bloom, asi
+        que "efectos suaves", "efectos apagados", los temas planos y quien
+        pide menos movimiento en el sistema los apagan solos.
+   ========================================================================== */
+
+
+/* ==========================================================================
+   ESTUDIO
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ fondo
+   Tres luces de neon muy abiertas sobre tinta: cian arriba, magenta por la
+   esquina de abajo a la derecha y azul profundo por la de la izquierda, con
+   una vinneta que cierra los bordes. Va detras de todo (z-index -1 dentro de
+   #app) para que ni una letra pierda contraste por su culpa. */
+#app::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+        radial-gradient(120% 58% at 50% -16%, rgba(var(--ice), calc(.16 * var(--bloom))), transparent 62%),
+        radial-gradient(70% 42% at 92% 112%, rgba(var(--ember), calc(.12 * var(--bloom))), transparent 66%),
+        radial-gradient(80% 44% at 8% 112%, rgba(var(--deep), calc(.34 * var(--bloom))), transparent 68%),
+        linear-gradient(180deg, var(--bg-1), var(--bg-0) 46%);
+    box-shadow: inset 0 0 200px 60px rgba(0, 0, 0, .45);
+}
+
+/* ------------------------------------------------------------------ marco
+   La barra de arriba y la de abajo son las dos unicas piezas que tocan el
+   borde de la pantalla. Se separan con un rail de neon de un pixel y su
+   halo; el resto de la separacion la sigue haciendo una sombra negra. */
+#menubar {
+    box-shadow:
+        var(--bevel),
+        0 1px 0 rgba(var(--ice), calc(.3 * var(--bloom))),
+        0 8px 30px rgba(var(--ice), calc(.1 * var(--bloom))),
+        var(--shadow-s);
+}
+#statusbar {
+    box-shadow:
+        inset 0 1px 0 rgba(var(--ice), calc(.22 * var(--bloom))),
+        0 -8px 26px rgba(var(--ice), calc(.07 * var(--bloom)));
+}
+
+/* ------------------------------------------------------------------ marca
+   Letras rellenas con un degradado vertical, de blanco a acento. Es el truco
+   de siempre de los titulos, y aqui cuesta cuatro lineas. Se pide permiso con
+   @supports porque un navegador que entienda el degradado pero no el relleno
+   transparente pintaria una caja de color detras del texto. */
+@supports (-webkit-text-fill-color: transparent) {
+    .brand b, .hero-mark {
+        background-image: linear-gradient(176deg, #fff 10%, rgb(var(--ice-hot)) 58%, rgb(var(--ice)) 104%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+}
+
+/* El punto que respira dentro de la pastilla de la marca: la senal de "esto
+   esta vivo", que es justo lo que hay que decir de una aplicacion que no
+   tiene servidor detras. */
+.brand-sub::before {
+    content: "";
+    display: inline-block;
+    width: 6px; height: 6px;
+    margin-right: 8px;
+    vertical-align: middle;
+    border-radius: 50%;
+    background: rgb(var(--ok));
+    box-shadow: 0 0 9px rgba(var(--ok), calc(.9 * var(--bloom)));
+    animation: breathe 3.4s ease-in-out infinite;
+}
+
+@keyframes breathe {
+    0%, 100% { opacity: .4; }
+    50% { opacity: 1; }
+}
+
+/* -------------------------------------------------------- tarjetas y panel
+   Sombra negra para separar del fondo y un halo de cian muy abierto para que
+   la tarjeta parezca encendida por dentro y no pegada encima. */
+.panel, .block {
+    box-shadow:
+        var(--bevel),
+        var(--shadow-m),
+        0 0 30px rgba(var(--ice), calc(.07 * var(--bloom)));
+}
+.panel-head, .panel-foot, #composer {
+    background-image: var(--grad-chrome);
+}
+
+/* ---------------------------------------------------------------- botones */
+.btn {
+    position: relative;
+    overflow: hidden;
+    background-image: var(--grad-chrome);
+    box-shadow: var(--bevel), var(--shadow-s);
+}
+.btn:hover { box-shadow: var(--bevel), var(--shadow-s), var(--glow-s); }
+.btn:active { transform: translateY(1px); }
+.btn:disabled { transform: none; box-shadow: none; }
+
+/* El principal es lo unico solido de la pantalla, y por eso se ve antes que
+   nada. Un producto tiene una sola llamada a la accion por vista. */
+.btn--primary {
+    background-image: var(--grad-hot);
+    border-color: rgba(var(--deep), .9);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .22),
+        0 1px 2px rgba(0, 0, 0, .4),
+        0 8px 26px rgba(var(--ice), calc(.38 * var(--bloom)));
+}
+.btn--primary:hover {
+    color: var(--on-accent);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .3),
+        0 1px 2px rgba(0, 0, 0, .4),
+        0 10px 32px rgba(var(--ice), calc(.55 * var(--bloom)));
+}
+.btn--ghost { background-image: none; box-shadow: none; }
+.btn--ghost:hover { background-image: var(--grad-chrome); }
+.btn--danger { background-image: none; box-shadow: var(--bevel), var(--shadow-s); }
+
+/* ----------------------------------------------------------------- campos */
+.input, textarea.input, select.input, #composer textarea {
+    box-shadow: var(--sunk);
+}
+.input:focus, textarea.input:focus, select.input:focus, #composer textarea:focus {
+    box-shadow: var(--sunk), var(--ring);
+}
+
+/* Cualquier cosa enfocada con el teclado. Van en reglas separadas a
+   proposito: un navegador que no conozca :focus-visible tiraria el grupo
+   entero, y con el se llevaria por delante el aro de las casillas. */
+.check:focus-within {
+    outline: 2px solid rgba(var(--ice), .9);
+    outline-offset: 2px;
+}
+.btn:focus-visible {
+    outline: 2px solid rgba(var(--ice), .9);
+    outline-offset: 2px;
+}
+
+/* ----------------------------------------------------------- piezas sueltas */
+
+/* Contador de no leidos: pastilla de color, no un circulo blanco. Es lo unico
+   magenta de la pantalla, y por eso se ve antes que nada aunque mida catorce
+   pixeles. El azul se queda para lo que se pulsa; el magenta, para lo que
+   reclama. */
+.badge {
+    color: #fff;
+    background-image: linear-gradient(180deg, rgb(var(--ember)), rgb(var(--deep)));
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .28),
+        var(--shadow-s),
+        0 0 14px rgba(var(--ember), calc(.55 * var(--bloom)));
+}
+
+/* Barra de fuerza de la contrasena: del azul profundo al cian y del cian al
+   magenta. Es el degradado que mas se mira de la aplicacion, asi que es el
+   unico sitio donde los dos colores de la casa salen juntos y a tope. */
+.bar i {
+    background-image: linear-gradient(90deg, rgb(var(--deep)), rgb(var(--ice)) 55%, rgb(var(--ember)));
+    box-shadow: 0 0 14px rgba(var(--ice), calc(.55 * var(--bloom)));
+}
+
+/* El punto de "conectado" con un aro que late. */
+.dot { position: relative; }
+.dot--live::after {
+    content: "";
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 7px; height: 7px;
+    margin: -3.5px 0 0 -3.5px;
+    border-radius: 50%;
+    border: 1px solid rgb(var(--ok));
+    animation: ping 2.2s ease-out infinite;
+}
+@keyframes ping {
+    0% { transform: scale(1); opacity: .8; }
+    100% { transform: scale(3.2); opacity: 0; }
+}
+
+/* Fila de la lista: la activa lleva un galon de color, no un marco. */
+.list-item {
+    position: relative;
+    transition: background .12s;
+}
+.list-item.is-active {
+    background-image: linear-gradient(90deg, rgba(var(--ice), .16), transparent 64%);
+}
+.list-item.is-active::before {
+    content: "";
+    position: absolute;
+    top: 0; bottom: 0; left: 0;
+    width: 3px;
+    background: linear-gradient(180deg, rgb(var(--ice-hot)), rgb(var(--ice)));
+    box-shadow: 0 0 14px rgba(var(--ice), calc(.8 * var(--bloom)));
+}
+
+/* Los mensajes propios llevan el color de la casa detras y un halo minimo:
+   lo justo para distinguirlos de un vistazo sin tener que leer. */
+.msg--out {
+    background-image: linear-gradient(135deg, rgba(var(--ice), .1), rgba(var(--ice), .02));
+    box-shadow: 0 0 20px rgba(var(--ice), calc(.14 * var(--bloom)));
+}
+
+/* Avisos: los que salen por abajo tambien son producto. */
+.toast {
+    box-shadow: var(--shadow-l), var(--glow-m);
+}
+
+/* El QR sobre blanco: es lo que la gente fotografia, y tiene que verse
+   impecable. El aro de cian lo separa del panel y le da el punto de neon. */
+.qr-box {
+    box-shadow:
+        0 0 0 1px rgba(var(--ice), .35),
+        var(--shadow-m),
+        0 0 34px rgba(var(--ice), calc(.18 * var(--bloom)));
+}
+
+/* Portada: la pastilla de cada garantia se levanta un pelo del fondo y se
+   enciende por dentro. */
+.chip {
+    box-shadow: var(--shadow-s), inset 0 0 14px rgba(var(--ice), calc(.08 * var(--bloom)));
+}
+
+
+/* ==========================================================================
+   TERMINAL
+   De aqui abajo, el cromado CRT de los otros seis temas. Todo cuelga de
+   :root[data-skin="terminal"], asi que el acabado de casa no lo ve.
+   ========================================================================== */
+
+/* --------------------------------------------------- fondo: tejido y calor */
+:root[data-skin="terminal"] #app::before {
+    background:
+        radial-gradient(78% 46% at 50% -12%, rgba(var(--ice), calc(.07 * var(--bloom))), transparent 64%),
+        radial-gradient(70% 34% at 50% 118%, rgba(var(--deep), calc(.34 * var(--bloom))), transparent 70%),
+        repeating-linear-gradient(45deg, rgba(var(--ice-hot), .012) 0 1px, transparent 1px 5px);
+    box-shadow: inset 0 0 240px 70px rgba(0, 0, 0, .85);
+}
+
+/* Las lineas de barrido dejan de ser grises: se tinen del acento, que es lo
+   que las hace parecer un fosforo y no una malla de imprenta. */
+:root[data-skin="terminal"] body::before {
+    background:
+        repeating-linear-gradient(0deg, rgba(0, 0, 0, .15) 0 1px, transparent 1px 3px),
+        repeating-linear-gradient(0deg, rgba(var(--ice), calc(.03 * var(--bloom))) 0 1px, transparent 1px 3px);
+}
+
+/* ------------------------------------------------------------ barra superior
+   Bisel, rail de luz y un brillo que la cruza cada nueve segundos. Es el
+   unico sitio con movimiento constante, y es lento a proposito: tiene que
+   notarse sin llamar. */
+:root[data-skin="terminal"] #menubar {
+    overflow: hidden;
+    background-color: transparent;
+    background-image: var(--grad-chrome);
+    border-bottom-color: var(--line-mid);
+    box-shadow:
+        var(--bevel),
+        0 1px 0 rgba(var(--ice), calc(.32 * var(--bloom))),
+        0 6px 30px rgba(var(--ice), calc(.16 * var(--bloom))),
+        0 2px 10px rgba(0, 0, 0, .55);
+}
+
+:root[data-skin="terminal"] #menubar::after {
+    content: "";
+    position: absolute;
+    top: 0; bottom: 0; left: 0;
+    width: 34%;
+    pointer-events: none;
+    opacity: calc(.55 * var(--sheen));
+    background: linear-gradient(104deg,
+        transparent,
+        rgba(var(--ice-hot), .1) 44%,
+        rgba(var(--ice), .2) 56%,
+        transparent);
+    transform: translateX(-130%);
+    animation: sweep 9s cubic-bezier(.35, 0, .2, 1) infinite;
+}
+
+@keyframes sweep {
+    0%, 64% { transform: translateX(-130%); }
+    100% { transform: translateX(400%); }
+}
+
+/* La marca del terminal se rellena con su propio degradado, mas caliente. */
+:root[data-skin="terminal"] .brand { color: rgba(var(--ice-hot), .55); }
+:root[data-skin="terminal"] .brand b { font-weight: 500; }
+:root[data-skin="terminal"] .brand-sub {
+    padding: 0;
+    border: 0;
+    background: none;
+    font-size: 9px;
+    letter-spacing: .18em;
+}
+@supports (-webkit-text-fill-color: transparent) {
+    :root[data-skin="terminal"] .brand b,
+    :root[data-skin="terminal"] .hero-mark {
+        background-image: linear-gradient(178deg,
+            #fff 6%,
+            rgb(var(--ice-hot)) 42%,
+            rgb(var(--ice)) 96%);
+    }
+}
+
+/* El punto que respira, aqui del color del acento y no del de "correcto". */
+:root[data-skin="terminal"] .brand-sub::before {
+    width: 5px; height: 5px;
+    margin-right: 7px;
+    background: rgb(var(--ice));
+    box-shadow: 0 0 9px rgba(var(--ice), calc(.9 * var(--bloom)));
+}
+:root[data-skin="terminal"] .chip::before {
+    background: rgb(var(--ice));
+    box-shadow: 0 0 8px rgba(var(--ice), calc(.8 * var(--bloom)));
+}
+:root[data-skin="terminal"] .chip { box-shadow: none; }
+
+/* ---------------------------------------------------------------- botones
+   Chapa con bisel arriba, sombra abajo y un brillo que cruza el principal.
+   El de borrar lleva rayas de peligro, porque en una interfaz entera del
+   mismo color el color ya no distingue nada. */
+:root[data-skin="terminal"] .btn {
+    box-shadow: var(--bevel);
+}
+:root[data-skin="terminal"] .btn:hover {
+    box-shadow: var(--bevel), var(--glow-s);
+}
+:root[data-skin="terminal"] .btn:active {
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, .6);
+}
+:root[data-skin="terminal"] .btn--primary {
+    color: rgb(var(--ice-hot));
+    background-image: var(--grad-hot);
+    border-color: var(--line-hot);
+    text-shadow: var(--text-glow);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, calc(.24 * var(--bloom))),
+        0 0 18px rgba(var(--ice), calc(.3 * var(--bloom)));
+}
+:root[data-skin="terminal"] .btn--primary:hover {
+    color: rgb(var(--ice-hot));
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, calc(.3 * var(--bloom))),
+        0 0 26px rgba(var(--ice), calc(.5 * var(--bloom)));
+}
+:root[data-skin="terminal"] .btn--primary::after {
+    content: "";
+    position: absolute;
+    top: 0; bottom: 0; left: 0;
+    width: 45%;
+    pointer-events: none;
+    opacity: calc(.5 * var(--sheen));
+    background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .3) 50%, transparent);
+    transform: translateX(-160%);
+    animation: sweep 5.5s cubic-bezier(.35, 0, .2, 1) infinite;
+}
+
+/* Rayas de peligro: lo unico de la interfaz que no se puede confundir con
+   otra cosa. Se ven poco hasta que pasas por encima. */
+:root[data-skin="terminal"] .btn--danger {
+    background-image: repeating-linear-gradient(-45deg,
+        rgba(var(--danger), .16) 0 6px,
+        transparent 6px 12px);
+    box-shadow: var(--bevel);
+}
+:root[data-skin="terminal"] .btn--danger:hover {
+    background-image: repeating-linear-gradient(-45deg,
+        rgba(var(--danger), .34) 0 6px,
+        rgba(var(--danger), .08) 6px 12px);
+}
+
+/* -------------------------------------------------------- paneles y bloques
+   Un hilo de luz arriba y sombra debajo. Lo justo para que se despeguen del
+   fondo sin parecer tarjetas de otra aplicacion. */
+:root[data-skin="terminal"] .panel,
+:root[data-skin="terminal"] .block {
+    box-shadow: var(--bevel), 0 10px 34px rgba(0, 0, 0, .5);
+}
+:root[data-skin="terminal"] .panel-head { box-shadow: var(--bevel); }
+
+/* Un galon delante del titulo del panel. Cuesta una linea y ordena la vista. */
+:root[data-skin="terminal"] .panel-title::before,
+:root[data-skin="terminal"] .block h2::before {
+    content: "";
+    display: inline-block;
+    width: 3px;
+    height: 9px;
+    margin-right: 8px;
+    vertical-align: -1px;
+    background: rgb(var(--ice));
+    box-shadow: 0 0 8px rgba(var(--ice), calc(.8 * var(--bloom)));
+}
+:root[data-skin="terminal"] .panel-title { color: rgba(var(--ice-hot), .84); }
+:root[data-skin="terminal"] .block h2 { color: rgba(var(--ice-hot), .84); font-weight: 500; }
+
+/* Los corchetes de las esquinas, que son la firma de la casa, encendidos. */
+:root[data-skin="terminal"] .bracket {
+    box-shadow:
+        0 0 14px rgba(var(--ice), calc(.42 * var(--bloom))),
+        0 0 3px rgba(var(--ice-hot), calc(.5 * var(--bloom)));
+}
+
+/* ----------------------------------------------------------------- campos */
+:root[data-skin="terminal"] .input:focus,
+:root[data-skin="terminal"] textarea.input:focus,
+:root[data-skin="terminal"] select.input:focus,
+:root[data-skin="terminal"] #composer textarea:focus {
+    box-shadow:
+        var(--sunk),
+        0 0 0 1px rgba(var(--ice), .5),
+        0 0 16px rgba(var(--ice), calc(.34 * var(--bloom)));
+}
+
+/* ----------------------------------------------------------- piezas sueltas */
+:root[data-skin="terminal"] .badge {
+    background-image: linear-gradient(180deg, rgb(var(--ice)), rgba(var(--deep), 1));
+    border: 1px solid rgba(var(--ice-hot), .45);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .3),
+        0 0 12px rgba(var(--ice), calc(.6 * var(--bloom)));
+    text-shadow: 0 1px 0 rgba(0, 0, 0, .45);
+}
+:root[data-skin="terminal"] .bar {
+    background: rgba(0, 0, 0, .45);
+    box-shadow: var(--sunk);
+}
+:root[data-skin="terminal"] .bar i {
+    box-shadow: 0 0 12px rgba(var(--ice), calc(.7 * var(--bloom)));
+}
+:root[data-skin="terminal"] .list-item.is-active::before {
+    width: 2px;
+    box-shadow: 0 0 12px rgba(var(--ice), calc(.9 * var(--bloom)));
+}
+
+/* Los mensajes propios, con el color de la casa detras. */
+:root[data-skin="terminal"] .msg { background: rgba(0, 0, 0, .3); }
+:root[data-skin="terminal"] .msg--in { border-left: 2px solid var(--line-mid); }
+:root[data-skin="terminal"] .msg--out {
+    border-right: 2px solid rgb(var(--ice-hot));
+    background-image: linear-gradient(135deg, rgba(var(--ice), .16), rgba(var(--ice), .04));
+    box-shadow: var(--glow-s);
+}
+:root[data-skin="terminal"] .msg--sys { background: transparent; }
+
+:root[data-skin="terminal"] .toast {
+    background-image: var(--grad-chrome);
+    border-color: var(--line-hot);
+    box-shadow: var(--bevel), var(--glow-m), 0 8px 26px rgba(0, 0, 0, .6);
+}
+
+:root[data-skin="terminal"] .qr-box {
+    border-color: var(--line-hot);
+    box-shadow:
+        0 0 0 1px rgba(var(--ice), .5),
+        var(--glow-l),
+        0 10px 30px rgba(0, 0, 0, .55);
+}
+
+:root[data-skin="terminal"] #statusbar {
+    background-color: transparent;
+    background-image: var(--grad-chrome);
+    border-top-color: var(--line-mid);
+    box-shadow:
+        inset 0 1px 0 rgba(var(--ice), calc(.2 * var(--bloom))),
+        0 -6px 24px rgba(var(--ice), calc(.1 * var(--bloom)));
+}
+
+:root[data-skin="terminal"] ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(var(--ice), .42), rgba(var(--deep), .6));
+    border: 0;
+    background-clip: border-box;
+}
+:root[data-skin="terminal"] ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, rgba(var(--ice), .7), rgba(var(--ice), .4));
+    background-clip: border-box;
+}
+
+/* ==========================================================================
+   TEMAS PLANOS
+   Aqui solo lo que --bloom y --sheen no pueden apagar por si solos: un
+   pseudoelemento con fondo propio sigue estando ahi aunque no brille.
+   ========================================================================== */
+:root[data-theme="carbon"] #app::before,
+:root[data-theme="paper"] #app::before,
+:root[data-theme="carbon"] .brand-sub::before,
+:root[data-theme="paper"] .brand-sub::before { display: none; }
+
+:root[data-skin="terminal"] body[data-bloom="off"] #app::before,
+body[data-bloom="off"] .brand-sub::before,
+body[data-bloom="off"] .dot--live::after { display: none; }

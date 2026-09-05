@@ -1,0 +1,42 @@
+{
+  "name": "bintio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "BINTIO - mensajeria cifrada de punta a punta, sin servidores, con malla Bluetooth y guardar-y-reenviar. Funciona en navegador, en escritorio y desde un solo fichero.",
+  "license": "MIT",
+  "scripts": {
+    "start": "node tools/build.js --con-escritorio && node tools/verify.js && node tools/desktop.js --only-package --soft && node tools/serve.js",
+    "start:lan": "node tools/build.js --con-escritorio && node tools/desktop.js --only-package --soft && node tools/cert.js && node tools/serve.js --https --lan",
+    "start:https": "node tools/build.js --con-escritorio && node tools/desktop.js --only-package --soft && node tools/cert.js && node tools/serve.js --https",
+    "build": "node tools/build.js --con-escritorio && node tools/verify.js && node tools/desktop.js --only-package --soft",
+    "serve": "node tools/serve.js",
+    "cert": "node tools/cert.js",
+    "audit": "node tools/build.js && node tools/cert.js && node tools/audit-headers.js",
+    "test": "node test/crypto.test.js && node test/invite.test.js && node test/qr.test.js && node test/protocol.test.js && node test/mesh.test.js && node test/presentacion.test.js && node tools/build.js && node tools/verify.js && node tools/cert.js && node tools/audit-headers.js",
+    "verify": "node tools/build.js && node tools/verify.js",
+    "desktop": "node tools/desktop.js --run",
+    "desktop:build": "node tools/desktop.js",
+    "desktop:setup": "node tools/desktop.js --setup",
+    "build:web": "node tools/build.js",
+    "seed": "node tools/seed.js",
+    "bench": "node tools/bench.js",
+    "logo": "node tools/logo.js"
+  },
+  "devDependencies": {
+    "@neutralinojs/neu": "^11.7.2",
+    "qrcode": "^1.5.4",
+    "terser": "^5.51.2"
+  },
+  "author": "BINTIO",
+  "keywords": [
+    "mensajeria",
+    "cifrado",
+    "punta a punta",
+    "sin servidores",
+    "malla",
+    "bluetooth",
+    "privacidad",
+    "pwa",
+    "offline"
+  ]
+}

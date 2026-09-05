@@ -1,0 +1,314 @@
+/* ==========================================================================
+   Estructura: barra superior, escenario, barra de estado.
+   Movil y escritorio comparten el mismo arbol; solo cambia si el panel de
+   conversaciones esta al lado o encima.
+   ========================================================================== */
+
+#app {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+
+/* ----------------------------------------------------------------- barra */
+#menubar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: var(--bar-h);
+    padding: 0 12px 0 16px;
+    background: var(--bg-1);
+    border-bottom: 1px solid var(--line);
+    flex: 0 0 auto;
+    -webkit-user-select: none;
+    user-select: none;
+    position: relative;
+    z-index: 500;
+}
+
+/* La marca de la cabecera: el logo y el nombre, en esa fila. El logo va de
+   fondo y no en un <img> para que la imagen viaje una sola vez en la pagina
+   -la usan la cabecera y la portada- y para que no haya nada que se pueda
+   arrastrar ni abrir en una pestana nueva. */
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 13px;
+    letter-spacing: var(--brand-track);
+    color: var(--text-hot);
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+.brand b {
+    color: rgb(var(--ice-hot));
+    font-weight: 600;
+    text-shadow: var(--text-glow-hot);
+}
+
+/* La coletilla de la marca: en el acabado de casa es una pastilla, que es
+   como se dice "esto es un producto" sin escribir una palabra de mas. */
+.brand-sub {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 10px 2px 8px;
+    font-size: 10.5px;
+    letter-spacing: var(--micro-track);
+    color: var(--text-dim);
+    text-transform: var(--micro-case);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+}
+
+#menubar .spacer { flex: 1; }
+
+/* --------------------------------------------------------------- escenario */
+#stage {
+    flex: 1;
+    position: relative;
+    min-height: 0;
+    display: flex;
+}
+
+.view {
+    display: none;
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+}
+.view.is-active { display: flex; }
+
+/* ------------------------------------------------------------------ paneles */
+.panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: rgba(14, 19, 28, .86);
+    background: var(--panel-bg);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    margin: var(--gap);
+    min-height: 0;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.panel-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: var(--head-h);
+    padding: 0 10px;
+    border-bottom: 1px solid var(--line);
+    background: var(--surface);
+    flex: 0 0 auto;
+    -webkit-user-select: none;
+    user-select: none;
+}
+.panel-title {
+    font-size: var(--pt-size);
+    font-weight: 600;
+    letter-spacing: var(--title-track);
+    text-transform: var(--title-case);
+    color: var(--text-hot);
+    text-shadow: var(--text-glow);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.panel-tools { margin-left: auto; display: flex; gap: 6px; }
+.panel-body { flex: 1; overflow: auto; min-height: 0; -webkit-overflow-scrolling: touch; }
+.panel-foot {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 8px;
+    border-top: 1px solid var(--line);
+    background: var(--surface);
+    flex: 0 0 auto;
+}
+
+/* Corchetes en las esquinas: puro PCSE, y ademas marcan el foco. En el
+   acabado de casa no salen: con esquinas redondeadas se pelean, y una tarjeta
+   limpia dice mas que cuatro angulos encendidos. El marcado se queda por si
+   se cambia de tema en caliente. */
+.bracket {
+    display: none;
+    position: absolute;
+    width: 9px; height: 9px;
+    border: 0 solid rgba(var(--ice), .9);
+    box-shadow: 0 0 12px rgba(var(--ice), calc(.28 * var(--bloom)));
+    pointer-events: none;
+}
+:root[data-skin="terminal"] .bracket { display: block; }
+.bracket--tl { top: -1px; left: -1px; border-top-width: 1px; border-left-width: 1px; }
+.bracket--tr { top: -1px; right: -1px; border-top-width: 1px; border-right-width: 1px; }
+.bracket--bl { bottom: -1px; left: -1px; border-bottom-width: 1px; border-left-width: 1px; }
+.bracket--br { bottom: -1px; right: -1px; border-bottom-width: 1px; border-right-width: 1px; }
+
+/* ------------------------------------------------------- vista principal */
+#view-main { display: none; }
+#view-main.is-active { display: flex; }
+
+#roster-panel { width: 300px; flex: 0 0 auto; margin-right: 0; }
+#chat-panel { flex: 1; min-width: 0; }
+
+/* ------------------------------------------------- vistas de una columna */
+.sheet {
+    flex: 1;
+    overflow: auto;
+    padding: 22px 18px 28px;
+    -webkit-overflow-scrolling: touch;
+}
+.sheet-inner {
+    max-width: 620px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* El hueco de las solicitudes se vacia y se rellena entero desde
+   javascript, asi que tiene que apilar sus bloques igual que apila la hoja
+   que lo contiene. */
+#requests-list { display: flex; flex-direction: column; gap: 16px; }
+
+.block {
+    position: relative;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: rgba(17, 23, 33, .82);
+    background: var(--block-bg);
+    padding: var(--pad);
+}
+.block h2 {
+    font-size: var(--h2-size);
+    font-weight: 600;
+    letter-spacing: var(--title-track);
+    text-transform: var(--title-case);
+    color: var(--text-hot);
+    text-shadow: var(--text-glow);
+    margin-bottom: 12px;
+}
+.block p { margin-bottom: 10px; font-size: 13px; color: var(--text); }
+.block p:last-child { margin-bottom: 0; }
+
+/* ------------------------------------------------------------- portada
+   La primera pantalla es la unica que ve alguien que todavia no ha decidido
+   nada, asi que dice lo que hay en tres golpes: la marca, la promesa y lo que
+   NO se pide. Es marcado plano, sin una linea de javascript detras. */
+.hero {
+    text-align: center;
+    padding: 12px 4px 4px;
+}
+/* El mismo logo de la cabecera, a tamano de portada. Los dos salen de la
+   misma variable, asi que cambiar el logo es cambiar un fichero. */
+.brand-logo,
+.hero-logo {
+    background: var(--logo) center / contain no-repeat;
+}
+
+.brand-logo {
+    flex: 0 0 auto;
+    width: 24px;
+    height: 24px;
+}
+
+.hero-logo {
+    width: 108px;
+    height: 108px;
+    margin: 0 auto 18px;
+}
+
+.hero-mark {
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: var(--brand-track);
+    text-transform: uppercase;
+    color: rgb(var(--ice-hot));
+    text-shadow: var(--text-glow-hot);
+}
+.hero-claim {
+    max-width: 44ch;
+    margin: 10px auto 0;
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--text);
+}
+.chips {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 16px;
+}
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 12px;
+    font-size: 11.5px;
+    letter-spacing: var(--micro-track);
+    text-transform: var(--micro-case);
+    color: var(--text-dim);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+}
+.chip::before {
+    content: "";
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: rgb(var(--ok));
+    box-shadow: 0 0 8px rgba(var(--ok), calc(.7 * var(--bloom)));
+}
+
+/* ---------------------------------------------------------- barra estado */
+#statusbar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    height: var(--status-h);
+    padding: 0 14px;
+    border-top: 1px solid var(--line);
+    background: var(--bg-1);
+    font-size: 10.5px;
+    letter-spacing: var(--micro-track);
+    text-transform: var(--micro-case);
+    color: var(--text-dim);
+    flex: 0 0 auto;
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+    z-index: 500;
+}
+#statusbar .stat b {
+    color: var(--text-hot);
+    font-weight: 600;
+}
+#statusbar .stat.is-live b { color: rgb(var(--ice-hot)); text-shadow: var(--text-glow-hot); }
+
+/* ------------------------------------------------------------------ movil */
+@media (max-width: 720px) {
+    /* En movil el panel de conversaciones ocupa la fila entera. Se hace
+       creciendo, no con width:100%: con el ancho al 100% mas los margenes,
+       el panel se sale de la pantalla por los dos lados. */
+    #roster-panel { width: auto; flex: 1 1 auto; margin: var(--gap); }
+    #view-main.show-chat #roster-panel { display: none; }
+    #view-main:not(.show-chat) #chat-panel { display: none; }
+    #menubar { height: 54px; }
+    .brand-sub { display: none; }
+    .sheet { padding: 16px 12px 22px; }
+    .hero-mark { font-size: 25px; }
+    .hero-logo { width: 84px; height: 84px; margin-bottom: 14px; }
+    .hero-claim { font-size: 13.5px; }
+    #statusbar { gap: 12px; font-size: 9.5px; }
+}
+@media (min-width: 721px) {
+    .only-mobile { display: none !important; }
+}

@@ -1,0 +1,362 @@
+/* ==========================================================================
+   Piezas sueltas: botones, campos, etiquetas, avisos, dialogos.
+
+   Ninguna regla de aqui sabe que acabado esta puesto: las mayusculas, el
+   espaciado, la fuente y el redondeo salen de variables, asi que la misma
+   pieza vale para el escaparate y para el terminal.
+   ========================================================================== */
+
+/* ---------------------------------------------------------------- botones */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: var(--btn-h);
+    padding: 0 14px;
+    font-family: inherit;
+    font-size: var(--btn-size);
+    font-weight: 500;
+    letter-spacing: var(--micro-track);
+    text-transform: var(--micro-case);
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--line-mid);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    white-space: nowrap;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: background .12s, color .12s, box-shadow .12s, border-color .12s;
+}
+.btn:hover {
+    color: var(--text-hot);
+    background: var(--surface-hi);
+    border-color: var(--line-hot);
+}
+.btn:active { background: var(--surface-hi); }
+.btn:disabled { opacity: .4; cursor: not-allowed; box-shadow: none; }
+.btn--primary {
+    color: var(--on-accent);
+    background: rgba(var(--ice), .16);
+    border-color: var(--line-hot);
+    text-shadow: var(--text-glow);
+}
+.btn--ghost { background: transparent; border-color: transparent; }
+.btn--ghost:hover { border-color: var(--line-mid); }
+.btn--danger { color: rgb(var(--danger)); border-color: rgba(var(--danger), .4); background: rgba(var(--danger), .08); }
+.btn--danger:hover { background: rgba(var(--danger), .18); border-color: rgba(var(--danger), .7); }
+.btn--sm { height: calc(var(--btn-h) - 6px); padding: 0 10px; font-size: calc(var(--btn-size) - 1px); }
+.btn--block { width: 100%; }
+
+.btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ---------------------------------------------------------------- campos */
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.field:last-child { margin-bottom: 0; }
+.field label {
+    font-size: 11.5px;
+    font-weight: 500;
+    letter-spacing: var(--micro-track);
+    text-transform: var(--micro-case);
+    color: var(--text-dim);
+}
+.input, textarea.input, select.input {
+    width: 100%;
+    min-height: var(--btn-h);
+    padding: 8px 11px;
+    font-family: inherit;
+    font-size: 13.5px;
+    color: var(--text-hot);
+    background: var(--field-bg);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: border-color .12s, box-shadow .12s;
+}
+.input:focus, textarea.input:focus, select.input:focus {
+    border-color: var(--line-hot);
+    box-shadow: var(--ring);
+}
+.input::-webkit-input-placeholder { color: var(--text-dim); }
+.input::placeholder { color: var(--text-dim); }
+textarea.input { resize: vertical; min-height: 88px; line-height: 1.5; word-break: break-all; }
+
+/* El desplegable se queda sin la flecha del sistema al quitarle el aspecto
+   nativo, y un desplegable que parece un campo de texto es un desplegable que
+   nadie abre. La flecha se dibuja con dos medios cuadrados girados: ni una
+   imagen, ni una fuente de iconos, ni una peticion de mas. */
+select.input {
+    cursor: pointer;
+    padding-right: 32px;
+    background-image:
+        linear-gradient(45deg, transparent 50%, currentColor 50%),
+        linear-gradient(135deg, currentColor 50%, transparent 50%);
+    background-position: calc(100% - 18px) calc(50% + 1px), calc(100% - 13px) calc(50% + 1px);
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+}
+
+/* Y las opciones, pintadas a mano: los navegadores que no miran color-scheme
+   las abrian blancas sobre blanco. */
+select.input option {
+    background-color: var(--bg-2);
+    color: var(--text-hot);
+}
+
+.check {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    cursor: pointer;
+    font-size: 13px;
+}
+.check input { margin-top: 3px; flex: 0 0 auto; accent-color: rgb(var(--ice)); }
+.check span small { display: block; color: var(--text-dim); font-size: 12px; line-height: 1.5; }
+
+/* -------------------------------------------------------------- etiquetas */
+.tag {
+    display: inline-block;
+    padding: 1px 8px;
+    font-size: 10.5px;
+    letter-spacing: var(--micro-track);
+    text-transform: var(--micro-case);
+    border: 1px solid var(--line);
+    color: var(--text-dim);
+    border-radius: var(--radius-pill);
+}
+.tag--ok { color: rgb(var(--ok)); border-color: rgba(var(--ok), .4); }
+.tag--warn { color: rgb(var(--warn)); border-color: rgba(var(--warn), .4); }
+.tag--danger { color: rgb(var(--danger)); border-color: rgba(var(--danger), .4); }
+
+.dot {
+    display: inline-block;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--text-dim);
+    flex: 0 0 auto;
+}
+.dot--live { background: rgb(var(--ok)); box-shadow: 0 0 8px rgba(var(--ok), .8); }
+
+/* Bloque de codigo largo para copiar y pegar. Siempre monoespaciado, pase lo
+   que pase con el acabado. */
+.code {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    font-size: 12px;
+    line-height: 1.65;
+    color: rgb(var(--ice-hot));
+    background: var(--field-bg);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    word-break: break-all;
+    max-height: 168px;
+    overflow: auto;
+    -webkit-user-select: all;
+    user-select: all;
+}
+
+.key-grid {
+    font-size: 14px;
+    letter-spacing: .16em;
+    line-height: 2;
+    color: rgb(var(--ice-hot));
+    word-spacing: .2em;
+    word-break: break-all;
+}
+
+/* ------------------------------------------------------------------ QR */
+.qr-box {
+    display: flex;
+    justify-content: center;
+    padding: 16px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+}
+.qr-box svg { display: block; width: 100%; height: auto; max-width: 260px; image-rendering: pixelated; }
+
+/* El QR de una invitacion lleva un SDP entero dentro: tiene casi el doble de
+   modulos de lado que el de una tarjeta, y a 260 px cada modulo queda tan
+   fino que la camara del otro no lo engancha. Mismo recuadro, mas grande. */
+.qr-box--lg { padding: 10px; }
+.qr-box--lg svg { max-width: 340px; }
+
+/* Un aviso dentro del recuadro del QR. El fondo de ese recuadro es blanco
+   siempre, asi que este texto no puede heredar el color del tema: en los
+   temas oscuros seria blanco sobre blanco. */
+.qr-note {
+    padding: 28px 10px;
+    font-size: 12.5px;
+    line-height: 1.6;
+    text-align: center;
+    color: #333;
+    max-width: 340px;
+}
+
+.qr-scan { width: 100%; max-width: 320px; border: 1px solid var(--line); border-radius: var(--radius); background: #000; }
+
+/* -------------------------------------------------------------- avisos */
+#toasts {
+    position: fixed;
+    left: 50%;
+    bottom: 48px;
+    transform: translateX(-50%);
+    z-index: 9500;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    pointer-events: none;
+    width: 92%;
+    max-width: 480px;
+}
+.toast {
+    padding: 10px 16px;
+    font-size: 13px;
+    letter-spacing: var(--micro-track);
+    color: var(--text-hot);
+    background: var(--bg-2);
+    border: 1px solid var(--line-mid);
+    border-radius: var(--radius-sm);
+    text-align: center;
+    max-width: 100%;
+    word-break: break-word;
+}
+.toast--bad { border-color: rgba(var(--danger), .7); color: rgb(var(--danger)); }
+.toast--ok { border-color: rgba(var(--ok), .6); color: rgb(var(--ok)); }
+
+/* ------------------------------------------------------------- progreso */
+.bar {
+    height: 4px;
+    background: var(--surface-hi);
+    border-radius: var(--radius-pill);
+    overflow: hidden;
+}
+.bar i {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: rgb(var(--ice));
+    border-radius: var(--radius-pill);
+    transition: width .2s linear;
+}
+
+/* ------------------------------------------------------------- listados */
+.list { display: flex; flex-direction: column; }
+.list-item {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 11px 13px;
+    border-bottom: 1px solid var(--line);
+    cursor: pointer;
+    min-height: 58px;
+}
+.list-item:hover { background: var(--surface); }
+.list-item.is-active { background: var(--surface-hi); }
+.list-item .who { flex: 1; min-width: 0; }
+.list-item .who b {
+    display: block;
+    font-weight: 600;
+    font-size: 13.5px;
+    color: var(--text-hot);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.list-item .who small {
+    display: block;
+    font-size: 12px;
+    color: var(--text-dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.list-item .meta { text-align: right; flex: 0 0 auto; }
+.list-item .meta time { display: block; font-size: 10.5px; color: var(--text-dim); }
+.badge {
+    display: inline-block;
+    min-width: 18px;
+    padding: 0 5px;
+    margin-top: 4px;
+    font-size: 10.5px;
+    font-weight: 600;
+    line-height: 17px;
+    text-align: center;
+    color: var(--bg-0);
+    background: rgb(var(--ice-hot));
+    border-radius: 9px;
+}
+
+/* ---------------------------------------------------------- solicitudes
+   La fila que avisa vive en la lista de conversaciones pero no es una de
+   ellas: es una decision sin tomar. Se marca con el ambar de los avisos,
+   que es el color que dice "mira esto" sin decir "esto ha fallado" -una
+   solicitud no es un error- y con el mismo galon de la izquierda que lleva
+   la fila activa, porque repetir un recurso que ya se entiende cuesta
+   menos que inventar otro.
+
+   El galon va a rayas y no macizo por el tema BRASA: alli el acento ya es
+   ambar, y un galon macizo del color de aviso seria el mismo galon que
+   lleva la conversacion abierta, justo encima. La diferencia no puede ser
+   solo de color, tiene que ser de trato.
+
+   Sin halo: esta fila tiene que verse igual con las luces apagadas.
+
+   Y EL AMBAR NO SE PINTA DEBAJO DEL TEXTO. Esta fila llevaba un lavado de
+   fondo, rgba(var(--warn), .08), que subia el negro del fondo y le comia
+   entre 0,6 y 0,8 puntos de contraste a la nota -que es la unica linea que
+   dice cuanta gente esta esperando y que hay que pulsar-: 4,40 en HIELO,
+   4,36 en BRASA, 4,40 en VIOLETA y 4,48 en CARBON, todos por debajo del 4,5
+   que pide WCAG AA, y con el raton encima (.16) por debajo del minimo en
+   los OCHO temas, entre 3,57 y 4,49. Un color con alfa debajo de un texto
+   siempre se paga en contraste, y se paga otra vez cada vez que alguien
+   anade un tema, sin que nada avise. Asi que el aviso se sube a donde no
+   hay nada que leer -el galon, ahora de 4 px, y la linea de abajo tenida de
+   ambar- y la nota se lee con --text, no con --text-dim: no es texto
+   secundario, es lo que hay que leer. El peor de los ocho temas queda en
+   6,11:1 con el raton encima. */
+.list-item--req {
+    position: relative;
+    border-bottom-color: rgba(var(--warn), .45);
+}
+/* Sin regla propia de :hover: hereda la de cualquier fila (var(--surface)),
+   que es un velo del acento y no un segundo lavado ambar. */
+.list-item--req .who small { color: var(--text); }
+.list-item--req::before {
+    content: "";
+    position: absolute;
+    top: 0; bottom: 0; left: 0;
+    /* Un pixel mas ancho que antes: es lo que devuelve la presencia que se
+       perdio al quitar el lavado, y aqui no hay ni una letra encima. */
+    width: 4px;
+    /* Las rayas se escriben con dos paradas por color y no con la forma
+       corta (color 0 4px), que es de CSS Images 4 y no llego a Firefox
+       hasta 2020. El dibujo es exactamente el mismo y aqui se publica
+       para navegadores de los ultimos diez anos, igual que el ES5. */
+    background: repeating-linear-gradient(180deg,
+        rgb(var(--warn)), rgb(var(--warn)) 4px,
+        transparent 4px, transparent 8px);
+}
+
+.empty-msg {
+    padding: 44px 22px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+/* ------------------------------------------------------------- utilidades
+   Cuatro clases de separacion. Existen porque la politica de seguridad de
+   contenido prohibe los estilos en linea: sin ellas habria que escribir
+   style="margin-top:12px" y el navegador lo bloquearia. */
+.mt-s { margin-top: 8px; }
+.mt-m { margin-top: 10px; }
+.mt-l { margin-top: 12px; }
+.spacer { flex: 1; }

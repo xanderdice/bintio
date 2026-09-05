@@ -1,0 +1,225 @@
+/* ==========================================================================
+   Temas.
+
+   Todos se activan con data-theme en <html>. Como el color entero sale de
+   --ice, --ice-hot, --ember y --deep, un tema son ocho lineas; lo demas son
+   retoques de ambiente.
+
+   BINTIO  el de casa, azul de confianza y acabado de escaparate (no necesita
+           bloque: es el de 00-tokens.css)
+   NEON    el rojo de siempre, con todo el cromado CRT encendido
+   ICE     azul clinico, el lenguaje original de PCSE
+   MATRIX  verde de fosforo
+   EMBER   ambar de terminal antiguo
+   VIOLET  purpura de noche
+   CARBON  gris sin brillo, para pantallas malas y baterias justas
+   PAPER   claro y de mucho contraste, para leer al sol o con poca vista
+
+   Menos el de casa, todos van con data-skin="terminal": monoespaciada,
+   versalitas y esquinas rectas. Quien pone el atributo es 61-ui-theme.js, y
+   ahi esta la lista de cuales lo llevan.
+   ========================================================================== */
+
+/* ---------------------------------------------------------------- NEON
+   El rojo de escaparate con el que crecio BINTIO: negro casi puro, escarlata
+   encendido y un naranja de brasa en los degradados. Sigue aqui entero:
+   cambiar el acabado de casa no es motivo para tirar el que ya funcionaba.
+
+   Ojo con el estado: el acento ya es rojo, asi que "peligro" no puede serlo
+   tambien. Se distingue por tratamiento (rayas de peligro en 70-flourish.css)
+   y por ser mas claro y mas plano que el escarlata de la interfaz. */
+:root[data-theme="neon"] {
+    --ice: 255, 40, 56;
+    --ice-hot: 255, 226, 220;
+    --ember: 255, 138, 62;
+    --deep: 150, 10, 26;
+    --bg-0: #070204;
+    --bg-1: #0d0407;
+    --bg-2: #13060a;
+    --bg-3: #1c0a10;
+    --text: #d9b4b8;
+    --text-dim: #a87d84;
+    --text-hot: #fff3f0;
+    --panel-bg: rgba(17, 5, 9, .84);
+    --block-bg: rgba(14, 4, 7, .8);
+    --ok: 106, 232, 154;
+    --danger: 255, 96, 92;
+    --warn: 255, 196, 120;
+    --haze: .58;
+}
+
+/* ---------------------------------------------------------------- ICE
+   El azul clinico de siempre. */
+:root[data-theme="ice"] {
+    --ice: 143, 216, 232;
+    --ice-hot: 225, 246, 252;
+    --ember: 120, 200, 255;
+    --deep: 18, 62, 86;
+    --bg-0: #04070a;
+    --bg-1: #070d13;
+    --bg-2: #0a121a;
+    --bg-3: #0e1822;
+    --text: #8fa6b1;
+    --text-dim: #70848d;
+    --text-hot: #eafaff;
+    --panel-bg: rgba(6, 13, 19, .72);
+    --block-bg: rgba(6, 13, 19, .6);
+    --haze: 1;
+}
+
+/* ------------------------------------------------------------- MATRIX */
+:root[data-theme="matrix"] {
+    --ice: 0, 255, 65;
+    --ice-hot: 180, 255, 149;
+    --ember: 120, 255, 120;
+    --deep: 6, 84, 26;
+    --bg-0: #0a0a0a;
+    --bg-1: #0c0f0c;
+    --bg-2: #0d120d;
+    --bg-3: #111a11;
+    --text: #0f6;
+    --text-dim: #03ca52;
+    --text-hot: #cfff9a;
+    --panel-bg: rgba(5, 12, 5, .74);
+    --block-bg: rgba(5, 12, 5, .66);
+    --haze: 1;
+}
+:root[data-theme="matrix"] body { background: #050805; }
+:root[data-theme="matrix"] body::before {
+    background: repeating-linear-gradient(0deg, rgba(0, 255, 65, .05) 0 1px, transparent 1px 3px);
+}
+
+/* -------------------------------------------------------------- EMBER */
+:root[data-theme="ember"] {
+    --ice: 255, 168, 60;
+    --ice-hot: 255, 226, 170;
+    --ember: 255, 120, 40;
+    --deep: 122, 58, 8;
+    --bg-0: #0b0703;
+    --bg-1: #130c05;
+    --bg-2: #1a1108;
+    --bg-3: #23180c;
+    --text: #b79068;
+    --text-dim: #9d7b58;
+    --text-hot: #ffeccd;
+    --panel-bg: rgba(19, 12, 5, .74);
+    --block-bg: rgba(19, 12, 5, .66);
+    --haze: .8;
+}
+
+/* ------------------------------------------------------------- VIOLET */
+:root[data-theme="violet"] {
+    --ice: 178, 130, 255;
+    --ice-hot: 233, 219, 255;
+    --ember: 255, 120, 220;
+    --deep: 66, 30, 122;
+    --bg-0: #07050e;
+    --bg-1: #0d0918;
+    --bg-2: #120d20;
+    --bg-3: #18122b;
+    --text: #a294c2;
+    --text-dim: #867aa3;
+    --text-hot: #f0e9ff;
+    --panel-bg: rgba(13, 9, 24, .74);
+    --block-bg: rgba(13, 9, 24, .66);
+    --haze: 1;
+}
+
+/* ------------------------------------------------------------- CARBON
+   Sin luz y sin barrido: la version que no cansa y que gasta menos. */
+:root[data-theme="carbon"] {
+    --ice: 190, 198, 204;
+    --ice-hot: 240, 244, 246;
+    --ember: 190, 198, 204;
+    --deep: 60, 66, 70;
+    --bg-0: #0c0d0e;
+    --bg-1: #121415;
+    --bg-2: #17191b;
+    --bg-3: #1d2023;
+    --text: #a8b0b5;
+    --text-dim: #83898d;
+    --text-hot: #eef2f4;
+    --panel-bg: rgba(18, 20, 21, .9);
+    --block-bg: rgba(18, 20, 21, .86);
+    --bloom: .35;
+    --sheen: 0;
+    --haze: 0;
+    --scan: 0;
+    --flicker: none;
+}
+:root[data-theme="carbon"] .bloom-layer,
+:root[data-theme="carbon"] .bloom-ambient { display: none; }
+
+/* -------------------------------------------------------------- PAPER
+   Fondo claro de verdad: para leer a pleno sol y para quien no ve bien el
+   texto tenue sobre negro. Aqui la luz sobra, asi que se apaga entera. */
+:root[data-theme="paper"] {
+    --ice: 20, 84, 120;
+    --ice-hot: 8, 44, 66;
+    --ember: 20, 84, 120;
+    --deep: 8, 44, 66;
+    --bg-0: #eef1f3;
+    --bg-1: #e4e9ec;
+    --bg-2: #dbe1e5;
+    --bg-3: #d2d9de;
+    --line: rgba(20, 84, 120, .28);
+    --line-mid: rgba(20, 84, 120, .45);
+    --line-hot: rgba(20, 84, 120, .8);
+    --text: #24313a;
+    --text-dim: #5a6b76;
+    --text-hot: #0a1a24;
+    --panel-bg: rgba(255, 255, 255, .82);
+    --block-bg: rgba(255, 255, 255, .82);
+    --field-bg: #fff;
+
+    /* Los tres colores de estado se redefinen aqui SIEMPRE. Los de casa estan
+       elegidos para tinta casi negra, y sobre el blanco de este tema el verde
+       daba 1,6:1 y el ambar 1,5:1: invisibles. No es un detalle de estilo, es
+       todo el canal de "esto ha ido bien" y "esto ha fallado" -el informe de
+       compatibilidad del arranque, los avisos de error, el estado de cada
+       mensaje- en el unico tema pensado para quien no ve bien. */
+    --ok: 0, 108, 78;
+    --danger: 178, 0, 34;
+    --warn: 124, 74, 0;
+    --surface: rgba(20, 84, 120, .06);
+    --surface-hi: rgba(20, 84, 120, .12);
+    --bloom: 0;
+    --sheen: 0;
+    --haze: 0;
+    --scan: 0;
+    --flicker: none;
+}
+:root[data-theme="paper"] { color-scheme: light; }
+
+/* La marca y el titulo de la portada se rellenan con un degradado que empieza
+   en BLANCO (70-flourish.css): sobre tinta queda un brillo arriba, pero sobre
+   papel es blanco sobre blanco y la mitad de arriba de las letras desaparece.
+   Aqui se apaga el relleno y se pinta con color plano, que es justo lo que
+   este tema viene a hacer. */
+:root[data-theme="paper"] .brand b,
+:root[data-theme="paper"] .hero-mark {
+    background-image: none;
+    -webkit-text-fill-color: currentColor;
+    color: var(--text-hot);
+}
+:root[data-theme="paper"] body { background: #eef1f3; color: #24313a; }
+:root[data-theme="paper"] .bloom-layer,
+:root[data-theme="paper"] .bloom-ambient { display: none; }
+/* La pista de la barra de fuerza la pone el acabado terminal en negro al 45%
+   (70-flourish.css): sobre una tarjeta blanca es una franja negra. */
+:root[data-theme="paper"] .bar { background: rgba(20, 84, 120, .16); }
+:root[data-theme="paper"] .code { background: #fff; }
+:root[data-theme="paper"] .msg { background: #fff; }
+:root[data-theme="paper"] .msg--out { background: rgba(20, 84, 120, .1); }
+:root[data-theme="paper"] .badge { color: #fff; background: #145478; }
+:root[data-theme="paper"] .toast { background: #fff; }
+
+/* Los temas planos no llevan cromado: ni biseles, ni degradados, ni barridos.
+   Se apaga aqui y no en cada regla, para que anadir un tema plano nuevo sea
+   anadirlo a esta lista y ya. */
+:root[data-theme="carbon"],
+:root[data-theme="paper"] {
+    --bevel: none;
+    --grad-chrome: none;
+    --grad-hot: none;
+}

@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="bintio" data-skin="studio">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; media-src 'self' blob: mediastream:; connect-src 'self'; font-src 'self'; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<title>BINTIO - mensajes cifrados que no pasan por ningun servidor</title>
+
+<!-- ==========================================================================
+     Ficha de la pagina.
+
+     La descripcion es la misma en los tres sitios (buscadores, Open Graph y
+     Twitter) a proposito: si alguien la cambia, tiene que cambiarla entera y
+     no se queda una vista previa diciendo algo distinto que otra.
+
+     Las direcciones van relativas. Si se pasa BINTIO_URL al compilar,
+     tools/build.js las convierte en absolutas, que es lo que necesitan las
+     redes sociales para ir a buscar la imagen.
+     ========================================================================== -->
+<meta name="description" content="Mensajes cifrados de punta a punta que no pasan por ningun servidor. Sin cuentas, sin telefono y sin rastreadores. Funciona hasta sin conexion.">
+<meta name="author" content="BINTIO">
+<meta name="keywords" content="mensajeria cifrada, cifrado de punta a punta, sin servidores, privacidad, malla, bluetooth, guardar y reenviar, PWA, sin conexion, codigo abierto">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="generator" content="BINTIO build">
+<link rel="canonical" href=".">
+
+<!-- Open Graph: Facebook, WhatsApp, Telegram, LinkedIn, Slack, Discord,
+     Signal, Mastodon y todo lo que copie el estandar (que es casi todo). -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BINTIO">
+<meta property="og:locale" content="es_ES">
+<meta property="og:title" content="BINTIO - mensajes cifrados que no pasan por ningun servidor">
+<meta property="og:description" content="Mensajes cifrados de punta a punta que no pasan por ningun servidor. Sin cuentas, sin telefono y sin rastreadores. Funciona hasta sin conexion.">
+<meta property="og:url" content=".">
+<meta property="og:image" content="social.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="BINTIO">
+
+<!-- Twitter / X: la tarjeta grande, que es la que ensena la imagen entera. -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="BINTIO - mensajes cifrados que no pasan por ningun servidor">
+<meta name="twitter:description" content="Mensajes cifrados de punta a punta que no pasan por ningun servidor. Sin cuentas, sin telefono y sin rastreadores. Funciona hasta sin conexion.">
+<meta name="twitter:image" content="social.png">
+<meta name="twitter:image:alt" content="BINTIO">
+
+<!-- Aplicacion instalada: navegador, iOS y Windows. -->
+<meta name="theme-color" content="#0a0d1a">
+<meta name="application-name" content="BINTIO">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="BINTIO">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="msapplication-TileColor" content="#0a0d1a">
+<meta name="msapplication-TileImage" content="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<!-- BUILD:CSS -->
+<link rel="stylesheet" href="css/00-tokens.css">
+<link rel="stylesheet" href="css/10-base.css">
+<link rel="stylesheet" href="css/20-layout.css">
+<link rel="stylesheet" href="css/30-components.css">
+<link rel="stylesheet" href="css/40-chat.css">
+<link rel="stylesheet" href="css/70-flourish.css">
+<link rel="stylesheet" href="css/90-themes.css">
+<!-- /BUILD:CSS -->
+</head>
+<body data-bloom="on">
+
+<div class="bloom-ambient"></div>
+<div class="bloom-layer bloom-layer--core"></div>
+<div class="bloom-layer bloom-layer--halo"></div>
+
+<div id="app">
+
+    <header id="menubar">
+        <div class="brand"><span class="brand-logo" aria-hidden="true"></span><b>BINTIO</b></div>
+        <div class="brand-sub" id="brand-sub">sin servidores</div>
+        <div class="spacer"></div>
+        <button type="button" class="btn btn--sm hidden" id="btn-connect">Conectar</button>
+        <button type="button" class="btn btn--sm hidden" id="btn-settings">Ajustes</button>
+        <button type="button" class="btn btn--sm btn--ghost hidden" id="btn-lock">Cerrar</button>
+    </header>
+
+    <main id="stage">
+
+        <!-- ============================================ ARRANQUE ======= -->
+        <section class="view is-active" id="view-boot">
+            <div class="sheet"><div class="sheet-inner">
+                <div class="block">
+                    <span class="bracket bracket--tl"></span><span class="bracket bracket--tr"></span>
+                    <span class="bracket bracket--bl"></span><span class="bracket bracket--br"></span>
+                    <h2>Comprobando el aparato</h2>
+                    <div id="compat-report"></div>
+                </div>
+            </div></div>
+        </section>
+
+        <!-- ============================================ ACCESO ========= -->
+        <section class="view" id="view-lock">
+            <div class="sheet"><div class="sheet-inner">
+
+                <!-- La portada. Es lo unico que ve alguien que todavia no ha
+                     decidido nada, asi que dice la promesa y, sobre todo, lo
+                     que NO se le va a pedir. Marcado plano: ni una linea de
+                     javascript detras, y desaparece con la vista. -->
+                <div class="hero">
+                    <div class="hero-logo" aria-hidden="true"></div>
+                    <div class="hero-mark">BINTIO</div>
+                    <p class="hero-claim">Mensajes cifrados de punta a punta que no pasan por ningun servidor. Solo tu aparato y el de la otra persona.</p>
+                    <ul class="chips">
+                        <li class="chip">Cifrado de punta a punta</li>
+                        <li class="chip">Sin servidores</li>
+                        <li class="chip">Sin cuentas ni telefono</li>
+                        <li class="chip">Codigo abierto</li>
+                    </ul>
+                </div>
+
+                <div class="block" id="lock-new">
+                    <span class="bracket bracket--tl"></span><span class="bracket bracket--tr"></span>
+                    <span class="bracket bracket--bl"></span><span class="bracket bracket--br"></span>
+                    <h2>Crear tu identidad</h2>
+                    <p>BINTIO no pide telefono, ni correo, ni nombre real. Tu identidad es una clave que se genera aqui dentro y no sale nunca de este aparato.</p>
+                    <p class="dim">La contrase&ntilde;a cifra todo lo que se guarda. <b class="hot">Nadie puede recuperarla</b>: ni nosotros, ni el desarrollador, ni con una orden judicial. Si la pierdes, pierdes los mensajes.</p>
+                    <div class="field">
+                        <label for="new-name">Como quieres que te vean</label>
+                        <input class="input" type="text" id="new-name" maxlength="40" autocomplete="off" spellcheck="false">
+                    </div>
+                    <div class="field">
+                        <label for="new-pass">Contrase&ntilde;a</label>
+                        <input class="input" type="password" id="new-pass" autocomplete="new-password">
+                    </div>
+                    <div class="field">
+                        <label for="new-pass2">Repitela</label>
+                        <input class="input" type="password" id="new-pass2" autocomplete="new-password">
+                    </div>
+                    <div class="bar" id="new-bar"><i></i></div>
+                    <div class="btn-row mt-l">
+                        <button type="button" class="btn btn--primary" id="btn-create">Crear identidad</button>
+                        <button type="button" class="btn btn--ghost" id="btn-show-restore">Ya tengo una</button>
+                    </div>
+                </div>
+
+                <div class="block hidden" id="lock-open">
+                    <span class="bracket bracket--tl"></span><span class="bracket bracket--tr"></span>
+                    <span class="bracket bracket--bl"></span><span class="bracket bracket--br"></span>
+                    <h2>Abrir</h2>
+                    <div class="field">
+                        <label for="open-pass">Contrase&ntilde;a</label>
+                        <input class="input" type="password" id="open-pass" autocomplete="current-password">
+                    </div>
+                    <div class="bar" id="open-bar"><i></i></div>
+                    <div class="btn-row mt-l">
+                        <button type="button" class="btn btn--primary" id="btn-open">Abrir</button>
+                        <button type="button" class="btn btn--ghost" id="btn-show-restore2">Restaurar copia</button>
+                    </div>
+                </div>
+
+                <div class="block hidden" id="lock-restore">
+                    <span class="bracket bracket--tl"></span><span class="bracket bracket--tr"></span>
+                    <span class="bracket bracket--bl"></span><span class="bracket bracket--br"></span>
+                    <h2>Recuperar</h2>
+                    <p class="dim">Con la Llave de Recuperacion vuelves a ser la misma persona en otro aparato, aunque el anterior este en el fondo del mar. Con una copia de seguridad completa recuperas ademas las conversaciones.</p>
+                    <div class="field">
+                        <label for="restore-key">Llave de Recuperacion, o copia de seguridad completa</label>
+                        <textarea class="input" id="restore-key" spellcheck="false" autocomplete="off"></textarea>
+                    </div>
+                    <div class="field">
+                        <label for="restore-pass">Contrase&ntilde;a (la nueva, o la de la copia)</label>
+                        <input class="input" type="password" id="restore-pass" autocomplete="off">
+                    </div>
+                    <div class="bar" id="restore-bar"><i></i></div>
+                    <div class="btn-row mt-l">
+                        <button type="button" class="btn btn--primary" id="btn-restore">Recuperar</button>
+                        <button type="button" class="btn btn--ghost" id="btn-restore-cancel">Volver</button>
+                    </div>
+                </div>
+
+            </div></div>
+        </section>
+
+        <!-- ============================================ PRINCIPAL ====== -->
+        <section class="view" id="view-main">
+
+            <aside class="panel" id="roster-panel">
+                <span class="bracket bracket--tl"></span><span class="bracket bracket--tr"></span>
+                <span class="bracket bracket--bl"></span><span class="bracket bracket--br"></span>
+                <div class="panel-head">
+                    <span class="panel-title">Conversaciones</span>
+                    <div class="panel-tools">
+                        <button type="button" class="btn btn--sm" id="btn-add">+ Contacto</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <!-- Las solicitudes se avisan aqui y se resuelven en su
+                         vista. Va FUERA de #roster-list a proposito:
+                         refreshRoster vacia esa lista y la vuelve a fabricar
+                         entera, y esto no es una conversacion ni puede
+                         ordenarse entre ellas. Una sola fila, la primera: se
+                         ve al abrir la aplicacion, que es cuando se mira
+                         aqui, y no le quita el sitio a nadie.
+
+                         Sin punto de conectado: el punto significa "hay
+                         camino con esta persona" y aqui todavia no hay
+                         ninguna persona. Un punto apagado seria inventarse
+                         un estado. -->
+                    <div class="list-item list-item--req hidden" id="requests-row">
+                        <div class="who">
+                            <b>Quieren escribirte</b>
+                            <small id="requests-row-note"></small>
+                        </div>
+                        <div class="meta">
+                            <span class="badge" id="requests-row-count"></span>
+                        </div>
+                    </div>
+                    <div class="list" id="roster-list"></div>
+                    <div class="empty-msg" id="roster-empty">
+                        Todavia no conoces a nadie.<br>
+                        Pulsa <b class="hot">+ Contacto</b> y pasale tu codigo a alguien.
+                    </div>
+                </div>
+            </aside>
+
+            <section class="panel" id="chat-panel">
+                <span class="bracket bracket--tl"></span><span class="bracket bracket--tr"></span>
+                <span class="bracket bracket--bl"></span><span class="bracket bracket--br"></span>
+                <div class="panel-head">
+                    <button type="button" class="btn btn--sm btn--ghost only-mobile" id="btn-back">&lt;</button>
+                    <div class="peer-head">
+                        <span class="dot" id="peer-dot"></span>
+                        <span class="who">
+                            <b id="peer-name">&mdash;</b>
+                            <small id="peer-fp"></small>
+                        </span>
+                    </div>
+                    <div class="panel-tools">
+                        <button type="button" class="btn btn--sm btn--ghost" id="btn-peer">Ficha</button>
+                    </div>
+                </div>
+                <div class="panel-body" id="chat-body">
+                    <div id="chat-scroll"></div>
+                </div>
+                <div id="composer">
+                    <textarea id="composer-text" rows="1" placeholder="Escribe. Nadie mas lo vera." spellcheck="false"></textarea>
+                    <button type="button" class="btn btn--primary" id="btn-send">Enviar</button>
+                </div>
+            </section>
+
+        </section>
+
+        <!-- ============================================ CONECTAR =======
+             Una sola idea de arriba abajo: los dos se ense&ntilde;an un codigo.
+
+             El primer bloque es SIEMPRE "el codigo que ense&ntilde;as ahora". Lo
+             normal es que sea tu invitacion; cuando alguien te ense&ntilde;a la
+             suya, ese mismo hueco pasa a ense&ntilde;ar tu respuesta, que es el
+             segundo y ultimo paso. Por eso el titulo y el texto de debajo los
+             escribe 66-ui-connect.js y aqui van vacios.
+
+             El segundo bloque es el codigo del otro. No hay un tercer sitio
+             donde "crear un enlace": eso era lo que partia en dos algo que es
+             una sola cosa. -->
+        <section class="view" id="view-connect">
+            <div class="sheet" id="connect-sheet"><div class="sheet-inner">
+
+                <div class="block">
+                    <span class="bracket bracket--tl"></span><span class="bracket bracket--tr"></span>
+                    <span class="bracket bracket--bl"></span><span class="bracket bracket--br"></span>
+                    <h2 id="mine-title">Tu codigo para conectar</h2>
+                    <p class="dim" id="mine-note"></p>
+                    <div class="qr-box qr-box--lg" id="my-qr"></div>
+                    <div class="code mt-l" id="my-code"></div>
+                    <div class="btn-row mt-m">
+                        <button type="button" class="btn" id="btn-copy-code">Copiar</button>
+                        <button type="button" class="btn" id="btn-share-code">Compartir</button>
+                        <button type="button" class="btn btn--ghost hidden" id="btn-show-mine">Volver a mi codigo</button>
+                    </div>
+                    <div id="mine-lock" class="mt-l">
+                        <div class="field">
+                            <label for="meet-pass">Clave de encuentro (opcional)</label>
+                            <input class="input" type="text" id="meet-pass" autocomplete="off" spellcheck="false" placeholder="algo que solo sepais los dos">
+                        </div>
+                        <div class="btn-row">
+                            <button type="button" class="btn btn--sm" id="btn-lock-code">Rehacer con esta clave</button>
+                        </div>
+                        <p class="dim mt-s">Con clave, el codigo va cifrado: si viaja por un chat y alguien lo intercepta, no le sirve de nada. Dile la clave por otra via, no en el mismo mensaje. Ense&ntilde;ando el QR en persona no hace falta.</p>
+                    </div>
+                </div>
+
+                <div class="block">
+                    <span class="bracket bracket--tl"></span><span class="bracket bracket--tr"></span>
+                    <span class="bracket bracket--bl"></span><span class="bracket bracket--br"></span>
+                    <h2>Su codigo</h2>
+                    <p class="dim">Escanea el QR que te ense&ntilde;en, o pega el codigo que te pasen. Vale cualquiera de los tres (invitacion, respuesta o tarjeta): BINTIO sabe cual es y hace lo que toca.</p>
+                    <div class="btn-row">
+                        <button type="button" class="btn" id="btn-scan">Escanear su QR</button>
+                    </div>
+                    <div id="scan-area" class="hidden mt-l">
+                        <video class="qr-scan" id="scan-video" playsinline muted></video>
+                        <div class="btn-row mt-s">
+                            <button type="button" class="btn btn--sm" id="btn-scan-stop">Parar</button>
+                        </div>
+                    </div>
+                    <div class="field mt-l">
+                        <label for="paste-code">O pega aqui su codigo</label>
+                        <textarea class="input" id="paste-code" spellcheck="false" autocomplete="off"></textarea>
+                    </div>
+                    <div class="field">
+                        <label for="paste-pass">Clave de encuentro (solo si os la habeis puesto)</label>
+                        <input class="input" type="text" id="paste-pass" autocomplete="off" spellcheck="false">
+                    </div>
+                    <!-- El boton va DEBAJO del cuadro, no encima: actua sobre lo
+                         que se acaba de pegar, y un boton que manda sobre algo
+                         que todavia no has escrito no se entiende. -->
+                    <div class="btn-row">
+                        <button type="button" class="btn btn--primary" id="btn-use-code">Usar el codigo pegado</button>
+                    </div>
+                    <div id="use-note" class="hidden mt-l">
+                        <p class="dim" id="use-note-text"></p>
+                        <div class="btn-row mt-s">
+                            <button type="button" class="btn btn--sm btn--ghost" id="btn-note-chat">Ver la conversacion</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="block">
+                    <span class="bracket bracket--tl"></span><span class="bracket bracket--tr"></span>
+                    <span class="bracket bracket--bl"></span><span class="bracket bracket--br"></span>
+                    <h2>Sin codigos: Bluetooth</h2>
+                    <p class="dim">Si cerca hay un nodo BINTIO de verdad (la version de escritorio, un movil con la aplicacion nativa o un cacharro con el perfil), engancharse a el abre camino sin pasarse nada. Dos pesta&ntilde;as de navegador no se ven asi: ningun navegador puede anunciarse por Bluetooth.</p>
+                    <div class="btn-row">
+                        <button type="button" class="btn" id="btn-ble">Buscar por Bluetooth</button>
+                    </div>
+                </div>
+
+                <div class="btn-row">
+                    <button type="button" class="btn btn--ghost" id="btn-connect-back">Volver</button>
+                </div>
+
+            </div></div>
+        </section>
+
+        <!-- ============================================ FICHA ========== -->
+        <section class="view" id="view-peer">
+            <div class="sheet"><div class="sheet-inner">
+                <div class="block">
+                    <span class="bracket bracket--tl"></span><span class="bracket bracket--tr"></span>
+                    <span class="bracket bracket--bl"></span><span class="bracket bracket--br"></span>
+                    <h2 id="peer-title">Contacto</h2>
+                    <div class="field">
+                        <label for="peer-alias">Como lo llamas tu</label>
+                        <input class="input" type="text" id="peer-alias" maxlength="40" autocomplete="off">
+                    </div>
+                    <p class="dim">Comparad esta huella en persona o por telefono. Si coincide, nadie se ha colado en medio. Es la unica comprobacion que de verdad importa.</p>
+                    <div class="key-grid" id="peer-fingerprint"></div>
+                    <label class="check mt-m">
+                        <input type="checkbox" id="peer-verified">
+                        <span>He comparado la huella y coincide
+                            <small>Marca esto solo si lo has comprobado por un canal distinto a este.</small>
+                        </span>
+                    </label>
+                    <div class="btn-row mt-l">
+                        <button type="button" class="btn" id="btn-peer-save">Guardar</button>
+                        <button type="button" class="btn btn--danger" id="btn-peer-clear">Borrar conversacion</button>
+                        <button type="button" class="btn btn--danger" id="btn-peer-remove">Eliminar contacto</button>
+                        <button type="button" class="btn btn--ghost" id="btn-peer-back">Volver</button>
+                    </div>
+                </div>
+            </div></div>
+        </section>
+
+        <!-- ============================================ SOLICITUDES ====
+             Un sobre de presentacion no a&ntilde;ade a nadie: deja aqui un
+             nombre, una huella y una frase, y decide el usuario.
+
+             Vista propia y no una tarjeta dentro de la lista: hay que leer
+             una huella de veinte caracteres y compararla con la que te
+             digan por telefono. Eso pide sitio y calma, y con tres
+             solicitudes enterraria las conversaciones de verdad. En la
+             lista solo queda la fila que trae hasta aqui. -->
+        <section class="view" id="view-requests">
+            <div class="sheet"><div class="sheet-inner">
+
+                <div class="block">
+                    <span class="bracket bracket--tl"></span><span class="bracket bracket--tr"></span>
+                    <span class="bracket bracket--bl"></span><span class="bracket bracket--br"></span>
+                    <h2>Quieren escribirte</h2>
+                    <p>Alguien te ha escrito sin que lo tuvieras a&ntilde;adido. Su mensaje venia cifrado para tu clave y solo este aparato ha podido abrirlo. No entra en tus conversaciones hasta que tu lo aceptes.</p>
+                    <p class="dim">El nombre se lo pone quien escribe: puede poner el que quiera y no se comprueba. La huella si se comprueba, y es lo unico que se comprueba. Las horas son las de llegada a este aparato, no las que venian escritas dentro del sobre.</p>
+                </div>
+
+                <div id="requests-list"></div>
+
+                <!-- Aceptar la ultima ya no lleva solo a la conversacion: abrir
+                     una conversacion es leerla, y leerla manda un acuse al otro
+                     lado con la hora exacta (ver 68-ui-requests.js). Asi que
+                     aqui se dice donde han quedado y por donde se sale. -->
+                <div class="empty-msg hidden" id="requests-empty">No queda ninguna solicitud.<br>Lo que aceptes aparece en tus conversaciones.</div>
+
+                <div class="btn-row">
+                    <button type="button" class="btn btn--ghost" id="btn-requests-back">Volver</button>
+                </div>
+
+            </div></div>
+        </section>
+
+        <!-- ============================================ AJUSTES ======== -->
+        <section class="view" id="view-settings">
+            <div class="sheet"><div class="sheet-inner">
+
+                <div class="block">
+                    <span class="bracket bracket--tl"></span><span class="bracket bracket--tr"></span>
+                    <span class="bracket bracket--bl"></span><span class="bracket bracket--br"></span>
+                    <h2>Tu identidad</h2>
+                    <div class="field">
+                        <label for="me-name">Nombre visible</label>
+                        <input class="input" type="text" id="me-name" maxlength="40" autocomplete="off">
+                    </div>
+                    <p class="dim">Tu huella. Quien te la lea puede comprobar que habla contigo y no con un impostor.</p>
+                    <div class="key-grid" id="me-fingerprint"></div>
+                    <div class="btn-row mt-l">
+                        <button type="button" class="btn" id="btn-save-name">Guardar nombre</button>
+                    </div>
+                </div>
+
+                <div class="block">
+                    <span class="bracket bracket--tl"></span><span class="bracket bracket--tr"></span>
+                    <span class="bracket bracket--bl"></span><span class="bracket bracket--br"></span>
+                    <h2>Aspecto</h2>
+                    <div class="field">
+                        <label for="set-theme">Tema</label>
+                        <select class="input" id="set-theme">
+                            <option value="bintio">Bintio (por defecto)</option>
+                            <option value="neon">Neon (rojo)</option>
+                            <option value="ice">Hielo</option>
+                            <option value="matrix">Matrix</option>
+                            <option value="ember">Brasa</option>
+                            <option value="violet">Violeta</option>
+                            <option value="carbon">Carbon (sin efectos)</option>
+                            <option value="paper">Papel (claro)</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="set-bloom">Luz y efectos</label>
+                        <select class="input" id="set-bloom">
+                            <option value="on">Completos</option>
+                            <option value="soft">Suaves</option>
+                            <option value="off">Apagados (mas bateria)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="block">
+                    <span class="bracket bracket--tl"></span><span class="bracket bracket--tr"></span>
+                    <span class="bracket bracket--bl"></span><span class="bracket bracket--br"></span>
+                    <h2>La malla</h2>
+                    <label class="check">
+                        <input type="checkbox" id="set-relay">
+                        <span>Llevar mensajes de otros
+                            <small>Tu aparato guarda y reparte sobres ajenos que no puede leer. Es lo que hace que un mensaje llegue a alguien que estaba apagado. Si lo quitas, tu si usaras la malla pero no la sostendras.</small>
+                        </span>
+                    </label>
+                    <label class="check">
+                        <input type="checkbox" id="set-receipts">
+                        <span>Enviar acuses de recibo
+                            <small>Avisar de que has recibido y leido. Quitalo si prefieres no decir cuando estas.</small>
+                        </span>
+                    </label>
+                    <label class="check">
+                        <input type="checkbox" id="set-inbox">
+                        <span>Dejar que te escriban sin tenerlos a&ntilde;adidos
+                            <small>Con esto puesto, cualquiera que tenga tu codigo puede mandarte un primer mensaje y te llega como solicitud, con su nombre y su huella, para que aceptes o descartes. Sin esto -que es como viene- para escribirte hay que estar en tu lista: tienes que a&ntilde;adirlo tu antes. Ojo: ese primer mensaje no va autenticado, asi que el nombre lo pone quien escribe hasta que compruebes la huella.</small>
+                        </span>
+                    </label>
+                    <div class="field mt-m">
+                        <label for="set-stun">Servidor STUN (opcional, vacio = ninguno)</label>
+                        <input class="input" type="text" id="set-stun" spellcheck="false" autocomplete="off" placeholder="stun:ejemplo.org:3478">
+                    </div>
+                    <p class="dim">Sin STUN funcionan la red local, el cable y compartir datos desde el movil. Con uno, tambien enlaces a traves de internet, a cambio de que ese servidor vea que dos direcciones IP se buscan. Tu decides; por defecto no hay ninguno.</p>
+                    <div class="btn-row mt-m">
+                        <button type="button" class="btn" id="btn-save-net">Guardar</button>
+                        <button type="button" class="btn btn--danger" id="btn-empty-bag">Vaciar la mochila</button>
+                    </div>
+                    <p class="dim mt-s" id="bag-info"></p>
+                </div>
+
+                <div class="block">
+                    <span class="bracket bracket--tl"></span><span class="bracket bracket--tr"></span>
+                    <span class="bracket bracket--bl"></span><span class="bracket bracket--br"></span>
+                    <h2>Copias y recuperacion</h2>
+                    <p class="dim">La Llave de Recuperacion es tu identidad en 56 caracteres. Escribela en papel y guardala lejos del aparato. Quien la tenga puede hacerse pasar por ti.</p>
+                    <div class="btn-row">
+                        <button type="button" class="btn" id="btn-show-key">Ver la llave</button>
+                        <button type="button" class="btn" id="btn-backup">Descargar copia cifrada</button>
+                    </div>
+                    <div id="key-out" class="hidden mt-l">
+                        <div class="key-grid" id="key-value"></div>
+                    </div>
+                </div>
+
+                <div class="block">
+                    <span class="bracket bracket--tl"></span><span class="bracket bracket--tr"></span>
+                    <span class="bracket bracket--bl"></span><span class="bracket bracket--br"></span>
+                    <h2>Este aparato</h2>
+                    <div id="tech-report"></div>
+                    <div class="btn-row mt-l">
+                        <button type="button" class="btn btn--danger" id="btn-panic">Borrar todo de este aparato</button>
+                    </div>
+                </div>
+
+                <div class="btn-row">
+                    <button type="button" class="btn btn--ghost" id="btn-settings-back">Volver</button>
+                </div>
+
+            </div></div>
+        </section>
+
+    </main>
+
+    <footer id="statusbar">
+        <span class="stat" id="st-links">Enlaces <b>0</b></span>
+        <span class="stat" id="st-bag">Mochila <b>0</b></span>
+        <span class="stat" id="st-contacts">Contactos <b>0</b></span>
+        <span class="stat" id="st-store">Disco <b>0 KB</b></span>
+        <span class="spacer"></span>
+        <span class="stat" id="st-mode"></span>
+    </footer>
+
+</div>
+
+<div id="toasts"></div>
+
+<!-- BUILD:JS -->
+<script src="js/00-ns.js"></script>
+<script src="js/01-compat.js"></script>
+<script src="js/10-util.js"></script>
+<script src="js/20-sha256.js"></script>
+<script src="js/21-kdf.js"></script>
+<script src="js/22-chacha.js"></script>
+<script src="js/23-x25519.js"></script>
+<script src="js/24-box.js"></script>
+<script src="js/30-identity.js"></script>
+<script src="js/31-vault.js"></script>
+<script src="js/32-envelope.js"></script>
+<script src="js/33-contacts.js"></script>
+<script src="js/34-session.js"></script>
+<script src="js/35-mesh.js"></script>
+<script src="js/36-chat.js"></script>
+<script src="js/37-presenta.js"></script>
+<script src="js/40-transport.js"></script>
+<script src="js/41-transport-local.js"></script>
+<script src="js/42-transport-rtc.js"></script>
+<script src="js/43-transport-ble.js"></script>
+<script src="js/44-invite.js"></script>
+<script src="js/45-qr.js"></script>
+<script src="js/50-app.js"></script>
+<script src="js/60-ui-dom.js"></script>
+<script src="js/61-ui-theme.js"></script>
+<script src="js/62-ui-qr.js"></script>
+<script src="js/63-ui-lock.js"></script>
+<script src="js/64-ui-roster.js"></script>
+<script src="js/65-ui-chat.js"></script>
+<script src="js/66-ui-connect.js"></script>
+<script src="js/67-ui-settings.js"></script>
+<script src="js/68-ui-requests.js"></script>
+<script src="js/99-boot.js"></script>
+<!-- /BUILD:JS -->
+
+</body>
+</html>
