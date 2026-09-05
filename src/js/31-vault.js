@@ -23,6 +23,21 @@
     var key = null;          /* clave de cifrado en memoria, nunca en disco */
     var saveTimer = null;
 
+    /* Lo que ocupa el blob en disco, apuntado en vez de medido.
+
+       Medirlo era leerlo entero: sizeBytes() hacia un get() de localStorage,
+       que devuelve la boveda completa -cientos de kilobytes cuando hay
+       conversaciones- para quedarse solo con .length y tirar la cadena. Eso lo
+       llama la barra de estado, y la barra de estado se repasa cada cuatro
+       segundos: novecientas lecturas completas por hora, sincronas y en el
+       hilo de la interfaz.
+
+       La longitud solo cambia cuando escribimos nosotros, asi que se apunta al
+       escribir y se devuelve de memoria. -1 es "todavia no se ha mirado". */
+    var tamano = -1;
+
+    function apuntar(blob) { tamano = blob ? blob.length : 0; }
+
     Vault.state = null;      /* objeto plano; lo lee y escribe el resto de la app */
 
     /* ---------------------------------------------------------------------
@@ -129,7 +144,9 @@
     };
 
     Vault.unlock = function (pass, onProgress, cb) {
-        var rec = decode(be().get(STORE_KEY));
+        var crudo = be().get(STORE_KEY);
+        apuntar(crudo);
+        var rec = decode(crudo);
         if (!rec) { cb(new Error('No hay ninguna boveda en este dispositivo')); return; }
         C.pbkdf2Async(pass, rec.salt, rec.iters, 32, onProgress, function (k) {
             var plain = C.open(k, rec.nonce, U.fromString('bintio/vault/v1'), rec.ct);
@@ -164,7 +181,9 @@
         try {
             var k = sessionStorage.getItem(SESSION_KEY);
             if (!k) { return false; }
-            var rec = decode(be().get(STORE_KEY));
+            var crudo = be().get(STORE_KEY);
+            apuntar(crudo);
+            var rec = decode(crudo);
             if (!rec) { return false; }
             var kk = U.fromB64(k);
             var plain = C.open(kk, rec.nonce, U.fromString('bintio/vault/v1'), rec.ct);
@@ -191,7 +210,9 @@
         var ct = C.seal(key, nonce, U.fromString('bintio/vault/v1'), plain);
         U.wipe(plain);
         try {
-            be().set(STORE_KEY, encode(salt, ITERS, nonce, ct));
+            var blob = encode(salt, ITERS, nonce, ct);
+            be().set(STORE_KEY, blob);
+            apuntar(blob);
             Vault.lastError = null;
         } catch (e) {
             /* Cuota agotada: el llamante decide si podar historial. */
@@ -218,13 +239,15 @@
         return be().get(STORE_KEY) || '';
     };
     Vault.importBackup = function (text, pass, onProgress, cb) {
-        var rec = decode(text.replace(/\s+/g, ''));
+        var limpio = text.replace(/\s+/g, '');
+        var rec = decode(limpio);
         if (!rec) { cb(new Error('Ese texto no es una copia de BINTIO')); return; }
         C.pbkdf2Async(pass, rec.salt, rec.iters, 32, onProgress, function (k) {
             var plain = C.open(k, rec.nonce, U.fromString('bintio/vault/v1'), rec.ct);
             if (!plain) { U.wipe(k); cb(new Error('Contrase\u00f1a incorrecta para esa copia')); return; }
             try {
-                be().set(STORE_KEY, text.replace(/\s+/g, ''));
+                be().set(STORE_KEY, limpio);
+                apuntar(limpio);
                 key = k;
                 Vault.state = JSON.parse(U.toString(plain));
                 Vault.state.saltHint = U.toB64(rec.salt);
@@ -235,16 +258,17 @@
 
     /* Borrado de panico: deja el aparato como si BINTIO nunca hubiera estado. */
     Vault.destroy = function () {
-        try { be().del(STORE_KEY); } catch (e) {}
+        try { be().del(STORE_KEY); apuntar(null); } catch (e) {}
         try { if (typeof sessionStorage !== 'undefined') { sessionStorage.removeItem(SESSION_KEY); } } catch (e) {}
         if (key) { U.wipe(key); }
         key = null;
         Vault.state = null;
     };
 
-    /* Tamano aproximado en disco, para avisar antes de llenar la cuota. */
+    /* Tamano aproximado en disco, para avisar antes de llenar la cuota. Sale
+       de lo apuntado al escribir; solo la primera vez hay que ir a mirarlo. */
     Vault.sizeBytes = function () {
-        var s = be().get(STORE_KEY);
-        return s ? s.length : 0;
+        if (tamano < 0) { apuntar(be().get(STORE_KEY)); }
+        return tamano;
     };
 })(BINTIO);

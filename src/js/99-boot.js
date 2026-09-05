@@ -165,6 +165,7 @@
         wireApp();
         registerWorker();
         anchorManifest();
+        D.on(document, 'visibilitychange', latido);
 
         if (!compatReport()) { return; }
 
@@ -182,7 +183,37 @@
             consumeHash();
         }, 450);
 
-        setInterval(function () { D.refreshStatus(); }, 4000);
+        latido();
+    }
+
+    /* ================================================================ LATIDO
+       El unico reloj de la interfaz: repasar la barra de abajo.
+
+       Aqui no hay ni una consulta periodica de mensajes. Nada de "mirar si ha
+       llegado algo" cada pocos segundos, que es de donde sale casi toda la
+       bateria que gastan las aplicaciones de mensajeria. Lo que llega despierta
+       a la interfaz por evento -el canal de datos, el bluetooth o el
+       BroadcastChannel entre pestanas- y lo unico que corre solo es el minuto
+       de mantenimiento de 50-app.js, que es el suelo al que los navegadores
+       estrangulan cualquier temporizador en segundo plano.
+
+       Quedaba este repaso de cuatro segundos, y corria siempre: con la ventana
+       tapada, minimizada o el movil en el bolsillo son novecientos despertares
+       a la hora para redibujar algo que nadie esta mirando. Asi que se PARA
+       mientras la pagina esta oculta y se reanuda al volver, con un repaso
+       inmediato para que no se vean numeros viejos ni un parpadeo.
+
+       Si el navegador es tan viejo que no sabe decir si la pagina se ve,
+       document.hidden no es true y todo sigue como antes. */
+    var reloj = null;
+
+    function latido() {
+        if (document.hidden === true) {
+            if (reloj) { clearInterval(reloj); reloj = null; }
+            return;
+        }
+        D.refreshStatus();
+        if (!reloj) { reloj = setInterval(function () { D.refreshStatus(); }, 4000); }
     }
 
     if (document.readyState === 'complete' || document.readyState === 'interactive') {

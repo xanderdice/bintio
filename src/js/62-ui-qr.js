@@ -165,6 +165,13 @@
 
     function tick(video, onFound) {
         if (!running) { return; }
+        /* Con la ventana tapada no hay nada que leer. La camara sigue abierta
+           -cerrarla obligaria a volver a pedir permiso al volver- pero el
+           analisis de imagen, que es lo caro, se queda parado. */
+        if (document.hidden === true) {
+            setTimeout(function () { tick(video, onFound); }, 500);
+            return;
+        }
         detector.detect(video).then(function (codes) {
             if (!running) { return; }
             if (codes && codes.length) {

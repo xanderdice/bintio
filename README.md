@@ -722,6 +722,34 @@ Ninguno de los dos toca lo que se publica: son del compilador, no de la
 aplicacion. El dia que Neutralino actualice sus dependencias, se borran las dos
 lineas de `overrides` y ya esta.
 
+### La ventana no se recuerda a proposito
+
+En `neutralino.config.json` la ventana lleva `"useSavedState": false`, y no es
+una manía: con el valor de serie (`true`) Neutralino guarda la posicion y el
+tamano al cerrar, en `.tmp/window_state.config.json` al lado del ejecutable, y
+los vuelve a poner al abrir. El problema es **que hora los guarda**. Si se
+cierra la aplicacion estando minimizada, lo que apunta es esto:
+
+```json
+{"width":237,"height":39,"x":-32000,"y":-32000, ...}
+```
+
+`-32000,-32000` es donde Windows aparca las ventanas minimizadas. A partir de
+ahi, cada vez que se abre la aplicacion la ventana se coloca ahi: el proceso
+arranca, la aplicacion funciona, y **no se ve nada**. Ni se puede arreglar
+desde la propia aplicacion, porque no hay ventana que tocar, ni lo va a
+encontrar nadie: el fichero esta en una carpeta oculta al lado del ejecutable.
+
+Medido: cerrar sin tocar nada guarda `1120x760` y reabre bien; redimensionar y
+cerrar guarda el tamano nuevo y reabre bien; **minimizar y cerrar deja la
+ventana invisible para siempre**. Con `useSavedState` apagado, la ventana sale
+donde dice esta configuracion -1120x760 y centrada- pase lo que pase, y un
+fichero de estado ya envenenado se ignora sin mas.
+
+Se pierde recordar el tamano entre sesiones. A cambio, la aplicacion siempre se
+ve, que es bastante mas importante en un ejecutable suelto que se reparte por
+ahi.
+
 Todo queda dentro de `dist/`, al lado del `index.html` y del `sw.js`:
 
 | Fichero | Sistema |

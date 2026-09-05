@@ -57,6 +57,15 @@
         if (D.refreshRequests) { D.refreshRequests(); }
     };
 
+    /* Lo ultimo que se pinto en la barra de abajo. La barra se repasa cada
+       cuatro segundos y en regimen normal no cambia NADA entre repaso y
+       repaso: mismos enlaces, misma mochila, mismos contactos. Repintarla
+       igualmente eran seis borrados y once nodos nuevos cada cuatro segundos,
+       con su calculo de estilo y su pintada, para dejar la pantalla
+       exactamente como estaba. Ahora se compara antes y casi siempre se sale
+       por la puerta de al lado. */
+    var pintado = null;
+
     D.refreshStatus = function () {
         /* Con la boveda cerrada no se sale sin mas: se BORRA. Salir dejaba en
            pantalla los ultimos numeros del dueno -cuantos contactos tiene,
@@ -65,6 +74,8 @@
            aparato despues. Es poco, pero es exactamente lo que esta aplicacion
            promete no ensenar. */
         if (!V.app.ready) {
+            if (pintado === 'cerrada') { return; }
+            pintado = 'cerrada';
             var ids = ['st-links', 'st-bag', 'st-contacts', 'st-store', 'st-mode'];
             for (var i = 0; i < ids.length; i++) {
                 var el = D.$(ids[i]);
@@ -73,6 +84,13 @@
             return;
         }
         var s = V.app.status();
+
+        /* Todo lo que la barra ensena, y nada mas: si esta firma no ha
+           cambiado, lo que hay en pantalla ya es correcto. */
+        var firma = [s.peers, s.rtc, s.ble, s.local, s.carrying,
+                     s.contacts, s.storage, s.persistent].join('|');
+        if (firma === pintado) { return; }
+        pintado = firma;
 
         var links = D.$('st-links');
         D.clear(links);
