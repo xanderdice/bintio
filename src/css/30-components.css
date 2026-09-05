@@ -144,6 +144,50 @@ select.input option {
    se reserva igual para que los nombres de la lista queden alineados. */
 .dot--none { background: transparent; }
 
+/* --------------------------------------------------------------- cortina
+
+   La pantalla protegida. Opaca de verdad -nada de opacidad al 90%, que deja
+   leer los titulares- y por encima de todo, avisos incluidos: una cortina que
+   algo tapa a medias no tapa nada.
+
+   Sin transicion al aparecer. Doscientas milesimas de desvanecido son
+   doscientas milesimas de conversacion legible en la imagen, que es justo lo
+   que viene a evitar. Al quitarse si puede ir suave, pero no hace falta. */
+.shield {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 9800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+    background: var(--bg-0, #06070f);
+    /* Por si el tema no define --bg-0: una cortina translucida seria peor que
+       ninguna, asi que el respaldo es negro y no "transparente". */
+}
+.shield-inner { max-width: 34ch; }
+.shield-logo {
+    width: 76px; height: 76px;
+    margin: 0 auto 16px;
+    background: var(--logo) center / contain no-repeat;
+    opacity: .55;
+}
+.shield-inner b {
+    display: block;
+    font-size: 13px;
+    letter-spacing: var(--brand-track);
+    text-transform: uppercase;
+    color: rgb(var(--ice-hot));
+}
+.shield-inner small {
+    display: block;
+    margin-top: 10px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--text-dim);
+}
+
 /* ------------------------------------------------------------- el vinculo
 
    Dos anillos. Si se tocan, hay cadena; si estan separados, no la hay. Se lee

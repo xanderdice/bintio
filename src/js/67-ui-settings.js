@@ -26,6 +26,15 @@
         D.$('set-relay').checked = s.relay !== false;
         D.$('set-receipts').checked = s.receipts !== false;
         D.$('set-typing').checked = s.typing !== false;
+        D.$('set-shield').checked = s.shield !== false;
+        /* En el ejecutable blindado la frase de arriba se queda corta: ahi la
+           ventana no sale en NINGUNA captura, y lo aplica Windows. */
+        if (D.pantallaBlindada && D.pantallaBlindada()) {
+            D.text(D.$('set-shield-note'),
+                'Esta ventana no sale en ninguna captura ni grabacion de pantalla: lo impide Windows, ' +
+                'no la pagina. Ademas tapa la conversacion cuando la ventana deja de estar delante y ' +
+                'quita el menu del boton derecho. Una camara apuntando a la pantalla se lo lleva todo igual.');
+        }
         /* Este va al reves que los otros dos: !== false los deja encendidos
            cuando la clave no existe, y este tiene que quedarse APAGADO en una
            boveda que se creo antes de que el buzon existiera. */
@@ -86,6 +95,8 @@
             s.relay = D.$('set-relay').checked;
             s.receipts = D.$('set-receipts').checked;
             s.typing = D.$('set-typing').checked;
+            s.shield = D.$('set-shield').checked;
+            if (D.applyShield) { D.applyShield(); }
             var abriendo = D.$('set-inbox').checked && !s.openInbox;
             s.openInbox = D.$('set-inbox').checked;
             s.stun = (D.$('set-stun').value || '').replace(/^\s+|\s+$/g, '');

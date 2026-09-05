@@ -387,6 +387,102 @@ contrase&ntilde;a y la Llave de Recuperacion, tus datos son ruido. Eso es el pro
   (comparadla en persona o por telefono y marcadla como comprobada).
 - **El navegador puede borrar el almacenamiento.** Descarga la copia cifrada.
 - **iPhone no tiene Web Bluetooth.** Todo lo demas si.
+- **Una captura de pantalla no se puede impedir desde una pagina web.** Ni
+  desde aqui ni desde ninguna: la pantalla es del sistema operativo. En el
+  navegador solo cabe estorbarla, y eso es lo que se hace. En Windows si hay
+  salida de verdad, y tiene su propio ejecutable: ver la seccion siguiente.
+
+---
+
+## Pantalla protegida
+
+Encendida de serie, en Ajustes. Hace tres cosas, y ninguna de ellas es
+"bloquear capturas", porque eso desde una pagina no existe.
+
+**1. Tapa en cuanto la ventana deja de estar delante.** No es cosmetico. En
+Windows, `Win + Mayus + S` abre el recorte y **se lleva el foco antes de
+capturar**: lo que acaba en la imagen es la cortina. Lo mismo con casi todo lo
+que obliga a salir de la ventana, y con el descuido mas comun de todos —
+compartir pantalla en una reunion y cambiar de aplicacion con la conversacion
+detras.
+
+**2. `Impr Pant` si llega a la pagina.** La captura ya esta hecha cuando nos
+enteramos y no se puede cancelar, pero va al **portapapeles**, y el
+portapapeles si se puede pisar. Se pisa, se tapa la pantalla y se avisa con
+todas las letras de que la captura no se ha impedido.
+
+**3. Fuera el menu del boton derecho**, que era ademas la via comoda para
+"Inspeccionar" por encima del hombro de alguien. Con una excepcion a proposito:
+**dentro de un campo de texto si sale**, porque ese menu es como se pega, y en
+el movil la pulsacion larga es la unica forma de pegar el codigo de una
+invitacion. Un menu de pegar sobre un campo vacio no ensena nada de nadie.
+
+### Lo que NO hace
+
+- Un grabador que **no roba el foco** (OBS, una videollamada ya en marcha) graba
+  la conversacion entera. No hay nada que hacer desde una pagina.
+- Una **camara apuntando a la pantalla** se lo lleva todo, siempre. Contra eso
+  no hay software.
+- `Impr Pant` a secas ya ha hecho la foto: solo se puede estropear la copia del
+  portapapeles.
+
+### En Windows si se impide: bintio-win_x64-protegido.exe
+
+En Windows existe la solucion buena: `SetWindowDisplayAffinity` con
+`WDA_EXCLUDEFROMCAPTURE`. Marca la ventana como no capturable **en el sistema
+operativo**, y entonces cualquier grabador -OBS incluido- solo ve negro. Es lo
+que usan la banca y las plataformas de video, y es lo que hay detras de
+`setContentProtection` en Electron o `set_content_protected` en Tauri.
+
+La primera idea es lanzarla desde fuera: un `.cmd` al lado del ejecutable que
+busque la ventana de BINTIO y le aplique la afinidad. **No funciona**, y no es
+una cuestion de permisos de administrador. Medido en esta misma maquina:
+
+| Llamada | Resultado |
+|---|---|
+| sobre una ventana **del propio proceso** | `True`, afinidad queda en `0x11` |
+| sobre la ventana de **otro proceso** | `False`, error 5 (acceso denegado) |
+
+Esa API solo la puede llamar el proceso dueno de la ventana. Asi que tampoco
+sirve una extension de Neutralino: las extensiones son procesos aparte y se
+comen el mismo error 5. Tiene que salir de **dentro** del propio ejecutable.
+
+Asi que hay un anfitrion propio, y es lo minimo que puede ser: una ventana, el
+WebView2 que Windows ya trae dentro, y esa llamada. Carga el MISMO
+`dist/bintio.html` que todo el mundo; no hay ni una linea de logica de BINTIO
+en el (`tools/protegido/`, unas 180 lineas de C#, y `bintio-win_x64-protegido.exe`
+ocupa 22 KB).
+
+```bash
+npm run protegido      # deja el ejecutable y sus dll en dist/
+```
+
+Va **suelto y no dentro de `npm run build`** porque pide el SDK de .NET, y la
+promesa de este proyecto es que con Node y nada mas se compila todo. Quien no
+lo tenga sigue teniendo los siete ejecutables normales y la web.
+
+| | Neutralino | Protegido |
+|---|---|---|
+| Sistemas | los siete | solo Windows |
+| Tamano | 2,6 MB | 22 KB + 790 KB de dll |
+| Sale en capturas y grabaciones | si | **no** |
+| Necesita | nada | Windows 10 2004+, WebView2, .NET Framework 4.8 |
+
+Las tres cosas que necesita vienen puestas en Windows 11 y en cualquier
+Windows 10 al dia.
+
+**Dos avisos que importan:**
+
+- **Las bovedas NO son la misma.** El protegido carga la pagina desde `file://`
+  y el de Neutralino desde un http local con su propio puerto; para el navegador
+  son dos origenes, y cada origen tiene su almacen. Cambiar de un ejecutable al
+  otro es empezar de cero salvo que te lleves la identidad con la Llave de
+  Recuperacion o con una copia completa.
+- **Una camara apuntando a la pantalla se lo sigue llevando todo.** Eso no lo
+  arregla ningun software, y conviene repetirlo cada vez que se habla de esto.
+
+En los otros seis sistemas sigue valiendo lo de arriba, ni mas ni menos: macOS
+y Linux tienen equivalentes, pero Neutralino tampoco los expone.
 
 ---
 

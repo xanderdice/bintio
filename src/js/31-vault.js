@@ -122,6 +122,12 @@
                    serie, como los acuses, y las bovedas de antes lo leen
                    encendido porque solo el false explicito lo apaga. */
                 typing: true,
+                /* Pantalla protegida. Encendida de serie: tapa al perder el
+                   foco y quita el menu del boton derecho. Lo que NO hace -y
+                   no puede hacer nadie desde una pagina- es impedir una
+                   captura; el interruptor lo dice y 69-ui-privacidad.js lo
+                   explica entero. */
+                shield: true,
                 notify: true,
                 /* Buzon abierto: que alguien pueda escribirte teniendo solo tu
                    codigo, sin que tu le hayas dado de alta antes.

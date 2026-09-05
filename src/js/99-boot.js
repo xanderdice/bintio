@@ -180,6 +180,7 @@
         D.initConnect();
         D.initSettings();
         D.initRequests();
+        D.initPrivacidad();
         wireApp();
         registerWorker();
         anchorManifest();

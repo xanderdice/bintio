@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- net48 y no net8: el .NET Framework 4.8 viene puesto en Windows 10 desde
+       la 1903 y en todo Windows 11, asi que quien reciba el ejecutable no
+       tiene que instalar ningun runtime. Con net8 habria que bajar 60 MB de
+       runtime o irse a un ejecutable autocontenido de 150 MB, y este proyecto
+       reparte binarios de dos. -->
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <AssemblyName>bintio-win_x64-protegido</AssemblyName>
+    <RootNamespace>Bintio</RootNamespace>
+    <LangVersion>7.3</LangVersion>
+    <!-- x64 explicito. El .NET Framework compila WinExe como AnyCPU con
+         Prefer32Bit puesto, o sea que el programa arrancaba en 32 bits y el
+         paquete de WebView2 le dejaba al lado el cargador de x86. El resto de
+         los ejecutables de este proyecto son de 64 bits; que este no lo fuera
+         era una sorpresa esperando. -->
+    <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+    <Deterministic>true</Deterministic>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <ApplicationIcon>bintio.ico</ApplicationIcon>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <Product>BINTIO</Product>
+    <Company>BINTIO</Company>
+    <AssemblyTitle>BINTIO (pantalla protegida)</AssemblyTitle>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2903.40" />
+  </ItemGroup>
+
+</Project>

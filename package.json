@@ -20,7 +20,8 @@
     "build:web": "node tools/build.js",
     "seed": "node tools/seed.js",
     "bench": "node tools/bench.js",
-    "logo": "node tools/logo.js"
+    "logo": "node tools/logo.js",
+    "protegido": "node tools/protegido.js"
   },
   "devDependencies": {
     "@neutralinojs/neu": "^11.7.2",

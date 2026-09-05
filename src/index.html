@@ -531,6 +531,12 @@
                         </span>
                     </label>
                     <label class="check">
+                        <input type="checkbox" id="set-shield">
+                        <span>Pantalla protegida
+                            <small id="set-shield-note">Tapa la conversacion en cuanto la ventana deja de estar delante, quita el menu del boton derecho y, si pulsas Impr Pant, borra lo que quede en el portapapeles. <b class="hot">No impide una captura</b>: desde una pagina web eso no se puede, y una camara apuntando a la pantalla se lo lleva todo igual.</small>
+                        </span>
+                    </label>
+                    <label class="check">
                         <input type="checkbox" id="set-typing">
                         <span>Avisar de que estas escribiendo
                             <small>Mientras tecleas, la otra persona lo ve. No se guarda en ninguna parte y caduca en segundos, pero es un aviso cada cuatro mientras escribes; en un grupo, uno por miembro.</small>
@@ -604,6 +610,17 @@
 
 </div>
 
+<!-- La cortina de "pantalla protegida". Fuera de #app y por encima de todo,
+     incluidos los avisos: si algo se cuela por delante, no tapa nada. Lo que
+     puede y lo que no puede hacer esta escrito en js/69-ui-privacidad.js. -->
+<div id="shield" class="shield hidden" aria-hidden="true">
+    <div class="shield-inner">
+        <div class="shield-logo" aria-hidden="true"></div>
+        <b>Pantalla protegida</b>
+        <small id="shield-note"></small>
+    </div>
+</div>
+
 <div id="toasts"></div>
 
 <!-- BUILD:JS -->
@@ -639,6 +656,7 @@
 <script src="js/66-ui-connect.js"></script>
 <script src="js/67-ui-settings.js"></script>
 <script src="js/68-ui-requests.js"></script>
+<script src="js/69-ui-privacidad.js"></script>
 <script src="js/99-boot.js"></script>
 <!-- /BUILD:JS -->
 
