@@ -21,22 +21,50 @@
 
         for (var i = 0; i < rows.length; i++) {
             (function (row) {
-                var item = D.make('div', 'list-item' + (row.contact.pk === D.activePk ? ' is-active' : ''));
+                var esGrupo = !!row.group;
+                var item = D.make('div', 'list-item' + (row.key === D.activePk ? ' is-active' : ''));
 
-                var online = row.contact.lastSeen && (Date.now() - row.contact.lastSeen < 120000);
-                item.appendChild(D.make('span', 'dot' + (online ? ' dot--live' : '')));
+                /* El punto verde significa "hay camino con esta persona". Un
+                   grupo no es una persona y no tiene un camino: son cuatro
+                   caminos distintos. Pintarle un punto seria inventarse un
+                   estado, asi que lleva su marca y no punto. */
+                if (esGrupo) {
+                    item.appendChild(D.make('span', 'gmark', String(row.group.members.length)));
+                } else {
+                    var online = row.contact.lastSeen && (Date.now() - row.contact.lastSeen < 120000);
+                    item.appendChild(D.make('span', 'dot' + (online ? ' dot--live' : '')));
+                }
 
                 var who = D.make('div', 'who');
-                var name = D.make('b', null, row.contact.name);
-                if (row.contact.verified) {
+                var name = D.make('b', null, esGrupo ? row.group.name : row.contact.name);
+                if (!esGrupo && row.contact.verified) {
                     var v = D.make('span', 'tag tag--ok', 'ok');
                     v.title = 'Huella comprobada';
                     name.appendChild(document.createTextNode(' '));
                     name.appendChild(v);
                 }
                 who.appendChild(name);
-                who.appendChild(D.make('small', null,
-                    row.last ? (row.last.dir === 'out' ? 'Tu: ' : '') + row.last.text : row.contact.address));
+
+                /* Quien esta escribiendo se lee desde la lista, sin abrir la
+                   conversacion: es justo cuando mas sirve. */
+                var teclea = V.chat.typingIn(row.key);
+                var pie;
+                if (teclea) {
+                    pie = D.make('small', 'typing-now',
+                        esGrupo ? teclea + ' esta escribiendo...' : 'escribiendo...');
+                } else if (row.last) {
+                    /* En un grupo hace falta saber quien lo dijo; en uno a uno
+                       solo si fuiste tu, que es lo que distingue tu ultima
+                       linea de la suya. */
+                    var quien = row.last.dir === 'out' ? 'Tu: '
+                        : (esGrupo && row.last.fromName ? row.last.fromName + ': ' : '');
+                    pie = D.make('small', null, quien + row.last.text);
+                } else {
+                    pie = D.make('small', null, esGrupo
+                        ? row.group.members.length + ' personas, sin nada escrito todavia'
+                        : row.contact.address);
+                }
+                who.appendChild(pie);
                 item.appendChild(who);
 
                 var meta = D.make('div', 'meta');
@@ -44,7 +72,7 @@
                 if (row.chat.unread) { meta.appendChild(D.make('span', 'badge', row.chat.unread)); }
                 item.appendChild(meta);
 
-                D.on(item, 'click', function () { D.openChat(row.contact.pk); });
+                D.on(item, 'click', function () { D.openChat(row.key); });
                 list.appendChild(item);
             })(rows[i]);
         }

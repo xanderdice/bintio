@@ -25,6 +25,7 @@
         D.$('set-bloom').value = s.bloom || 'on';
         D.$('set-relay').checked = s.relay !== false;
         D.$('set-receipts').checked = s.receipts !== false;
+        D.$('set-typing').checked = s.typing !== false;
         /* Este va al reves que los otros dos: !== false los deja encendidos
            cuando la clave no existe, y este tiene que quedarse APAGADO en una
            boveda que se creo antes de que el buzon existiera. */
@@ -84,6 +85,7 @@
             var s = V.vault.state.settings;
             s.relay = D.$('set-relay').checked;
             s.receipts = D.$('set-receipts').checked;
+            s.typing = D.$('set-typing').checked;
             var abriendo = D.$('set-inbox').checked && !s.openInbox;
             s.openInbox = D.$('set-inbox').checked;
             s.stun = (D.$('set-stun').value || '').replace(/^\s+|\s+$/g, '');

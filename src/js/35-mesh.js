@@ -278,8 +278,28 @@
          'llena'     se abrio y es una solicitud nueva, pero la lista esta llena.
                      Se queda esperando sitio (marca w) en vez de darse por
                      atendida, que es como se perdian para siempre. */
+    /* Lo que caduca dentro de un minuto no se lleva.
+
+       La mochila existe para que un sobre que hoy no tiene camino lo tenga
+       manana dentro del bolsillo de otro. Guardar algo que M.prune va a tirar
+       en cincuenta segundos no ayuda a nadie: no le da tiempo a llegar a
+       ninguna parte y a cambio escribe la boveda entera en disco.
+
+       Lo pide el "esta escribiendo", que vive quince segundos y se manda uno
+       cada cuatro mientras alguien teclea. Sin esto, quien lo recibe se
+       guardaba cada aviso -como senuelo, para que su mochila no delatara que
+       el sobre era suyo- y acababa escribiendo la boveda en disco cada cuatro
+       segundos por algo que no es ni un mensaje.
+
+       Y la regla vale para TODOS por igual, que es lo que la hace segura:
+       destinatario, reenviador o vecino de paso, nadie guarda un sobre a punto
+       de caducar. Si solo lo saltara el destinatario, el hueco en su lista
+       diria para quien era, que es justo lo que el senuelo viene a tapar. */
+    var VIDA_MINIMA = 60;   /* segundos */
+
     function bagAdd(id, bytes, expires, clase, estado) {
         if (bagHas(id)) { return; }
+        if (expires - Math.floor(U.now() / 1000) < VIDA_MINIMA) { return; }
         var reg = { i: id, d: U.toB64(bytes), e: expires, t: Math.floor(U.now() / 1000) };
         if (clase === 'p') {
             reg.k = 'p';
@@ -588,6 +608,24 @@
 
        No se saca nada de la bolsa: seguimos reenviandolo como cualquier otro,
        que es lo que hace que la malla funcione. */
+    /* Un sobre que solo vale AHORA: sale por los cables que haya abiertos en
+       este instante y NO entra en la mochila.
+
+       Lo usa el "esta escribiendo". Guardarlo seria absurdo por partida doble:
+       vale siete segundos, y como se manda uno cada cuatro mientras alguien
+       teclea, la mochila se llenaria de avisos caducados y la boveda se
+       escribiria en disco cada cuatro segundos por algo que ni siquiera es un
+       mensaje. Si no hay nadie escuchando ahora mismo, no se ha perdido nada:
+       un "esta escribiendo" que llega tarde es ruido.
+
+       Se apunta como visto igual que en M.send, para que la copia que nos
+       devuelva un vecino no se vuelva a procesar. */
+    M.flash = function (bytes) {
+        var env = parse(bytes);
+        if (env) { markSeen(env.id); }
+        return M.broadcast(bytes, null);
+    };
+
     M.rescanBag = function () {
         if (!V.vault.state) { return 0; }
         var b = bag(), abiertos = 0, i, env, opened;

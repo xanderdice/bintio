@@ -24,6 +24,13 @@
     S.T_PROFILE = 3;
     S.T_FILE = 4;
     S.T_PRESENCE = 5;
+    S.T_TYPING = 6;      /* "esta escribiendo": caduca en segundos */
+    S.T_GTEXT = 7;       /* mensaje de grupo; el cuerpo lleva la ficha */
+
+    /* Un tipo desconocido NO es un error: una version mas nueva puede mandar
+       cosas que esta no entiende, y el sobre se abre igual porque el cifrado
+       no depende del tipo. Quien lo recibe simplemente no hace nada con el.
+       Por eso los numeros solo crecen y ninguno se reutiliza. */
 
     var KEEP_RATCHET = 6;   /* cuantas claves viejas se guardan por contacto */
 
@@ -84,7 +91,7 @@
     /* -----------------------------------------------------------------
        Cerrar un mensaje para un contacto.
        ----------------------------------------------------------------- */
-    S.seal = function (contact, type, body, mid, ttl) {
+    S.seal = function (contact, type, body, mid, ttl, vida) {
         var sec = K.secrets(contact);
         var eph = C.keypair();
         var mineKey = myRatchet(contact);
@@ -95,6 +102,11 @@
             pairSecret: sec.pair,
             payload: pack(type, mid || S.newMid(), body),
             ttl: ttl === undefined ? E.DEFAULT_TTL : ttl,
+            /* Casi todo vive las 72 h de serie. Lo que solo vale AHORA -el
+               "esta escribiendo"- pide una vida de segundos: asi el que lo
+               reciba tarde lo tira sin mirarlo y no ocupa sitio en ninguna
+               mochila del camino. */
+            lifeSeconds: vida,
             myRatchetPk: U.fromHex(mineKey.pk)
         };
         var theirs = contact.ratchet && contact.ratchet.theirs;

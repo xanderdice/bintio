@@ -140,6 +140,41 @@ select.input option {
     flex: 0 0 auto;
 }
 .dot--live { background: rgb(var(--ok)); box-shadow: 0 0 8px rgba(var(--ok), .8); }
+/* Un grupo no tiene "conectado": tiene tantos caminos como miembros. El hueco
+   se reserva igual para que los nombres de la lista queden alineados. */
+.dot--none { background: transparent; }
+
+/* La marca de un grupo en la lista: el numero de personas, donde iria el punto.
+   Dice de un vistazo que eso no es una persona y ademas cuenta algo util. */
+.gmark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px; height: 20px;
+    flex: 0 0 auto;
+    margin: 0 -6px 0 -6px;
+    font-size: 10.5px;
+    color: rgb(var(--ice-hot));
+    border: 1px solid rgba(var(--ice), .4);
+    border-radius: 50%;
+    background: rgba(var(--ice), .1);
+}
+
+/* Elegir quien entra en un grupo. Es una lista de casillas y no un desplegable
+   con Ctrl pulsado: en un movil eso ultimo no se puede tocar. */
+.list--pick {
+    max-height: 268px;
+    overflow: auto;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 0 12px;
+    background: var(--field-bg);
+}
+.check--row { align-items: center; border-bottom: 1px solid var(--line); }
+.check--row:last-child { border-bottom: 0; }
+/* Alguien que esta en el grupo y no tienes anadido: se ve, no se puede tocar
+   y dice por que. Esconderlo lo habria echado del grupo sin avisar. */
+.check--row.is-off { cursor: default; opacity: .55; padding-left: 26px; }
 
 /* Bloque de codigo largo para copiar y pegar. Siempre monoespaciado, pase lo
    que pase con el acabado. */

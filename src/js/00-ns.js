@@ -21,7 +21,7 @@ var BINTIO = (function () {
         NAME: 'BINTIO',
         /* Cada modulo se registra aqui abajo. */
         util: {}, crypto: {}, id: {}, vault: {}, contacts: {},
-        envelope: {}, mesh: {}, chat: {}, transport: {}, invite: {},
+        envelope: {}, mesh: {}, chat: {}, groups: {}, transport: {}, invite: {},
         qr: {}, app: {}, ui: {}
     };
 })();

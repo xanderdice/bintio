@@ -153,6 +153,77 @@ Tres formas de mover bytes, y a la malla le da igual cual sea:
 
 ---
 
+## Escribiendo, entregado y leido
+
+Tres avisos, y los tres son opcionales porque los tres dicen algo de ti.
+
+| | Que dice | Vida del sobre | Se guarda? |
+|---|---|---|---|
+| **Escribiendo** | estas tecleando ahora mismo | 15 s, y **cero saltos** | no, en ninguna parte |
+| **Entregado** | el sobre ha llegado a su aparato | la normal | si, con el mensaje |
+| **Leido** | ha abierto la conversacion | la normal | si, con el mensaje |
+
+El **escribiendo** sale como mucho una vez cada cuatro segundos aunque teclees
+sin parar, no se reenvia por la malla (`ttl 0`: solo por los cables que haya
+abiertos en ese instante) y **no entra en ninguna mochila**, ni en la de quien
+lo manda ni en la de quien lo recibe. Esto ultimo no es un caso especial suyo:
+la mochila no guarda nada que caduque en menos de un minuto, porque no le da
+tiempo a llegar a ninguna parte y a cambio escribiria la boveda en disco cada
+cuatro segundos. La regla vale para todos por igual -destinatario, reenviador o
+vecino de paso- y por eso no delata a nadie.
+
+El **acuse de lectura** solo se manda del ultimo mensaje de cada persona, no de
+todos: leer el ultimo implica los de antes, y asi la lectura no se convierte en
+un chorro de metadatos. Los dos interruptores estan en Ajustes y se pueden
+apagar por separado.
+
+---
+
+## Grupos
+
+Sin servidores no hay "sala": un grupo es una **lista** que guarda tu aparato, y
+mandar al grupo es sellar un sobre para cada miembro. Con cinco personas salen
+cuatro sobres, cada uno cifrado punta a punta con su destinatario.
+
+Cuesta ancho de banda. A cambio no hay **ni un solo secreto compartido**: no hay
+clave de grupo que robar, quien se sale no puede seguir leyendo, y ningun
+servidor sabe que ese grupo existe ni quien esta dentro.
+
+**La ficha viaja con cada mensaje.** El cuerpo de un mensaje de grupo lleva el
+nombre y la lista entera. Podria mandarse una vez, pero entonces quien se
+perdiera esa unica copia se quedaria con mensajes de un grupo que no sabe ni
+como se llama, y sin servidor no hay a quien preguntarle. Repitiendola, el grupo
+se arregla solo con el siguiente mensaje que llegue. Son unos 80 bytes por
+miembro; con el cupo de 32, 2,5 KB sobre una mochila de 900 KB.
+
+**No manda nadie.** No hay administrador. Cada ficha lleva un numero de
+revision y la mas nueva pisa a la que hay, asi que un cambio se propaga con el
+trafico normal.
+
+**No se anade a nadie solo.** La ficha trae claves publicas de gente que quiza
+no tienes dada de alta, y no se dan de alta solas: eso es una decision tuya y
+este proyecto entero se sostiene sobre eso. A quien no tengas no le puedes
+escribir, la conversacion lo dice con su nombre, y sus acuses no te llegaran
+nunca.
+
+### "Leido" quiere decir leido por todos
+
+Un mensaje de grupo pone **leido** cuando lo ha abierto el ultimo, no el
+primero. Mientras tanto ensena la cuenta:
+
+```
+Quedamos a las nueve?          12:11  enviado
+Sin problema, os espero.       12:16  leido 2 de 3
+Reservo mesa para cuatro.      12:20  entregado 3 de 3
+```
+
+"Leido" a secas cuando lo ha visto uno de cuatro es una mentira comoda para
+quien escribe y una trampa para los otros tres. Y si la cuenta se queda parada
+en "2 de 3" para siempre, la conversacion dice por que: falta alguien a quien no
+tienes anadido.
+
+---
+
 ## Que te escriban sin tenerlos anadidos (el buzon)
 
 Anadir a alguien va en **una sola direccion**. Un sobre solo se puede abrir si

@@ -47,6 +47,15 @@
                 D.refreshStatus();
                 D.refreshRoster();
             }
+            /* "Esta escribiendo" entra y sale cada pocos segundos, asi que
+               repinta lo justo: el renglon de la conversacion abierta y la
+               lista, donde tambien se lee sin abrir nada. Los mensajes no se
+               tocan: no ha cambiado ninguno. */
+            if (what === 'typing') {
+                D.paintTyping();
+                D.refreshRoster();
+                return;
+            }
             /* 'request' entra por aqui porque 37-presenta.js lo emite por
                V.chat y 50-app.js reemite lo que sale de ahi. Un segundo canal
                seria un segundo sitio que enganchar. */
@@ -69,8 +78,17 @@
             }
             if (what !== 'message' || !arg || arg.msg.dir !== 'in') { return; }
             if (D.activePk === arg.pk && document.hasFocus && document.hasFocus()) { return; }
-            var c = V.contacts.get(arg.pk);
-            D.toast('Mensaje de ' + (c ? c.name : 'alguien'));
+            /* En un grupo, quien escribe y donde: "Mensaje de Quim" a secas
+               deja sin saber en cual de las cuatro conversaciones mirar. */
+            var quien;
+            if (V.groups.isKey(arg.pk)) {
+                var g = V.groups.get(V.groups.idOf(arg.pk));
+                quien = (arg.msg.fromName || 'alguien') + ' en ' + (g ? g.name : 'un grupo');
+            } else {
+                var c = V.contacts.get(arg.pk);
+                quien = c ? c.name : 'alguien';
+            }
+            D.toast('Mensaje de ' + quien);
             try { document.title = '(' + V.chat.totalUnread() + ') BINTIO'; } catch (e) {}
         });
 

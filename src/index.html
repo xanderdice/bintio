@@ -191,6 +191,7 @@
                     <span class="panel-title">Conversaciones</span>
                     <div class="panel-tools">
                         <button type="button" class="btn btn--sm" id="btn-add">+ Contacto</button>
+                        <button type="button" class="btn btn--sm" id="btn-new-group">+ Grupo</button>
                     </div>
                 </div>
                 <div class="panel-body">
@@ -242,6 +243,12 @@
                 <div class="panel-body" id="chat-body">
                     <div id="chat-scroll"></div>
                 </div>
+                <!-- "Esta escribiendo": justo encima de donde escribes tu, que
+                     es donde se mira. Vive fuera de #chat-scroll a proposito:
+                     dentro se repinta la conversacion entera cada vez y el
+                     aviso, que aparece y desaparece cada pocos segundos,
+                     obligaria a repintarlo todo por un renglon. -->
+                <div id="typing-line" class="typing hidden"></div>
                 <div id="composer">
                     <textarea id="composer-text" rows="1" placeholder="Escribe. Nadie mas lo vera." spellcheck="false"></textarea>
                     <button type="button" class="btn btn--primary" id="btn-send">Enviar</button>
@@ -371,6 +378,38 @@
             </div></div>
         </section>
 
+        <!-- ============================================ GRUPO ==========
+             Una sola vista para crear y para editar: son el mismo formulario
+             -un nombre y una lista de quien esta dentro- y partirlo en dos
+             habria sido mantener dos veces la misma lista de casillas. Lo que
+             cambia es el titulo y si salen los botones de borrar y salir, que
+             al crear no significan nada. -->
+        <section class="view" id="view-group">
+            <div class="sheet"><div class="sheet-inner">
+                <div class="block">
+                    <span class="bracket bracket--tl"></span><span class="bracket bracket--tr"></span>
+                    <span class="bracket bracket--bl"></span><span class="bracket bracket--br"></span>
+                    <h2 id="group-title">Nuevo grupo</h2>
+                    <p class="dim">Aqui no hay sala ni servidor: un grupo es una lista que guarda tu aparato. Cada mensaje sale cifrado por separado para cada persona, asi que nadie de fuera sabe siquiera que este grupo existe.</p>
+                    <div class="field">
+                        <label for="group-name">Nombre del grupo</label>
+                        <input class="input" type="text" id="group-name" maxlength="40" autocomplete="off">
+                    </div>
+                    <div class="field">
+                        <label>Quien esta dentro</label>
+                        <div class="list list--pick" id="group-members"></div>
+                    </div>
+                    <p class="dim" id="group-note"></p>
+                    <div class="btn-row mt-l">
+                        <button type="button" class="btn btn--primary" id="btn-group-save">Crear grupo</button>
+                        <button type="button" class="btn btn--danger hidden" id="btn-group-clear">Borrar conversacion</button>
+                        <button type="button" class="btn btn--danger hidden" id="btn-group-leave">Salir del grupo</button>
+                        <button type="button" class="btn btn--ghost" id="btn-group-back">Volver</button>
+                    </div>
+                </div>
+            </div></div>
+        </section>
+
         <!-- ============================================ SOLICITUDES ====
              Un sobre de presentacion no a&ntilde;ade a nadie: deja aqui un
              nombre, una huella y una frase, y decide el usuario.
@@ -460,6 +499,12 @@
                         <input type="checkbox" id="set-relay">
                         <span>Llevar mensajes de otros
                             <small>Tu aparato guarda y reparte sobres ajenos que no puede leer. Es lo que hace que un mensaje llegue a alguien que estaba apagado. Si lo quitas, tu si usaras la malla pero no la sostendras.</small>
+                        </span>
+                    </label>
+                    <label class="check">
+                        <input type="checkbox" id="set-typing">
+                        <span>Avisar de que estas escribiendo
+                            <small>Mientras tecleas, la otra persona lo ve. No se guarda en ninguna parte y caduca en segundos, pero es un aviso cada cuatro mientras escribes; en un grupo, uno por miembro.</small>
                         </span>
                     </label>
                     <label class="check">

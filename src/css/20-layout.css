@@ -240,6 +240,10 @@
     color: var(--text);
 }
 
+/* En la lista, "escribiendo..." pisa a la ultima linea dicha. Se distingue por
+   el color, no por un icono que habria que explicar. */
+.typing-now { color: rgb(var(--ice-hot)) !important; }
+
 /* ---------------------------------------------------------- barra estado */
 #statusbar {
     display: flex;

@@ -81,6 +81,29 @@
 .msg .foot .st--pendiente { color: rgb(var(--warn)); }
 .msg .foot .st--error { color: rgb(var(--danger)); }
 
+/* Quien lo dijo, en un grupo. Va dentro de la burbuja y no encima: fuera se
+   despegaba del mensaje y con dos personas seguidas ya no se sabia si el
+   nombre era del de arriba o del de abajo. */
+.msg-who {
+    margin-bottom: 3px;
+    font-size: 11px;
+    letter-spacing: var(--micro-track);
+    text-transform: var(--micro-case);
+    color: rgb(var(--ice-hot));
+}
+
+/* "Esta escribiendo". Entre la conversacion y el hueco de escribir, que es
+   por donde va la mirada, y con la altura fija que ocupa la linea: si
+   apareciera y desapareciera empujando el composer, la conversacion daria un
+   salto cada cuatro segundos. */
+.typing {
+    padding: 4px 12px 0;
+    font-size: 11.5px;
+    letter-spacing: var(--micro-track);
+    color: rgb(var(--ice-hot));
+    opacity: .85;
+}
+
 .day-sep {
     align-self: center;
     margin: 8px 0;

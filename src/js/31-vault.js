@@ -101,6 +101,10 @@
                esto existiera no tienen el campo, y todo el codigo que lo lee
                tiene que tolerarlo, igual que hace M.init con carrier. */
             requests: [],
+            /* Grupos: id -> { id, name, members, rev, created }. Igual que
+               requests, una boveda de antes no lo tiene y 38-groups.js lo crea
+               al vuelo la primera vez que se mira. */
+            groups: {},
             settings: {
                 /* El tema de casa. Si aqui pone otra cosa, la boveda recien
                    creada arrancaria con un tema distinto del que se ve en la
@@ -111,6 +115,13 @@
                 bloom: 'on',
                 relay: true,         /* ayudar a otros reenviando sus sobres */
                 receipts: true,
+                /* "Esta escribiendo". Interruptor propio y no colgado de los
+                   acuses: un acuse dice "me llego" una vez por mensaje, y esto
+                   dice "esta aqui, tecleando" cada cuatro segundos. Es mas
+                   trafico y es mas presencia; que cada uno elija. Encendido de
+                   serie, como los acuses, y las bovedas de antes lo leen
+                   encendido porque solo el false explicito lo apaga. */
+                typing: true,
                 notify: true,
                 /* Buzon abierto: que alguien pueda escribirte teniendo solo tu
                    codigo, sin que tu le hayas dado de alta antes.
