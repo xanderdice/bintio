@@ -267,13 +267,39 @@
         });
     };
 
-    /* Borrado de panico: deja el aparato como si BINTIO nunca hubiera estado. */
+    /* Borrado de panico: deja el aparato como si BINTIO nunca hubiera estado.
+
+       Se barre TODO lo que empiece por "bintio.", no solo la boveda. Borrando
+       unicamente la boveda quedaba atras "bintio.bus.v1", el buzon que usan
+       las pestanas del mismo navegador para pasarse sobres (41-transport-
+       local.js). Dentro no hay nada legible -son sobres cifrados-, pero la
+       clave en si es una huella: dice que aqui se uso BINTIO. Y esta funcion
+       promete justo lo contrario.
+
+       Se barre por prefijo y no por una lista de claves a proposito: una lista
+       hay que acordarse de actualizarla, y el primero que no se acordo fue
+       este mismo fichero. Ademas asi 31-vault.js no tiene que conocer las
+       claves de los transportes, que estan dos capas por encima. */
+    function barrer(almacen) {
+        if (!almacen) { return; }
+        var fuera = [], i, k;
+        for (i = 0; i < almacen.length; i++) {
+            k = almacen.key(i);
+            if (k && k.substr(0, 7) === 'bintio.') { fuera.push(k); }
+        }
+        /* Se recogen primero y se borran despues: quitar mientras se recorre
+           mueve los indices y deja la mitad sin tocar. */
+        for (i = 0; i < fuera.length; i++) { almacen.removeItem(fuera[i]); }
+    }
+
     Vault.destroy = function () {
         try { be().del(STORE_KEY); apuntar(null); } catch (e) {}
-        try { if (typeof sessionStorage !== 'undefined') { sessionStorage.removeItem(SESSION_KEY); } } catch (e) {}
+        try { if (typeof localStorage !== 'undefined') { barrer(localStorage); } } catch (e) {}
+        try { if (typeof sessionStorage !== 'undefined') { barrer(sessionStorage); } } catch (e) {}
         if (key) { U.wipe(key); }
         key = null;
         Vault.state = null;
+        backend = null;   /* que el siguiente arranque elija de nuevo, en limpio */
     };
 
     /* Tamano aproximado en disco, para avisar antes de llenar la cuota. Sale

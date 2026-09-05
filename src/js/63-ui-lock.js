@@ -29,6 +29,7 @@
         D.show(D.$('lock-new'), !exists);
         D.show(D.$('lock-open'), exists);
         D.show(D.$('lock-restore'), false);
+        D.show(D.$('lock-wipe'), false);
         D.view('view-lock');
         var f = D.$(exists ? 'open-pass' : 'new-name');
         if (f) { try { f.focus(); } catch (e) {} }
@@ -83,11 +84,47 @@
         function showRestore() {
             D.show(D.$('lock-new'), false);
             D.show(D.$('lock-open'), false);
+            D.show(D.$('lock-wipe'), false);
             D.show(D.$('lock-restore'), true);
         }
         D.on(D.$('btn-show-restore'), 'click', showRestore);
         D.on(D.$('btn-show-restore2'), 'click', showRestore);
         D.on(D.$('btn-restore-cancel'), 'click', function () { D.showLock(); });
+
+        /* ------------------------------------------------- empezar de cero
+
+           La unica salida cuando se ha perdido la contrasena y no hay copia.
+           No la pide -seria absurdo pedir justo lo que no se tiene- y por eso
+           mismo la pregunta se hace despacio y en pantalla completa.
+
+           Que no pida contrasena tiene un precio y conviene decirlo: cualquiera
+           que coja el aparato desbloqueado puede borrarlo. No puede LEER nada,
+           que es lo que esta aplicacion protege, pero si puede destruirlo. A
+           cambio, sin esto una boveda que no se abre convierte el aparato en un
+           ladrillo para siempre, porque aqui no hay ningun servidor que
+           restablezca nada. */
+        D.on(D.$('btn-show-wipe'), 'click', function () {
+            D.show(D.$('lock-new'), false);
+            D.show(D.$('lock-open'), false);
+            D.show(D.$('lock-restore'), false);
+            D.show(D.$('lock-wipe'), true);
+        });
+
+        D.on(D.$('btn-wipe-no'), 'click', function () { D.showLock(); });
+
+        D.on(D.$('btn-wipe-yes'), 'click', function () {
+            /* Por si la boveda estuviera abierta: parar antes de borrar, para
+               que no quede un reloj de mantenimiento escribiendo en algo que
+               ya no existe. En la pantalla de acceso no lo esta, y por eso va
+               protegido en vez de darlo por hecho. */
+            try { V.app.stop(); } catch (e) {}
+            V.vault.destroy();
+            D.toast('Borrado. Este aparato ya no sabe nada de ti.');
+            /* Se recarga en vez de repintar: asi no queda ni un contacto en la
+               cache de memoria, ni un sobre visto en la malla, ni un enlace
+               abierto de la sesion anterior. Empezar de cero de verdad. */
+            setTimeout(function () { location.reload(); }, 900);
+        });
 
         D.on(D.$('btn-restore'), 'click', function () {
             var text = (D.$('restore-key').value || '').replace(/^\s+|\s+$/g, '');

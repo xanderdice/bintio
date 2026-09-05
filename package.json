@@ -12,7 +12,7 @@
     "serve": "node tools/serve.js",
     "cert": "node tools/cert.js",
     "audit": "node tools/build.js && node tools/cert.js && node tools/audit-headers.js",
-    "test": "node test/crypto.test.js && node test/invite.test.js && node test/qr.test.js && node test/protocol.test.js && node test/mesh.test.js && node test/presentacion.test.js && node test/grupos.test.js && node tools/build.js && node tools/verify.js && node tools/cert.js && node tools/audit-headers.js",
+    "test": "node test/crypto.test.js && node test/invite.test.js && node test/qr.test.js && node test/protocol.test.js && node test/mesh.test.js && node test/presentacion.test.js && node test/grupos.test.js && node test/borrado.test.js && node tools/build.js && node tools/verify.js && node tools/cert.js && node tools/audit-headers.js",
     "verify": "node tools/build.js && node tools/verify.js",
     "desktop": "node tools/desktop.js --run",
     "desktop:build": "node tools/desktop.js",

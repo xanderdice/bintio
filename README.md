@@ -256,6 +256,37 @@ descartas seria decirle a un desconocido el segundo exacto de tu decision.
 
 ---
 
+## Empezar de cero (perdiste la contrasena)
+
+Si pierdes la contrasena y no tienes Llave de Recuperacion ni copia, **no hay
+nada que hacer**: aqui no existe ningun servidor que restablezca nada, y esa es
+justo la propiedad por la que existe el proyecto. Pero el aparato no tiene por
+que quedarse inservible.
+
+En la pantalla de acceso, al lado de **Abrir**, hay **Empezar de cero**. Pregunta
+antes -si o no, en la propia pantalla y no con el cuadro del navegador, que se
+acepta sin leer- y dice entero lo que desaparece: la identidad y la clave, todas
+las conversaciones, los contactos, los grupos, los sobres de otros que llevabas
+en la mochila y los ajustes. Despues arranca en la pantalla de crear identidad,
+en limpio.
+
+No se borra solo la boveda: se barre **toda clave que empiece por `bintio.`**.
+Antes quedaba atras `bintio.bus.v1`, el buzon con el que hablan las pestanas del
+mismo navegador; dentro no hay nada legible, pero la clave en si dice que aqui
+se uso BINTIO, y esta funcion promete lo contrario. Lo que no es nuestro no se
+toca. Hay prueba: `test/borrado.test.js`.
+
+**No pide la contrasena, y tiene un precio.** Cualquiera que coja el aparato
+puede borrarlo. No puede *leer* nada -eso sigue protegido por la contrasena, que
+es lo que esta aplicacion defiende-, pero si puede destruirlo. Se acepta a
+proposito: pedir la contrasena para la salida que existe justo porque la has
+perdido no seria una medida de seguridad, seria un candado sin puerta.
+
+Con la boveda ya abierta hay otro camino equivalente en **Ajustes > Este
+aparato > Borrar todo**.
+
+---
+
 ## Como esta cifrado
 
 Todo con primitivas implementadas aqui dentro y **comprobadas contra los

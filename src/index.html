@@ -155,6 +155,35 @@
                     <div class="btn-row mt-l">
                         <button type="button" class="btn btn--primary" id="btn-open">Abrir</button>
                         <button type="button" class="btn btn--ghost" id="btn-show-restore2">Restaurar copia</button>
+                        <button type="button" class="btn btn--ghost" id="btn-show-wipe">Empezar de cero</button>
+                    </div>
+                </div>
+
+                <!-- ================================== EMPEZAR DE CERO ====
+                     La salida para quien ha perdido la contrase&ntilde;a y no tiene
+                     copia. Sin esto, un aparato con una boveda que no se puede
+                     abrir se queda inservible para siempre: no hay servidor
+                     que restablezca nada y no existe ninguna otra puerta.
+
+                     La pregunta se hace aqui dentro y no con el cuadro del
+                     navegador, que es una linea de texto que se lee en diagonal
+                     y se acepta sin mirar. Esto no se puede deshacer, asi que
+                     dice ENTERO lo que desaparece, con el mismo peso visual que
+                     el bot&oacute;n que lo ejecuta, y la salida sin riesgo va primero. -->
+                <div class="block hidden" id="lock-wipe">
+                    <span class="bracket bracket--tl"></span><span class="bracket bracket--tr"></span>
+                    <span class="bracket bracket--bl"></span><span class="bracket bracket--br"></span>
+                    <h2>Empezar de cero?</h2>
+                    <p>Vas a borrar de este aparato <b class="hot">todo lo que BINTIO guarda</b>, y despues podras crear una identidad nueva desde el principio.</p>
+                    <p class="dim">Desaparecen para siempre:</p>
+                    <p class="dim">&mdash; Tu identidad y tu clave. La persona que eras en BINTIO deja de existir: quien te tuviera anadido ya no podra escribirte.<br>
+                        &mdash; Todas las conversaciones y todos los mensajes, tuyos y de los demas.<br>
+                        &mdash; Tus contactos y tus grupos.<br>
+                        &mdash; Los sobres de otros que llevabas en la mochila y tus ajustes.</p>
+                    <p class="dim">Aqui no hay servidor ni copia en la nube: <b class="hot">nadie puede devolvertelo</b>, ni el desarrollador. Si tienes una Llave de Recuperacion o una copia de seguridad, vuelve atras y usa <b>Restaurar copia</b>; eso si recupera tu identidad.</p>
+                    <div class="btn-row mt-l">
+                        <button type="button" class="btn btn--ghost" id="btn-wipe-no">No, volver</button>
+                        <button type="button" class="btn btn--danger" id="btn-wipe-yes">Si, borrar todo y empezar de cero</button>
                     </div>
                 </div>
 
