@@ -56,7 +56,11 @@
            y el codigo fuera de pantalla. Parecia que faltaba media pantalla. */
         var hoja = D.$(name) ? D.$(name).querySelector('.sheet') : null;
         if (hoja) { hoja.scrollTop = 0; }
+        /* La barra de arriba y lo que lleva: son de dentro de la aplicacion.
+           En el arranque y en la portada no hay nada que poner en ellos, y el
+           nombre lo dice la portada en grande. */
         var inApp = (name !== 'view-boot' && name !== 'view-lock');
+        D.show(D.$('menubar'), inApp);
         D.show(D.$('btn-connect'), inApp);
         D.show(D.$('btn-settings'), inApp);
         D.show(D.$('btn-lock'), inApp);

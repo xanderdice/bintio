@@ -78,7 +78,11 @@
 
 <div id="app">
 
-    <header id="menubar">
+    <!-- La barra es de la aplicacion, no de la portada: nace escondida y la
+         enciende D.view() al entrar. Antes de entrar no pinta nada -los tres
+         botones estan escondidos tambien- y el nombre ya lo dice la portada
+         en grande, justo debajo. -->
+    <header id="menubar" class="hidden">
         <div class="brand"><span class="brand-logo" aria-hidden="true"></span><b>BINTIO</b></div>
         <div class="brand-sub" id="brand-sub">sin servidores</div>
         <div class="spacer"></div>
