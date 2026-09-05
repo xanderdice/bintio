@@ -246,13 +246,6 @@
         0 0 34px rgba(var(--ice), calc(.18 * var(--bloom)));
 }
 
-/* Portada: la pastilla de cada garantia se levanta un pelo del fondo y se
-   enciende por dentro. */
-.chip {
-    box-shadow: var(--shadow-s), inset 0 0 14px rgba(var(--ice), calc(.08 * var(--bloom)));
-}
-
-
 /* ==========================================================================
    TERMINAL
    De aqui abajo, el cromado CRT de los otros seis temas. Todo cuelga de
@@ -340,11 +333,6 @@
     background: rgb(var(--ice));
     box-shadow: 0 0 9px rgba(var(--ice), calc(.9 * var(--bloom)));
 }
-:root[data-skin="terminal"] .chip::before {
-    background: rgb(var(--ice));
-    box-shadow: 0 0 8px rgba(var(--ice), calc(.8 * var(--bloom)));
-}
-:root[data-skin="terminal"] .chip { box-shadow: none; }
 
 /* ---------------------------------------------------------------- botones
    Chapa con bisel arriba, sombra abajo y un brillo que cruza el principal.
