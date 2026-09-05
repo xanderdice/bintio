@@ -710,6 +710,18 @@ vuelven a bajar. Si no hay red, el empaquetado avisa y **la compilacion de la
 web sigue adelante igual**: nadie se queda sin poder trabajar porque falte una
 descarga.
 
+Ese CLI arrastra dos paquetes que npm da por muertos, y `npm install` lo
+anunciaba a gritos cada vez. Los dos estan atados en `overrides`:
+
+| Paquete | De donde venia | Que se hace |
+|---|---|---|
+| `glob@7` y su `inflight`, que pierde memoria | `@electron/asar@3` | subir `asar` a la 4, que ya no los usa (y de paso el `resources.neu` adelgaza 300 KB: la version nueva no guarda dos veces los ficheros identicos) |
+| `yaeti`, sin mantener desde 2016 | `websocket`, para los eventos de `neu run` | relevarlo por `tools/parches/yaeti`, cien lineas sin dependencias que hacen lo mismo |
+
+Ninguno de los dos toca lo que se publica: son del compilador, no de la
+aplicacion. El dia que Neutralino actualice sus dependencias, se borran las dos
+lineas de `overrides` y ya esta.
+
 Todo queda dentro de `dist/`, al lado del `index.html` y del `sw.js`:
 
 | Fichero | Sistema |

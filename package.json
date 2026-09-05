@@ -38,5 +38,9 @@
     "privacidad",
     "pwa",
     "offline"
-  ]
+  ],
+  "overrides": {
+    "@electron/asar": "^4.3.0",
+    "yaeti": "file:tools/parches/yaeti"
+  }
 }

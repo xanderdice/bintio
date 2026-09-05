@@ -1,0 +1,8 @@
+{
+  "name": "yaeti",
+  "version": "0.0.6",
+  "private": true,
+  "description": "Relevo local de yaeti, que npm da por abandonado. Ver index.js.",
+  "license": "MIT",
+  "main": "index.js"
+}
