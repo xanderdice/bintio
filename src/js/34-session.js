@@ -26,6 +26,7 @@
     S.T_PRESENCE = 5;
     S.T_TYPING = 6;      /* "esta escribiendo": caduca en segundos */
     S.T_GTEXT = 7;       /* mensaje de grupo; el cuerpo lleva la ficha */
+    S.T_UNLINK = 8;      /* "te he quitado": ya no hay vinculo por mi lado */
 
     /* Un tipo desconocido NO es un error: una version mas nueva puede mandar
        cosas que esta no entiende, y el sobre se abre igual porque el cifrado
@@ -174,7 +175,7 @@
                no habria sabido a quien sellar) y que hay camino. Hasta que
                pasa, la conversacion lo dice, porque un contacto anadido a
                medias no recibe nada y no hay forma de adivinarlo. */
-            contact.mutuo = true;
+            K.enlazado(contact);
 
             return {
                 contact: contact,

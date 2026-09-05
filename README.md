@@ -224,6 +224,50 @@ tienes anadido.
 
 ---
 
+## El vinculo: quien te tiene y quien no
+
+Anadir a alguien va en **una sola direccion**, asi que "lo tengo en mi lista" y
+"le puedo escribir" no son lo mismo. Al lado de cada nombre hay dos anillos que
+lo dicen: si se tocan hay cadena, si estan separados no la hay.
+
+| Icono | Estado | Que significa |
+|---|---|---|
+| anillos verdes **unidos** | vinculado | ha llegado algo suyo y se ha podido abrir, o sea que esa persona te tiene anadido. Es lo unico que demuestra que lo que escribas le va a llegar |
+| anillos grises **de puntos** | a medias | todavia no ha llegado nada suyo. Puede que no te haya anadido, o que aun no os hayais cruzado |
+| anillos ambar **separados** | te ha quitado | te lo ha dicho el. No hay nada que esperar |
+
+Lo que cambia de verdad es la **forma** -pegados o separados-, no el color: quien
+no distingue el verde del ambar tiene que poder leerlo igual. El color solo lo
+subraya, y pasando el raton lo dice con palabras.
+
+Las dos primeras se parecen en la pantalla y no se parecen en nada: en una cabe
+esperar y en la otra no. Confundirlas es lo que hace creer que la aplicacion
+falla.
+
+### Quitar a alguien se le dice
+
+Al eliminar un contacto sale un sobre `T_UNLINK` para esa persona antes de
+borrarla, que es cuando todavia se tiene su clave para sellarselo. Si no hay
+camino, el aviso espera en la mochila y le llega cuando os crucais.
+
+Se manda **siempre, sin interruptor**, y no es un descuido. Los acuses son
+opcionales porque dicen algo de ti -a que hora abriste la aplicacion-; esto no
+dice nada de ti, dice algo de **el**: que lo que escriba a partir de ahora ya no
+se va a poder abrir. Callarselo lo deja escribiendo a una pared sin saberlo. El
+dialogo de eliminar lo avisa antes de pulsar, para que tampoco sea una sorpresa
+para quien lo hace.
+
+Quitar a alguien no le borra a el de tu lista si es el quien te quita a ti: eso
+lo decides tu. Lo que ya os disteis sigue donde estaba.
+
+Un detalle del que depende todo: el sobre que dice "te he quitado" **demuestra,
+por el mero hecho de abrirse**, que quien lo mando te tenia dado de alta. Asi
+que al abrirlo el vinculo se marca como bueno y una linea despues se marca como
+roto. Si ese orden se invierte, el aviso se anula a si mismo. Hay prueba:
+`test/vinculo.test.js`.
+
+---
+
 ## Que te escriban sin tenerlos anadidos (el buzon)
 
 Anadir a alguien va en **una sola direccion**. Un sobre solo se puede abrir si

@@ -37,6 +37,13 @@
 
                 var who = D.make('div', 'who');
                 var name = D.make('b', null, esGrupo ? row.group.name : row.contact.name);
+                /* El vinculo va con el NOMBRE y no en la fila suelta: lo que se
+                   pregunta es "puedo escribirle a esta persona", no "que pasa
+                   en esta fila". */
+                if (!esGrupo) {
+                    name.appendChild(document.createTextNode(' '));
+                    name.appendChild(D.vinculo(row.contact));
+                }
                 if (!esGrupo && row.contact.verified) {
                     var v = D.make('span', 'tag tag--ok', 'ok');
                     v.title = 'Huella comprobada';
@@ -147,7 +154,5 @@
         if (s.local) { modes.push(s.local + ' local'); }
         D.text(D.$('st-mode'), modes.length ? modes.join(' / ') : (s.persistent ? 'sin enlaces' : 'sin guardar en disco'));
 
-        var sub = D.$('brand-sub');
-        D.text(sub, s.peers ? 'en malla' : 'sin servidores');
     };
 })(BINTIO);

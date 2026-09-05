@@ -67,6 +67,32 @@
         if (D.onViewChange) { D.onViewChange(name); }
     };
 
+    /* ------------------------------------------------------------- vinculo
+
+       El estado del vinculo con una persona, en un icono. Son dos anillos: si
+       se tocan hay cadena, si estan separados no la hay.
+
+       Tres estados y no dos, porque "no hay vinculo" tiene dos causas muy
+       distintas y confundirlas hace que la gente crea que la aplicacion falla:
+
+         vinculado    ha llegado algo suyo y se ha podido abrir, o sea que esta
+                      persona te tiene dada de alta. Es lo unico que demuestra
+                      que lo que escribas le va a llegar.
+         a medias     todavia no ha llegado nada suyo. Puede que no te haya
+                      anadido, o puede que aun no os hayais cruzado.
+         te ha quitado  te lo ha dicho el. Ya no hay nada que esperar.
+
+       Devuelve un nodo listo para colgar al lado del nombre. */
+    D.vinculo = function (contact) {
+        var estado = contact.mutuo ? 'on' : (contact.unlinked ? 'cut' : 'wait');
+        var el = D.make('span', 'lnk lnk--' + estado);
+        el.title = estado === 'on' ? 'Vinculado: te tiene anadido, lo que le escribas le llega'
+            : estado === 'cut' ? 'Te ha quitado de sus contactos: lo que le escribas ya no lo puede abrir'
+            : 'Sin vinculo todavia: no ha llegado nada suyo, asi que puede que no te tenga anadido';
+        el.setAttribute('aria-label', el.title);
+        return el;
+    };
+
     /* ------------------------------------------------------------- avisos */
     D.toast = function (msg, kind) {
         var box = D.$('toasts');

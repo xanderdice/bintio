@@ -83,26 +83,6 @@
     }
 }
 
-/* El punto que respira dentro de la pastilla de la marca: la senal de "esto
-   esta vivo", que es justo lo que hay que decir de una aplicacion que no
-   tiene servidor detras. */
-.brand-sub::before {
-    content: "";
-    display: inline-block;
-    width: 6px; height: 6px;
-    margin-right: 8px;
-    vertical-align: middle;
-    border-radius: 50%;
-    background: rgb(var(--ok));
-    box-shadow: 0 0 9px rgba(var(--ok), calc(.9 * var(--bloom)));
-    animation: breathe 3.4s ease-in-out infinite;
-}
-
-@keyframes breathe {
-    0%, 100% { opacity: .4; }
-    50% { opacity: 1; }
-}
-
 /* -------------------------------------------------------- tarjetas y panel
    Sombra negra para separar del fondo y un halo de cian muy abierto para que
    la tarjeta parezca encendida por dentro y no pegada encima. */
@@ -309,13 +289,6 @@
 /* La marca del terminal se rellena con su propio degradado, mas caliente. */
 :root[data-skin="terminal"] .brand { color: rgba(var(--ice-hot), .55); }
 :root[data-skin="terminal"] .brand b { font-weight: 500; }
-:root[data-skin="terminal"] .brand-sub {
-    padding: 0;
-    border: 0;
-    background: none;
-    font-size: 9px;
-    letter-spacing: .18em;
-}
 @supports (-webkit-text-fill-color: transparent) {
     :root[data-skin="terminal"] .brand b,
     :root[data-skin="terminal"] .hero-mark {
@@ -324,14 +297,6 @@
             rgb(var(--ice-hot)) 42%,
             rgb(var(--ice)) 96%);
     }
-}
-
-/* El punto que respira, aqui del color del acento y no del de "correcto". */
-:root[data-skin="terminal"] .brand-sub::before {
-    width: 5px; height: 5px;
-    margin-right: 7px;
-    background: rgb(var(--ice));
-    box-shadow: 0 0 9px rgba(var(--ice), calc(.9 * var(--bloom)));
 }
 
 /* ---------------------------------------------------------------- botones
@@ -500,10 +465,7 @@
    pseudoelemento con fondo propio sigue estando ahi aunque no brille.
    ========================================================================== */
 :root[data-theme="carbon"] #app::before,
-:root[data-theme="paper"] #app::before,
-:root[data-theme="carbon"] .brand-sub::before,
-:root[data-theme="paper"] .brand-sub::before { display: none; }
+:root[data-theme="paper"] #app::before { display: none; }
 
 :root[data-skin="terminal"] body[data-bloom="off"] #app::before,
-body[data-bloom="off"] .brand-sub::before,
 body[data-bloom="off"] .dot--live::after { display: none; }

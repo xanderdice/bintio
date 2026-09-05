@@ -144,6 +144,48 @@ select.input option {
    se reserva igual para que los nombres de la lista queden alineados. */
 .dot--none { background: transparent; }
 
+/* ------------------------------------------------------------- el vinculo
+
+   Dos anillos. Si se tocan, hay cadena; si estan separados, no la hay. Se lee
+   sin haberlo aprendido antes, que es lo que no consigue un icono inventado, y
+   se dibuja con dos pseudoelementos: ni una imagen que descargar ni un byte
+   mas en la pagina.
+
+   El color no va solo: quien no distingue el verde del ambar tiene que poder
+   leerlo igual, y por eso lo que cambia de verdad es la FORMA -pegados o
+   separados-. El color solo lo subraya, y el title lo dice con palabras. */
+.lnk {
+    position: relative;
+    display: inline-block;
+    width: 17px; height: 9px;
+    vertical-align: middle;
+    color: var(--text-dim);
+}
+.lnk::before, .lnk::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 9px; height: 9px;
+    box-sizing: border-box;
+    border: 1.5px solid currentColor;
+    border-radius: 50%;
+}
+.lnk::before { left: 0; }
+.lnk::after { right: 0; }
+
+/* Vinculado: los dos anillos se solapan y forman la cadena. */
+.lnk--on { width: 15px; color: rgb(var(--ok)); }
+
+/* Sin vinculo todavia: separados, y del color apagado del texto secundario.
+   No es un error -puede que aun no os hayais cruzado-, asi que no se pinta
+   como si lo fuera. */
+.lnk--wait { width: 20px; }
+.lnk--wait::before, .lnk--wait::after { border-style: dashed; }
+
+/* Te ha quitado: separados igual, pero esto SI es un hecho consumado y se
+   dice con el color de aviso. */
+.lnk--cut { width: 20px; color: rgb(var(--warn)); }
+
 /* La marca de un grupo en la lista: el numero de personas, donde iria el punto.
    Dice de un vistazo que eso no es una persona y ademas cuenta algo util. */
 .gmark {

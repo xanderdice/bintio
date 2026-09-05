@@ -88,6 +88,28 @@
         if (c) { c.verified = !!yes; V.vault.save(); }
     };
 
+    /* Hay vinculo: ha llegado algo suyo y se ha podido abrir. Eso demuestra
+       que esta persona nos tiene dados de alta, porque si no no habria sabido
+       a quien sellar.
+
+       Vive aqui y no en las tres lineas que lo ponian por su cuenta -la
+       sesion y las dos de la presentacion- porque desde que existe el aviso de
+       desvinculacion hay algo mas que hacer: borrar la marca de "me quito".
+       Con tres sitios poniendolo, el primero que se olvidara dejaria a alguien
+       marcado como desvinculado para siempre aunque volviera a escribir. */
+    K.enlazado = function (contact) {
+        contact.mutuo = true;
+        if (contact.unlinked) { delete contact.unlinked; }
+    };
+
+    /* Nos ha quitado. No se le borra a el -eso lo decide el usuario-, se
+       apunta el hecho: la conversacion y la lista lo ensenan, y lo que se
+       escriba a partir de ahora ya no se va a poder abrir al otro lado. */
+    K.desenlazado = function (contact) {
+        contact.mutuo = false;
+        contact.unlinked = U.now();
+    };
+
     K.touch = function (pkHex) {
         var c = K.get(pkHex);
         if (c) { c.lastSeen = U.now(); }

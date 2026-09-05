@@ -49,21 +49,6 @@
     text-shadow: var(--text-glow-hot);
 }
 
-/* La coletilla de la marca: en el acabado de casa es una pastilla, que es
-   como se dice "esto es un producto" sin escribir una palabra de mas. */
-.brand-sub {
-    display: inline-flex;
-    align-items: center;
-    padding: 2px 10px 2px 8px;
-    font-size: 10.5px;
-    letter-spacing: var(--micro-track);
-    color: var(--text-dim);
-    text-transform: var(--micro-case);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-pill);
-    background: var(--surface);
-}
-
 #menubar .spacer { flex: 1; }
 
 /* --------------------------------------------------------------- escenario */
@@ -278,7 +263,6 @@
     #view-main.show-chat #roster-panel { display: none; }
     #view-main:not(.show-chat) #chat-panel { display: none; }
     #menubar { height: 54px; }
-    .brand-sub { display: none; }
     .sheet { padding: 16px 12px 22px; }
     .hero-mark { font-size: 25px; }
     .hero-logo { width: 84px; height: 84px; margin-bottom: 14px; }

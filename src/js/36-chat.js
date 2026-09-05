@@ -483,6 +483,31 @@
         return t.quien;
     };
 
+    /* ---------------------------------------------------------------------
+       Quitar a alguien, avisandole
+       --------------------------------------------------------------------- */
+
+    /* Se avisa ANTES de borrar, que es cuando todavia tenemos su clave para
+       sellarle algo. El sobre queda en la mochila si no hay camino, asi que le
+       llegara aunque ahora mismo no haya ningun enlace.
+
+       Y se avisa siempre, sin interruptor. Los acuses son opcionales porque
+       dicen algo de ti -a que hora abriste la aplicacion-; esto no dice nada de
+       ti, dice algo de EL: que lo que escriba a partir de ahora ya no se va a
+       poder abrir. Callarselo lo dejaria escribiendo a una pared sin saberlo,
+       que es exactamente el fallo que el aviso de "contacto a medias" vino a
+       arreglar en la otra direccion.
+
+       Devuelve false si esa persona ya no estaba. */
+    Chat.unlink = function (pkHex) {
+        var contact = K.get(pkHex);
+        if (!contact) { return false; }
+        try { M.send(S.seal(contact, S.T_UNLINK, null, null, 4)); } catch (e) {}
+        K.remove(pkHex);
+        fire('contact', null);
+        return true;
+    };
+
     Chat.sendPresence = function (contact) {
         try { M.send(S.seal(contact, S.T_PRESENCE, U.fromString('1'), null, 2)); } catch (e) {}
     };
@@ -632,6 +657,24 @@
                     fire('contact', contact);
                 }
             } catch (e) {}
+            return;
+        }
+
+        /* Nos han quitado.
+
+           Ojo al orden: S.open acaba de poner mutuo a true, porque un sobre
+           que se abre demuestra que quien lo mando nos tenia dados de alta.
+           Es verdad y hay que dejarlo pasar; lo que cuenta es lo que dice el
+           sobre, y lo dice justo despues. Sin este orden, el ultimo mensaje de
+           alguien que te quita te lo dejaria marcado como vinculado.
+
+           No se le borra a el: eso lo decide el usuario. Aqui solo se apunta,
+           y la lista y la conversacion lo ensenan. */
+        if (opened.type === S.T_UNLINK) {
+            K.desenlazado(contact);
+            delete escriben[pk];
+            V.vault.save();
+            fire('contact', contact);
             return;
         }
 

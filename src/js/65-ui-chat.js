@@ -80,7 +80,9 @@
                camino, tiene tantos como miembros. */
             dot.className = 'dot dot--none';
         } else {
-            D.text(D.$('peer-name'), contact.name);
+            D.clear(D.$('peer-name'));
+            D.$('peer-name').appendChild(document.createTextNode(contact.name + ' '));
+            D.$('peer-name').appendChild(D.vinculo(contact));
             D.text(D.$('peer-fp'), contact.verified ? 'huella comprobada' : contact.fingerprint);
             dot.className = 'dot' + (contact.lastSeen && Date.now() - contact.lastSeen < 120000 ? ' dot--live' : '');
         }
@@ -150,7 +152,18 @@
                tres segundos: es la unica forma de que se entienda por que no
                llega nada. Desaparece solo con el primer mensaje suyo. */
             var contacto = V.contacts.get(D.activePk);
-            if (contacto && !contacto.mutuo) {
+            if (contacto && contacto.unlinked) {
+                /* Nos ha quitado y nos lo ha dicho. Es distinto de "todavia no
+                   ha llegado nada suyo" y no se puede contar igual: ahi cabe
+                   esperar, y aqui no hay nada que esperar. */
+                var corte = D.make('div', 'msg msg--sys');
+                corte.appendChild(document.createTextNode(
+                    contacto.name + ' te ha quitado de sus contactos. Lo que escribas aqui saldra ' +
+                    'del aparato, pero ' + contacto.name + ' ya no lo puede abrir: para eso tendria ' +
+                    'que volver a anadirte. Lo que ya os disteis sigue aqui; si no lo quieres, ' +
+                    'borra la conversacion desde Ficha.'));
+                scroll.appendChild(corte);
+            } else if (contacto && !contacto.mutuo) {
                 var nota = D.make('div', 'msg msg--sys');
                 nota.appendChild(document.createTextNode(
                     'Todavia no ha llegado nada de ' + contacto.name + '. Anadir a alguien va en una ' +
@@ -354,7 +367,14 @@
             if (g) { pintarGrupo(g); return; }
             var c = V.contacts.get(D.activePk);
             if (!c) { return; }
-            D.text(D.$('peer-title'), c.name);
+            D.clear(D.$('peer-title'));
+            D.$('peer-title').appendChild(document.createTextNode(c.name + ' '));
+            D.$('peer-title').appendChild(D.vinculo(c));
+            D.text(D.$('peer-estado'), c.mutuo
+                ? 'Vinculado: te tiene anadido, asi que lo que le escribas lo puede abrir.'
+                : c.unlinked
+                    ? 'Te ha quitado de sus contactos. Lo que le escribas ya no lo puede abrir.'
+                    : 'Sin vinculo todavia: no ha llegado nada suyo. Hasta que te anada, no puede abrir lo que le escribas.');
             D.$('peer-alias').value = c.name;
             D.text(D.$('peer-fingerprint'), c.fingerprint);
             D.$('peer-verified').checked = !!c.verified;
@@ -383,8 +403,14 @@
         });
 
         D.on(D.$('btn-peer-remove'), 'click', function () {
-            if (!window.confirm('Eliminar el contacto y su conversacion?')) { return; }
-            V.contacts.remove(D.activePk);
+            /* Se dice que se le avisa. Quitar a alguien en silencio y que siga
+               escribiendo a una pared es lo que esta aplicacion no quiere
+               hacerle a nadie, pero tampoco puede ser una sorpresa para quien
+               lo hace: quien prefiera irse sin decir nada tiene que poder
+               enterarse ANTES de pulsar. */
+            if (!window.confirm('Eliminar el contacto y su conversacion? ' +
+                'Se le avisara de que ya no hay vinculo, para que no siga escribiendote sin saberlo.')) { return; }
+            V.chat.unlink(D.activePk);
             D.activePk = null;
             D.$('view-main').className = 'view is-active';
             D.view('view-main');

@@ -841,7 +841,7 @@
            esta linea la conversacion avisaria de que el otro no puede leernos,
            que aqui es falso. La huella sigue SIN comprobar: el sello dice que
            quien escribe tiene esa privada, no de quien es la clave. */
-        c.mutuo = true;
+        K.enlazado(c);
         c.lastSeen = U.now();
 
         /* K.add ya ha llamado a M.rescanBag, asi que un sobre suyo que
@@ -898,7 +898,7 @@
                demostro tener la privada y nos escribio- y tirarlo perderia un
                mensaje de verdad. No se toca su nombre (el usuario pudo
                renombrarlo) ni su verificacion. */
-            contacto.mutuo = true;
+            K.enlazado(contacto);
             contacto.lastSeen = U.now();
             if (a.text.length) {
                 V.chat.onIncoming({
