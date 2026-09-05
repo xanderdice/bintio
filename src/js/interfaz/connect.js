@@ -35,7 +35,7 @@
 
        Una invitacion no es un texto cualquiera: es la cara visible de una
        conexion WebRTC viva que espera respuesta. Por eso NO se rehace cada
-       vez que se entra aqui. 42-transport-rtc.js guarda todas las ofertas en
+       vez que se entra aqui. rtc.js guarda todas las ofertas en
        una tabla y acceptAnswer no puede saber a cual pertenece la respuesta
        que le llega: se queda con la ultima que encuentra esperando. Con una
        sola oferta viva eso es exacto; con cuatro, es una moneda al aire. Asi
@@ -86,10 +86,10 @@
 
     function pintarEspera() {
         mostrado = '';
-        D.text(D.$('mine-title'), 'Preparando tu codigo');
-        D.text(D.$('mine-note'), 'Mirando por donde puede salir este aparato. Un segundo.');
+        D.text(D.$('mine-title'), D.t('Preparando tu codigo'));
+        D.text(D.$('mine-note'), D.t('Mirando por donde puede salir este aparato. Un segundo.'));
         D.text(D.$('my-code'), '');
-        D.qrNote(D.$('my-qr'), 'Preparando el codigo...');
+        D.qrNote(D.$('my-qr'), D.t('Preparando el codigo...'));
     }
 
     function mostrarMio() {
@@ -101,17 +101,18 @@
         if (!miCodigo) { pintarEspera(); return; }
 
         if (miTipo === 'invitacion') {
-            pintar('Tu codigo para conectar',
-                   'Ense\u00f1aselo a la otra persona, o pasaselo por donde quieras. Al leerlo te a\u00f1ade y le sale una respuesta: escanea esa respuesta aqui abajo y el camino queda abierto. Son dos pasos porque no hay ningun servidor que lleve el segundo por vosotros.',
+            pintar(D.t('Tu codigo para conectar'),
+                   D.t('Ense\u00f1aselo a la otra persona, o pasaselo por donde quieras. Al leerlo te a\u00f1ade y le sale una respuesta: escanea esa respuesta aqui abajo y el camino queda abierto. Son dos pasos porque no hay ningun servidor que lleve el segundo por vosotros.'),
                    miCodigo,
-                   'Codigo QR con tu invitacion',
+                   D.t('Codigo QR con tu invitacion'),
                    'Conecta conmigo por BINTIO: ');
             return;
         }
-        pintar('Tu tarjeta de contacto',
-               miMotivo + ' Con esta tarjeta pueden a\u00f1adirte y comprobar tu huella, pero NO abre camino de red: lo que os escribais se quedara guardado y sin salir hasta que aparezca un enlace por Bluetooth, por la malla o desde otro aparato.',
+        pintar(D.t('Tu tarjeta de contacto'),
+               D.t('{motivo} Con esta tarjeta pueden a\u00f1adirte y comprobar tu huella, pero NO abre camino de red: lo que os escribais se quedara guardado y sin salir hasta que aparezca un enlace por Bluetooth, por la malla o desde otro aparato.',
+                   { motivo: D.t(miMotivo) }),
                miCodigo,
-               'Codigo QR con tu tarjeta de contacto',
+               D.t('Codigo QR con tu tarjeta de contacto'),
                'Mi tarjeta de BINTIO: ');
     }
 
@@ -120,10 +121,10 @@
         pkRespuesta = contact.pk;
         D.show(D.$('btn-show-mine'), true);
         D.show(D.$('mine-lock'), false);
-        pintar('Ense\u00f1ale esto ahora a ' + contact.name,
-               'Segundo y ultimo paso. En cuanto lea esta respuesta, el camino queda abierto por los dos lados y no hace falta ningun codigo mas. Si no puede escanear, copiala y pasasela.',
+        pintar(D.t('Ense\u00f1ale esto ahora a {quien}', { quien: contact.name }),
+               D.t('Segundo y ultimo paso. En cuanto lea esta respuesta, el camino queda abierto por los dos lados y no hace falta ningun codigo mas. Si no puede escanear, copiala y pasasela.'),
                answer,
-               'Codigo QR con tu respuesta',
+               D.t('Codigo QR con tu respuesta'),
                'Mi respuesta de BINTIO: ');
         alPrincipio();
     }
@@ -142,14 +143,14 @@
         if (creando) { pintarEspera(); return; }
 
         if (!V.transport.rtc.available()) {
-            caerATarjeta('Este navegador no tiene WebRTC, asi que no puede abrir un enlace directo.');
+            caerATarjeta(D.t('Este navegador no tiene WebRTC, asi que no puede abrir un enlace directo.'));
             return;
         }
 
         creando = true;
         pintarEspera();
         /* Con que clave se pidio ESTA vuelta. Recoger los candidatos de red
-           tarda hasta 2500 ms (42-transport-rtc.js, GATHER_MS) y la pantalla
+           tarda hasta 2500 ms (rtc.js, GATHER_MS) y la pantalla
            deja pulsar el boton de la clave mientras tanto: si la clave cambia
            por el camino, el codigo que llega es el de antes y ensenarlo seria
            mentir, porque el aviso ya ha dicho que lleva clave. */
@@ -179,13 +180,13 @@
     }
 
     D.openConnect = function () {
-        /* 99-boot puede llamar aqui con un codigo pegado en la direccion
+        /* boot.js puede llamar aqui con un codigo pegado en la direccion
            antes de que se haya abierto la boveda. Sin identidad no hay ni
            tarjeta ni invitacion que ensenar, y sacar al usuario de la
            pantalla de acceso solo lo dejaria mas perdido. El codigo no se
            pierde: se queda en el campo de abajo esperando. */
         if (!V.app.ready) {
-            D.toast('Abre tu identidad y entra en Conectar: el codigo te espera ahi.');
+            D.toast(D.t('Abre tu identidad y entra en Conectar: el codigo te espera ahi.'));
             return;
         }
         D.view('view-connect');
@@ -207,7 +208,7 @@
             if (err) { D.toast(err.message, 'bad'); return; }
 
             if (res.needPass) {
-                D.toast('Ese codigo lleva clave de encuentro: escribela abajo y vuelve a darle', 'bad');
+                D.toast(D.t('Ese codigo lleva clave de encuentro: escribela abajo y vuelve a darle'), 'bad');
                 var f = D.$('paste-pass');
                 if (f) { try { f.focus(); } catch (e) {} }
                 return;
@@ -224,7 +225,7 @@
                 nota((res.existed ? 'Ya tenias a ' : 'A\u00f1adido: ') + res.contact.name +
                      '. Pero eso era una tarjeta, que es solo identidad: todavia NO hay camino hasta su aparato. Para abrirlo, ense\u00f1ale el codigo de aqui arriba y que lo escanee, o pidele el suyo. Mientras tanto lo que le escribas se guarda y sale solo en cuanto haya camino.',
                      res.contact.pk);
-                D.toast('Te lo a\u00f1ade como contacto, pero no conecta: falta un codigo de los de arriba', 'bad');
+                D.toast(D.t('Te lo a\u00f1ade como contacto, pero no conecta: falta un codigo de los de arriba'), 'bad');
                 return;
             }
 
@@ -234,7 +235,8 @@
             if (res.kind === 'offer') {
                 nota('');
                 mostrarRespuesta(res.contact, res.answer);
-                D.toast('Ya tienes a ' + res.contact.name + '. Falta un paso: ense\u00f1ale la respuesta de arriba.', 'ok');
+                D.toast(D.t('Ya tienes a {quien}. Falta un paso: ense\u00f1ale la respuesta de arriba.',
+                    { quien: res.contact.name }), 'ok');
                 return;
             }
 
@@ -251,7 +253,7 @@
                por que.
 
                Asi que aqui no se promete nada: se espera a que el canal se
-               abra de verdad (42-transport-rtc.js avisa con 'peer' cuando el
+               abra de verdad (rtc.js avisa con 'peer' cuando el
                canal de datos abre) y, si no abre, se dice claramente. */
             olvidarMio();
             nota('');
@@ -268,14 +270,15 @@
 
     function esperarEnlace(contact) {
         if (esperando) { clearTimeout(esperando.timer); }
-        D.toast('Respuesta aceptada. Comprobando el enlace con ' + contact.name + '...');
+        D.toast(D.t('Respuesta aceptada. Comprobando el enlace con {quien}...', { quien: contact.name }));
         esperando = { pk: contact.pk, nombre: contact.name, timer: null };
         esperando.timer = setTimeout(function () {
             if (!esperando) { return; }
             var e = esperando;
             esperando = null;
-            D.toast('No se ha abierto el enlace con ' + e.nombre +
-                '. Esa respuesta puede ser de una sesion anterior: pidele que te ense\u00f1e su codigo otra vez.', 'bad');
+            D.toast(D.t('No se ha abierto el enlace con {quien}. Esa respuesta puede ser de una ' +
+                'sesion anterior: pidele que te ense\u00f1e su codigo otra vez.',
+                { quien: e.nombre }), 'bad');
             /* Se vuelve a ensenar el codigo propio, que es lo que hay que
                hacer a continuacion. */
             prepararMio();
@@ -300,7 +303,8 @@
             var e = esperando;
             esperando = null;
             clearTimeout(e.timer);
-            D.toast('Enlace abierto con ' + e.nombre + '. Lo que tuvieras sin salir sale ahora.', 'ok');
+            D.toast(D.t('Enlace abierto con {quien}. Lo que tuvieras sin salir sale ahora.',
+                    { quien: e.nombre }), 'ok');
             if (e.pk && V.contacts.get(e.pk)) { D.openChat(e.pk); }
             return;
         }
@@ -310,7 +314,7 @@
         var pk = pkRespuesta;
         estado = 'mio';
         pkRespuesta = null;
-        D.toast('Camino abierto. Lo que tuvieras sin salir sale ahora.', 'ok');
+        D.toast(D.t('Camino abierto. Lo que tuvieras sin salir sale ahora.'), 'ok');
         if (D.current !== 'view-connect') { return; }
         if (pk && V.contacts.get(pk)) { D.openChat(pk); }
         else { mostrarMio(); }
@@ -319,7 +323,7 @@
     D.initConnect = function () {
 
         D.on(D.$('btn-copy-code'), 'click', function () {
-            if (!mostrado) { D.toast('Todavia se esta preparando'); return; }
+            if (!mostrado) { D.toast(D.t('Todavia se esta preparando')); return; }
             D.copy(mostrado);
         });
 
@@ -328,7 +332,7 @@
            hay direccion (un fichero suelto), toLink devuelve el codigo tal
            cual y se comparte igual de bien. */
         D.on(D.$('btn-share-code'), 'click', function () {
-            if (!mostrado) { D.toast('Todavia se esta preparando'); return; }
+            if (!mostrado) { D.toast(D.t('Todavia se esta preparando')); return; }
             D.share(comoSeComparte + V.invite.toLink(mostrado), 'BINTIO');
         });
 
@@ -344,7 +348,7 @@
         D.on(D.$('btn-lock-code'), 'click', function () {
             var pass = limpio(D.$('meet-pass').value) || null;
             if (pass === miClave && miCodigo) {
-                D.toast(pass ? 'Tu codigo ya lleva esa clave' : 'Tu codigo ya va sin clave');
+                D.toast(D.t(pass ? 'Tu codigo ya lleva esa clave' : 'Tu codigo ya va sin clave'));
                 return;
             }
             miClave = pass;
@@ -354,15 +358,15 @@
             /* En pasado no, que todavia se esta haciendo: la oferta nueva
                tarda lo que tarde en recoger candidatos, y hasta entonces
                arriba pone "Preparando tu codigo". */
-            D.toast(pass
+            D.toast(D.t(pass
                 ? 'Rehaciendo tu codigo con clave. Dile la clave por otra via, no en el mismo mensaje.'
-                : 'Rehaciendo tu codigo sin clave.', 'ok');
+                : 'Rehaciendo tu codigo sin clave.'), 'ok');
         });
 
         D.on(D.$('btn-use-code'), 'click', function () {
             var text = limpio(D.$('paste-code').value);
             var pass = limpio(D.$('paste-pass').value);
-            if (!text) { D.toast('Pega primero un codigo, o escanea su QR', 'bad'); return; }
+            if (!text) { D.toast(D.t('Pega primero un codigo, o escanea su QR'), 'bad'); return; }
             handleCode(text, pass || null);
         });
 
@@ -403,13 +407,13 @@
         /* --------------------------------------------------- bluetooth */
         D.on(D.$('btn-ble'), 'click', function () {
             if (!V.transport.ble.available()) {
-                D.toast('Este navegador no tiene Web Bluetooth. En Android usa Chrome; en iPhone todavia no existe.', 'bad');
+                D.toast(D.t('Este navegador no tiene Web Bluetooth. En Android usa Chrome; en iPhone todavia no existe.'), 'bad');
                 return;
             }
-            D.toast('Elige un nodo de la lista del navegador...');
+            D.toast(D.t('Elige un nodo de la lista del navegador...'));
             V.transport.ble.connect(function (err, peer) {
-                if (err) { D.toast('Bluetooth: ' + err.message, 'bad'); return; }
-                D.toast('Conectado por Bluetooth a ' + peer.label, 'ok');
+                if (err) { D.toast(D.t('Bluetooth: {motivo}', { motivo: D.t(err.message) }), 'bad'); return; }
+                D.toast(D.t('Conectado por Bluetooth a {quien}', { quien: peer.label }), 'ok');
                 D.refreshStatus();
             });
         });

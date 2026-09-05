@@ -20,8 +20,8 @@
    aparato lleva encima para otros. Es la misma cosa.
 
    Formatos en el cable:
-     'B','X',...   -> un sobre (ver 32-envelope.js)
-     'B','P',...   -> una presentacion (ver 37-presenta.js)
+     'B','X',...   -> un sobre (ver envelope.js)
+     'B','P',...   -> una presentacion (ver presenta.js)
      'B','C',tipo  -> control de la malla
                       1 inventario: lista de identificadores que tengo
                       2 peticion:   dame estos identificadores
@@ -48,7 +48,7 @@
     var MAX_BAG_BYTES = 900 * 1024; /* aprox 900 KB, solo sobres */
     var MAX_SEEN = 800;
 
-    /* Cupo propio de las presentaciones. Vive aqui y no en 37-presenta.js
+    /* Cupo propio de las presentaciones. Vive aqui y no en presenta.js
        porque quien lo aplica es la bolsa; si falta el fichero, 40 sigue
        siendo el numero. 40 x 708 bytes son 28 KB: el 3% del presupuesto. */
     function presMax() {
@@ -177,7 +177,7 @@
                       nuestras, asi que valen mas que las ajenas, pero menos
                       que las que ya sabemos que lo son.
          3. propias   las sellamos aqui. Duele, pero se pueden volver a sellar:
-                      36-chat.js las reintenta.
+                      chat.js las reintenta.
          4. espera    abiertas, para nosotros, esperando sitio en la lista. Son
                       las UNICAS que no se pueden recuperar de ninguna forma si
                       se van: quien las mando no reintenta. Se sacrifican las
@@ -209,7 +209,7 @@
             /* El suelo vale para las DOS clases que pueden acaparar. Estaba
                solo en las propias, y con la mochila llena de las que esperan
                sitio, la presentacion que acababas de sellar moria en el mismo
-               M.send que la metia... y como 36-chat.js reintenta lo que no esta
+               M.send que la metia... y como chat.js reintenta lo que no esta
                en la mochila, se quedaba minando cada minuto para siempre. */
             cola = espera.length > Math.floor(tope / 2) ? espera
                  : (propias.length > Math.floor(tope / 4) ? propias
@@ -328,7 +328,7 @@
         V.vault.save();
     }
 
-    /* Sacar una pieza de la bolsa. Lo usa 36-chat.js al reintentar: un
+    /* Sacar una pieza de la bolsa. Lo usa chat.js al reintentar: un
        mensaje que no ha salido se vuelve a sellar, y el sobre nuevo tiene otro
        identificador, asi que sin esto la copia anterior se quedaria dentro
        para siempre. */
@@ -343,7 +343,7 @@
 
     /* Lo mismo que M.bagGet pero para dar a un tercero: por aqui no sale lo
        que sePublica no ensena. M.bagGet se queda como esta porque lo usa
-       36-chat.js para mirar su propia mochila, y ahi no hay nadie a quien
+       chat.js para mirar su propia mochila, y ahi no hay nadie a quien
        ocultarle nada. */
     function bagServe(id) {
         var b = bag();
@@ -560,7 +560,7 @@
 
        El segundo argumento es el identificador del sobre que ESTE sustituye, y
        existe por un fallo que costo la bolsa entera. Un mensaje que no ha
-       salido se reintenta cada minuto (50-app.js), y cada reintento lo vuelve
+       salido se reintenta cada minuto (app.js), y cada reintento lo vuelve
        a SELLAR: efimera nueva, nonce nuevo, identificador nuevo. bagAdd no lo
        reconocia como repetido y metia una copia mas. Once copias del mismo
        mensaje en diez minutos; en cinco horas, las trescientas de MAX_BAG.
@@ -597,7 +597,7 @@
 
        Un sobre solo se puede abrir si quien lo manda esta en nuestra lista de
        contactos: S.open recorre los contactos y prueba la etiqueta con cada
-       uno (34-session.js). Si alguien nos anade y nos escribe ANTES de que
+       uno (session.js). Si alguien nos anade y nos escribe ANTES de que
        nosotros le anadamos a el, su mensaje llega al aparato, no se reconoce
        como propio y se queda en la bolsa igual que el de un desconocido.
 

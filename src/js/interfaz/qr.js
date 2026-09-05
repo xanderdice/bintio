@@ -1,7 +1,7 @@
 /* ==========================================================================
    Pintar y leer codigos QR.
 
-   Pintar: siempre disponible, lo hace 45-qr.js y aqui solo se convierte la
+   Pintar: siempre disponible, lo hace qr.js y aqui solo se convierte la
    matriz en un SVG.
 
    Leer: se usa BarcodeDetector, que viene de serie en los navegadores

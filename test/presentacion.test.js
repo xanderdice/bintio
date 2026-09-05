@@ -14,38 +14,23 @@
    Todo lo caro (minar la prueba de coste) es sincrono a proposito salvo el
    ultimo bloque, que es el flujo de verdad: escribir a alguien que todavia no
    te tiene, con un tercero en medio que solo hace de mula.                  */
-var load = require('./load');
-var fails = 0, checks = 0;
+var ayuda = require('./ayuda');
+var ok = ayuda.ok;
 
-function ok(name, cond, extra) {
-    checks++;
-    if (cond) { console.log('  ok  ' + name); }
-    else { fails++; console.log('  FALLA ' + name + (extra ? '  -> ' + extra : '')); }
-}
+/* El nodo lo monta test/ayuda.js; aqui solo se le pide lo que esta prueba
+   necesita distinto, y se le ponen los nombres que usa este fichero.
 
-/* Un nodo completo en memoria. Ojo al estado: se crea SIN el campo requests,
-   que es como esta una boveda hecha antes de que la presentacion existiera.
-   Si algo de esto se rompiera con una boveda vieja, se rompe aqui. */
+   viejo: la boveda se monta SIN el campo "requests", que es como esta una
+   hecha antes de que la presentacion existiera. Si algo de esto se rompiera
+   con una boveda vieja, se rompe aqui.
+
+   openInbox: el buzon va CERRADO de serie (vault.js). Sin abrirlo, una
+   presentacion no se abre siquiera y todo lo de abajo mediria el rechazo en
+   vez de lo que quiere medir. Que haya que pedirlo a mano es justo lo que se
+   quiere, y el valor por defecto se comprueba aparte al final. */
 function nodo(nombre) {
-    var V = load('49');
-    var U = V.util;
-    var st = {
-        identity: null, contacts: [], chats: {}, carrier: [], seen: [],
-        /* El buzon va CERRADO de serie (31-vault.js): sin esta linea, una
-           presentacion no se abre siquiera y todo lo de abajo mediria el
-           rechazo en vez de lo que quiere medir. Que haya que ponerla a mano es
-           justo lo que se quiere: el valor por defecto es no aceptar de
-           desconocidos, y se comprueba aparte al final. */
-        settings: { relay: true, receipts: true, theme: 'bintio', openInbox: true }
-    };
-    V.vault.state = st;
-    V.vault.save = function () {};
-    V.vault.saveNow = function () {};
-    var id = V.id.create();
-    st.identity = { seed: U.toHex(id.seed), name: nombre };
-    V.contacts.bind(id);
-    V.mesh.init(function (abierto) { V.chat.onIncoming(abierto); });
-    return { V: V, U: U, id: id, pk: U.toHex(id.pk), nombre: nombre, st: st };
+    var V = ayuda.nodo(nombre, { viejo: true, ajustes: { openInbox: true } });
+    return { V: V, U: V.util, id: V.yo, pk: V.pkHex, nombre: nombre, st: V.vault.state };
 }
 
 /* Un nodo con los ajustes tal y como salen de fabrica: sin tocar el buzon.
@@ -658,7 +643,7 @@ ok('dos copias con distinto contador de saltos siguen siendo la misma',
    P.parse(conSalto).id === P.parse(legitima).id);
 
 /* Una presentacion SIN texto de quien ya tiene una solicitud puesta no la deja
-   muda: puede ser el reintento que manda 36-chat.js cuando la suya se perdio
+   muda: puede ser el reintento que manda chat.js cuando la suya se perdio
    antes de salir, y ese va vacio a proposito porque el texto viaja aparte. */
 entregar(fran, presentacion(ana, fran, 'Ana', ''));
 ok('una presentacion sin texto no borra el que ya se habia leido',
@@ -840,12 +825,7 @@ function propia(cb) {
     });
 }
 
-function terminar() {
-    console.log('');
-    console.log(fails ? fails + ' FALLOS de ' + checks + ' comprobaciones'
-                      : 'TODO CORRECTO: ' + checks + ' comprobaciones');
-    process.exit(fails ? 1 : 0);
-}
+function terminar() { ayuda.resumen(); }
 
 /* ======================================================================== */
 console.log('');

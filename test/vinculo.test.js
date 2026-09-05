@@ -15,46 +15,8 @@
    quitado" DEMUESTRA, por el mero hecho de abrirse, que quien lo mando te tenia
    dado de alta. Si el orden se cambia, el aviso se marca a si mismo como
    vinculo y no sirve de nada.                                               */
-var load = require('./load');
-var fails = 0, checks = 0;
-
-function ok(name, cond, extra) {
-    checks++;
-    if (cond) { console.log('  ok  ' + name); }
-    else { fails++; console.log('  FALLA ' + name + (extra ? '  -> ' + extra : '')); }
-}
-
-function nodo(nombre) {
-    var V = load('49');
-    var U = V.util;
-    V.vault.state = {
-        identity: null, contacts: [], chats: {}, carrier: [], seen: [],
-        requests: [], groups: {},
-        settings: { relay: true, receipts: true, typing: true, theme: 'bintio' }
-    };
-    V.vault.save = function () {};
-    V.vault.saveNow = function () {};
-    var id = V.id.create();
-    V.vault.state.identity = { seed: U.toHex(id.seed), name: nombre };
-    V.contacts.bind(id);
-    V.mesh.init(function (abierto) { V.chat.onIncoming(abierto); });
-    V.nombre = nombre;
-    V.pkHex = U.toHex(id.pk);
-    return V;
-}
-
-function cablear(a, b) {
-    var haciaA = { id: a.nombre, kind: 'local', close: function () {},
-        send: function (bytes) { a.mesh.handleFrame(bytes, haciaB); } };
-    var haciaB = { id: b.nombre, kind: 'local', close: function () {},
-        send: function (bytes) { b.mesh.handleFrame(bytes, haciaA); } };
-    a.transport.addPeer(haciaB);
-    b.transport.addPeer(haciaA);
-    return function desconectar() {
-        a.transport.removePeer(haciaB.id);
-        b.transport.removePeer(haciaA.id);
-    };
-}
+var ayuda = require('./ayuda');
+var ok = ayuda.ok, nodo = ayuda.nodo, cablear = ayuda.cablear, presentar = ayuda.presentar;
 
 /* ------------------------------------------------------------ a medias */
 console.log('Anadir va en una sola direccion');
@@ -168,9 +130,4 @@ var nadie = new Array(65).join('a');   /* 64 caracteres: una clave que no existe
 ok('quitar a alguien que ya no esta devuelve false',
    E.chat.unlink(nadie) === false);
 
-console.log('');
-if (fails) {
-    console.log('FALLOS: ' + fails + ' de ' + checks);
-    process.exit(1);
-}
-console.log('TODO CORRECTO: ' + checks + ' comprobaciones');
+ayuda.resumen();

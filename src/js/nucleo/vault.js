@@ -94,7 +94,7 @@
             chats: {},               /* pk hex -> {messages:[], unread:0, ...} */
             carrier: [],             /* sobres ajenos en transito (bolsa) */
             /* Presentaciones de desconocidos, a la espera de que el usuario
-               las acepte o las descarte (37-presenta.js). Van DENTRO de la
+               las acepte o las descarte (presenta.js). Van DENTRO de la
                boveda cifrada porque una solicitud que llega con la aplicacion
                cerrada y desaparece al abrirla seria justo el fallo que la
                presentacion viene a arreglar. Las bovedas creadas antes de que
@@ -102,14 +102,14 @@
                tiene que tolerarlo, igual que hace M.init con carrier. */
             requests: [],
             /* Grupos: id -> { id, name, members, rev, created }. Igual que
-               requests, una boveda de antes no lo tiene y 38-groups.js lo crea
+               requests, una boveda de antes no lo tiene y groups.js lo crea
                al vuelo la primera vez que se mira. */
             groups: {},
             settings: {
                 /* El tema de casa. Si aqui pone otra cosa, la boveda recien
                    creada arrancaria con un tema distinto del que se ve en la
                    pantalla de acceso, y el cambio de color al entrar parece
-                   un fallo. Vive aqui y en 61-ui-theme.js: los dos tienen
+                   un fallo. Vive aqui y en theme.js: los dos tienen
                    que decir lo mismo. */
                 theme: 'bintio',
                 bloom: 'on',
@@ -125,7 +125,7 @@
                 /* Pantalla protegida. Encendida de serie: tapa al perder el
                    foco y quita el menu del boton derecho. Lo que NO hace -y
                    no puede hacer nadie desde una pagina- es impedir una
-                   captura; el interruptor lo dice y 69-ui-privacidad.js lo
+                   captura; el interruptor lo dice y privacidad.js lo
                    explica entero. */
                 shield: true,
                 notify: true,
@@ -139,8 +139,7 @@
                    pero se elige; no se hereda por instalar la aplicacion. Una
                    boveda que ya existia y no tiene esta clave se lee como
                    cerrada, que es lo que hacia antes de que esto existiera. */
-                openInbox: false,
-                lang: 'es'
+                openInbox: false
             },
             createdAt: U.now()
         };
@@ -284,7 +283,7 @@
 
        Se barre por prefijo y no por una lista de claves a proposito: una lista
        hay que acordarse de actualizarla, y el primero que no se acordo fue
-       este mismo fichero. Ademas asi 31-vault.js no tiene que conocer las
+       este mismo fichero. Ademas asi vault.js no tiene que conocer las
        claves de los transportes, que estan dos capas por encima. */
     function barrer(almacen) {
         if (!almacen) { return; }

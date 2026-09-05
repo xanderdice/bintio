@@ -2,15 +2,16 @@
    BINTIO — espacio de nombres global
    --------------------------------------------------------------------------
    Todo el codigo vive colgado de un unico objeto global. No hay modulos ES,
-   no hay bundler magico: el build concatena los ficheros por orden de nombre
-   y cada fichero se envuelve en su propia funcion anonima.
+   no hay bundler magico: el build concatena los ficheros y cada uno se envuelve
+   en su propia funcion anonima. En que ORDEN los concatena lo dice la lista de
+   etiquetas <script> de src/index.html, que es tambien la unica lista que hay.
 
-   Regla de oro del proyecto:
-     - js/1x, 2x, 3x  -> nucleo puro. NO tocan el DOM. NO conocen la interfaz.
-     - js/4x          -> transportes. Hablan con la red. NO tocan el DOM.
-     - js/5x          -> controlador. Une nucleo y transportes.
-     - js/6x          -> interfaz. SOLO toca el DOM. NO hace criptografia.
-   Si un fichero rompe su regla, esta en el sitio equivocado.
+   Regla de oro del proyecto, y la carpeta ya la dice:
+     - js/nucleo/       la aplicacion de verdad. NO toca el DOM ni la red.
+     - js/transportes/  hablan con la red. Tampoco tocan el DOM.
+     - js/app/          el controlador. Une el nucleo con los transportes.
+     - js/interfaz/     SOLO toca el DOM. NO hace criptografia.
+   Si un fichero rompe su regla, esta en la carpeta equivocada.
    ========================================================================== */
 var BINTIO = (function () {
     'use strict';

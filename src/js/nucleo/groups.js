@@ -45,7 +45,13 @@
        la ficha en 2,5 KB, que es el 0,3% de la mochila. */
     G.MAX = 32;
 
+    /* Con la boveda cerrada no hay grupos, y preguntar no puede reventar: la
+       lista de conversaciones se pinta tambien en la pantalla de acceso -esta
+       vacia, pero se pinta- y K.all() ya lo tolera desde siempre. Esto no lo
+       hacia, y bastaba con repintar antes de entrar para llevarse por delante
+       el arranque entero. */
     function todos() {
+        if (!V.vault.state) { return {}; }
         if (!V.vault.state.groups) { V.vault.state.groups = {}; }
         return V.vault.state.groups;
     }

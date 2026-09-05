@@ -31,8 +31,8 @@
                 if (esGrupo) {
                     item.appendChild(D.make('span', 'gmark', String(row.group.members.length)));
                 } else {
-                    var online = row.contact.lastSeen && (Date.now() - row.contact.lastSeen < 120000);
-                    item.appendChild(D.make('span', 'dot' + (online ? ' dot--live' : '')));
+                    item.appendChild(D.make('span',
+                        'dot' + (D.enLinea(row.contact) ? ' dot--live' : '')));
                 }
 
                 var who = D.make('div', 'who');
@@ -45,7 +45,7 @@
                     name.appendChild(D.vinculo(row.contact));
                 }
                 if (!esGrupo && row.contact.verified) {
-                    var v = D.make('span', 'tag tag--ok', 'ok');
+                    var v = D.make('span', 'tag tag--ok', D.t('ok'));
                     v.title = 'Huella comprobada';
                     name.appendChild(document.createTextNode(' '));
                     name.appendChild(v);
@@ -58,17 +58,17 @@
                 var pie;
                 if (teclea) {
                     pie = D.make('small', 'typing-now',
-                        esGrupo ? teclea + ' esta escribiendo...' : 'escribiendo...');
+                        esGrupo ? D.t('{quien} esta escribiendo...', { quien: teclea }) : D.t('escribiendo...'));
                 } else if (row.last) {
                     /* En un grupo hace falta saber quien lo dijo; en uno a uno
                        solo si fuiste tu, que es lo que distingue tu ultima
                        linea de la suya. */
-                    var quien = row.last.dir === 'out' ? 'Tu: '
+                    var quien = row.last.dir === 'out' ? D.t('Tu: ')
                         : (esGrupo && row.last.fromName ? row.last.fromName + ': ' : '');
                     pie = D.make('small', null, quien + row.last.text);
                 } else {
                     pie = D.make('small', null, esGrupo
-                        ? row.group.members.length + ' personas, sin nada escrito todavia'
+                        ? D.t('{n} personas, sin nada escrito todavia', { n: row.group.members.length })
                         : row.contact.address);
                 }
                 who.appendChild(pie);
@@ -87,7 +87,7 @@
         /* La fila de solicitudes esta FUERA de #roster-list -aqui arriba se
            vacia y se reconstruye entera, y esa fila no es una conversacion ni
            puede ordenarse entre ellas-, pero se pinta al mismo tiempo porque
-           comparte pantalla. Es 68-ui-requests.js quien es dueno de sus ids;
+           comparte pantalla. Es requests.js quien es dueno de sus ids;
            aqui solo se le avisa. */
         if (D.refreshRequests) { D.refreshRequests(); }
     };
@@ -129,30 +129,31 @@
 
         var links = D.$('st-links');
         D.clear(links);
-        links.appendChild(document.createTextNode('Enlaces '));
+        links.appendChild(document.createTextNode(D.t('Enlaces ')));
         links.appendChild(D.make('b', null, s.peers));
         links.className = 'stat' + (s.peers ? ' is-live' : '');
 
         var bag = D.$('st-bag');
         D.clear(bag);
-        bag.appendChild(document.createTextNode('Mochila '));
+        bag.appendChild(document.createTextNode(D.t('Mochila ')));
         bag.appendChild(D.make('b', null, s.carrying));
 
         var con = D.$('st-contacts');
         D.clear(con);
-        con.appendChild(document.createTextNode('Contactos '));
+        con.appendChild(document.createTextNode(D.t('Contactos ')));
         con.appendChild(D.make('b', null, s.contacts));
 
         var st = D.$('st-store');
         D.clear(st);
-        st.appendChild(document.createTextNode('Disco '));
+        st.appendChild(document.createTextNode(D.t('Disco ')));
         st.appendChild(D.make('b', null, D.bytes(s.storage)));
 
         var modes = [];
         if (s.rtc) { modes.push(s.rtc + ' directo'); }
         if (s.ble) { modes.push(s.ble + ' bluetooth'); }
         if (s.local) { modes.push(s.local + ' local'); }
-        D.text(D.$('st-mode'), modes.length ? modes.join(' / ') : (s.persistent ? 'sin enlaces' : 'sin guardar en disco'));
+        D.text(D.$('st-mode'), modes.length ? modes.join(' / ')
+            : D.t(s.persistent ? 'sin enlaces' : 'sin guardar en disco'));
 
     };
 })(BINTIO);

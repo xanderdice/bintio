@@ -23,7 +23,7 @@
        --ember    el segundo acento, el que cierra los degradados
        --deep     el azul de fondo de esos mismos degradados
 
-   Un tema nuevo siguen siendo ocho lineas al final de 90-themes.css.
+   Un tema nuevo siguen siendo ocho lineas al final de themes.css.
 
    Cada color lleva delante un valor fijo de reserva para los navegadores sin
    variables CSS: veran la aplicacion en gris oscuro, pero la veran.
@@ -171,7 +171,7 @@
     --text-glow-hot: 0 0 18px rgba(var(--ice-hot), calc(.32 * var(--bloom))), 0 0 40px rgba(var(--ice), calc(.3 * var(--bloom)));
     --ring: 0 0 0 3px rgba(var(--ice), .4);
 
-    /* Piezas de cromado reutilizadas por 70-flourish.css. */
+    /* Piezas de cromado reutilizadas por flourish.css. */
     --bevel: inset 0 1px 0 rgba(var(--ice-hot), .07);
     --sunk: inset 0 1px 2px rgba(0, 0, 0, .3);
     --grad-chrome: linear-gradient(180deg, rgba(var(--ice-hot), .05), rgba(var(--ice-hot), .015));
@@ -191,7 +191,7 @@
    Los seis temas de siempre. Aqui no se toca ni un color: solo se devuelven
    la monoespaciada, las versalitas, las esquinas rectas y las luces de
    fosforo que el acabado de casa apaga. Un tema elige su acabado en una
-   linea de 61-ui-theme.js, no en la hoja de estilos.
+   linea de theme.js, no en la hoja de estilos.
    ========================================================================== */
 :root[data-skin="terminal"] {
     --line: rgba(var(--ice), .18);

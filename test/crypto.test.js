@@ -1,18 +1,9 @@
 /* Vectores oficiales. Si algo aqui falla, no se publica nada.
    Ejecutar con:  npm test                                                   */
-var V = require('./load')('29');
+var ayuda = require('./ayuda');
+var eq = ayuda.eq;
+var V = ayuda.cargar('nucleo');
 var U = V.util, C = V.crypto;
-var fails = 0, checks = 0;
-
-function eq(name, got, want) {
-    checks++;
-    if (got !== want) {
-        fails++;
-        console.log('  FALLA ' + name + '\n    obtenido: ' + got + '\n    esperado: ' + want);
-    } else {
-        console.log('  ok  ' + name);
-    }
-}
 
 console.log('SHA-256 (FIPS 180-4)');
 eq('cadena vacia', U.toHex(C.sha256(U.fromString(''))),
@@ -89,9 +80,6 @@ var salt = U.fromString('sal de prueba');
 C.pbkdf2Async('frase larga de prueba', salt, 12000, 32, null, function (rapida) {
     C.pbkdf2Slow('frase larga de prueba', salt, 12000, 32, null, function (lenta) {
         eq('rapida == lenta', U.toHex(rapida), U.toHex(lenta));
-        console.log('');
-        console.log(fails ? fails + ' FALLOS de ' + checks + ' comprobaciones'
-                          : 'TODO CORRECTO: ' + checks + ' comprobaciones');
-        process.exit(fails ? 1 : 0);
+        ayuda.resumen();
     });
 });

@@ -55,7 +55,7 @@
    quiera, y una ficha de tres mil pixeles entierra las solicitudes de
    abajo. Los 168 px son los mismos que ya limitan .code.
 
-   Vive AQUI y no en 30-components.css por el orden de la cascada: las dos
+   Vive AQUI y no en components.css por el orden de la cascada: las dos
    reglas son de una clase, empatan en peso, y .msg fija su max-width en
    este fichero, que se carga despues. */
 .msg--req {

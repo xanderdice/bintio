@@ -91,7 +91,7 @@
 
        Esa frase estaba aqui desde el principio y el codigo solo la cumplia a
        medias: encadenaba los trozos DE UN MENSAJE, pero quien llama manda
-       mensajes enteros en bucle. M.flushTo (35-mesh.js) suelta hasta 40 sobres
+       mensajes enteros en bucle. M.flushTo (mesh.js) suelta hasta 40 sobres
        seguidos en el mismo tick, y el inventario hasta 120. Eran cuarenta
        cadenas independientes sobre la misma caracteristica: el GATT rechaza
        todas menos la primera, el rechazo se tragaba un catch vacio, y la malla

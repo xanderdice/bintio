@@ -77,7 +77,7 @@ var path = require('path');
 var RAIZ = path.join(__dirname, '..');
 var DIA = 86400000;
 var HORA = 3600000;
-var MAX_PER_CHAT = 400;      /* tope real del modelo, 36-chat.js:17 */
+var MAX_PER_CHAT = 400;      /* tope real del modelo, chat.js:17 */
 var CUOTA = 5 * 1024 * 1024; /* cuota tipica de localStorage, en bytes UTF-16 */
 
 /* --------------------------------------------------------------------------
@@ -130,11 +130,11 @@ if (N_CONTACTOS < 1) { abortar('--contactos tiene que ser al menos 1'); }
 if (N_MENSAJES < 0) { abortar('--mensajes no puede ser negativo'); }
 if (N_MENSAJES > MAX_PER_CHAT) {
     /* Sembrar mas de 400 no anade nada: el modelo los va tirando de uno en
-       uno en cuanto llegue el primer mensaje nuevo (36-chat.js:56). */
+       uno en cuanto llegue el primer mensaje nuevo (chat.js:56). */
     abortar('--mensajes no puede pasar de ' + MAX_PER_CHAT + ', que es el tope por chat del modelo');
 }
 if (PASS.length < 8) {
-    /* No es capricho: la pantalla de recuperar exige ocho (63-ui-lock.js:96).
+    /* No es capricho: la pantalla de recuperar exige ocho (lock.js:96).
        Con menos, este fichero saldria bien y la aplicacion no lo aceptaria. */
     abortar('la contrasena necesita ocho caracteres o la aplicacion no dejara restaurar la copia');
 }
@@ -149,7 +149,7 @@ if (PASS.length < 8) {
 /* El fichero es ASCII, como todo el codigo del proyecto, pero los nombres que
    se ven en pantalla no tienen por que serlo: los acentos y la enye van con
    escape \u. Ademas de quedar creibles, obligan a que el texto pase por el
-   codificador UTF-8 escrito a mano de 10-util.js, que es justo lo que la
+   codificador UTF-8 escrito a mano de util.js, que es justo lo que la
    aplicacion hara al guardar y al leer. */
 var NOMBRES = [
     'Ana', 'Pablo', 'Marta', 'Sergio', 'Elena', 'Diego', 'Laura', 'Iv\u00e1n',
@@ -422,7 +422,7 @@ V.vault.create(PASS, null, function (err) {
         totalMensajes += msgs.length;
 
         /* lastSeen es cuando se le oyo por ultima vez, o sea el ultimo
-           mensaje entrante (34-session.js:148). Un punado va "en linea". */
+           mensaje entrante (session.js:148). Un punado va "en linea". */
         var ultimoIn = 0;
         for (j = msgs.length - 1; j >= 0; j--) {
             if (msgs[j].dir === 'in') { ultimoIn = msgs[j].ts; break; }
@@ -490,7 +490,7 @@ V.vault.create(PASS, null, function (err) {
 
     /* Cuanto cuesta calentar la cache de secretos, por contacto. No es el
        coste de un par de claves: contacts.secrets hace el x25519 Y ADEMAS el
-       HKDF de la clave de etiqueta (33-contacts.js:38), y ese HKDF es la
+       HKDF de la clave de etiqueta (contacts.js:38), y ese HKDF es la
        diferencia entre el aviso del final y lo que tarda de verdad. Asi que
        se mide la derivacion entera, con el codigo real, sobre unos cuantos
        contactos y se promedia. Son dieciseis y no una porque el numero se
@@ -552,7 +552,7 @@ V.vault.create(PASS, null, function (err) {
            compare la huella en persona.
 
            Y dos, que los nombres con acentos y enyes vuelven identicos. BINTIO
-           codifica UTF-8 a mano (10-util.js:37-71) porque TextEncoder no
+           codifica UTF-8 a mano (util.js:37-71) porque TextEncoder no
            existe en los navegadores viejos; si ese codigo tuviera un fallo,
            esta es la comprobacion que lo caza. */
         var malas = 0, textos = 0, noAscii = 0, m;
@@ -659,7 +659,7 @@ function informe(copia, d) {
                 ' mensajes en total antes de reventar');
     if (pct >= 100) {
         console.log('');
-        console.log('  ATENCION: NO CABE. be().set lanzara QuotaExceededError, 31-vault.js:177 se lo');
+        console.log('  ATENCION: NO CABE. be().set lanzara QuotaExceededError, vault.js:177 se lo');
         console.log('  traga y nadie mira Vault.lastError: la aplicacion parecera ir bien y no');
         console.log('  guardara nada. Al recargar habran desaparecido los cambios, sin aviso.');
         console.log('  Repite con  --mensajes ' + sugerido(d, r) + '  o con menos contactos.');
@@ -667,7 +667,7 @@ function informe(copia, d) {
         console.log('');
         console.log('  ATENCION: queda poco margen. Escribir en la aplicacion consume el resto');
         console.log('  enseguida, y cuando se agote la boveda dejara de persistir en silencio');
-        console.log('  (31-vault.js:174-181). Para dejar sitio:  --mensajes ' + sugerido(d, r));
+        console.log('  (vault.js:174-181). Para dejar sitio:  --mensajes ' + sugerido(d, r));
     }
     console.log('');
     console.log('QUE HACER CON EL FICHERO');
@@ -681,7 +681,7 @@ function informe(copia, d) {
     console.log('');
     /* El coste del primer sobre tras desbloquear, por contacto, no es un
        x25519 pelado: contacts.secrets calcula el secreto del par Y ADEMAS el
-       HKDF de la clave de etiqueta (33-contacts.js:38), y solo cachea en
+       HKDF de la clave de etiqueta (contacts.js:38), y solo cachea en
        memoria, asi que contacts.bind lo tira todo en cada desbloqueo.
        Estimarlo con el coste de un par de claves dejaba fuera ese HKDF y se
        quedaba corto en mas de un 10%. Aqui se multiplica por una derivacion

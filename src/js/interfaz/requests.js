@@ -14,7 +14,7 @@
     'use strict';
     var D = V.ui, U = V.util;
 
-    /* Sin 37-presenta.js no hay modelo. Se degrada en silencio en vez de
+    /* Sin presenta.js no hay modelo. Se degrada en silencio en vez de
        llevarse por delante la lista de conversaciones, que es la pantalla
        que de verdad hace falta. */
     function cuantas() { return V.requests ? V.requests.count() : 0; }
@@ -100,7 +100,7 @@
         if (!c) {
             /* Pudo caducar con el reloj del minuto mientras estaba en
                pantalla, o resolverse desde otra pestana con la misma boveda. */
-            D.toast('Esa solicitud ya no esta', 'bad');
+            D.toast(D.t('Esa solicitud ya no esta'), 'bad');
             D.refreshRoster();
             return;
         }
@@ -108,8 +108,7 @@
            quien escribe tiene esa clave privada, no de quien es la clave.
            Se dice tambien donde ha quedado la conversacion, porque ya no se
            llega sola a ella. */
-        D.toast('A\u00f1adido a tus conversaciones. Su huella sigue sin comparar: ' +
-                'hazlo en Ficha antes de fiarte.', 'ok');
+        D.toast(D.t('A\u00f1adido a tus conversaciones. Su huella sigue sin comparar: hazlo en Ficha antes de fiarte.'), 'ok');
         D.refreshStatus();
 
         /* Se repinta esta misma vista con una tarjeta menos, queden mas o no
@@ -132,7 +131,7 @@
        dialogos no lo hace nadie. */
     function descartar(pkHex) {
         V.requests.discard(pkHex);
-        D.toast('Descartada. No se guarda nada suyo. Si vuelve a escribir, saldra otra vez.');
+        D.toast(D.t('Descartada. No se guarda nada suyo. Si vuelve a escribir, saldra otra vez.'));
         /* Se queda donde esta aunque fuera la ultima: nada de cambiar de
            vista debajo del dedo. Al quedarse a cero sale #requests-empty. */
         D.refreshRoster();
@@ -172,10 +171,10 @@
            galon de color y va en versalitas- y meter ahi texto ajeno deja que
            alguien se llame "Contacto verificado por BINTIO" y lo lea con la
            tipografia de los titulos. */
-        b.appendChild(D.make('h2', null, 'Solicitud'));
+        b.appendChild(D.make('h2', null, D.t('Solicitud')));
 
         b.appendChild(D.make('p', 'dim',
-            'Se presenta con este nombre. Lo escribe quien manda y no lo comprueba nadie.'));
+            D.t('Se presenta con este nombre. Lo escribe quien manda y no lo comprueba nadie.')));
         /* Monoespaciada, que en este proyecto es la fuente de lo que llega de
            fuera y se compara, y nunca el acento encendido: ese es de la
            aplicacion, y prestarselo a un desconocido es media suplantacion
@@ -183,16 +182,13 @@
         b.appendChild(D.make('div', 'mono-break', r.name));
 
         b.appendChild(D.make('p', 'dim mt-l',
-            'Su huella. Esto si esta comprobado: quien ha mandado la solicitud tiene la clave ' +
-            'privada de esta huella, asi que nadie puede presentarse con la huella de otro. Lo ' +
-            'que la huella no dice es de quien es: para eso tienes que compararla con la ' +
-            'persona, por telefono o en persona.'));
+            D.t('Su huella. Esto si esta comprobado: quien ha mandado la solicitud tiene la clave privada de esta huella, asi que nadie puede presentarse con la huella de otro. Lo que la huella no dice es de quien es: para eso tienes que compararla con la persona, por telefono o en persona.')));
         /* Sin la etiqueta verde que lleva la lista de conversaciones: alli
            significa "la comparaste tu por otra via", que es exactamente lo
            que aqui todavia NO ha pasado. */
         b.appendChild(D.make('div', 'key-grid', V.id.fingerprint(U.fromHex(r.pk))));
 
-        b.appendChild(D.make('p', 'dim mt-l', 'Lo que te escribe:'));
+        b.appendChild(D.make('p', 'dim mt-l', D.t('Lo que te escribe:')));
         if (r.text) {
             /* Con la ficha de un mensaje recibido a proposito: es texto de un
                desconocido y no puede parecerse a lo que dice la aplicacion.
@@ -205,8 +201,7 @@
                mochila sin poder abrirse, y aceptar lo abre. Decirlo es mejor
                que ensenar una ficha vacia que parece un fallo. */
             b.appendChild(D.make('p', 'dim',
-                'Aqui no viene texto: lo que escribio no cabia en una presentacion. ' +
-                'Su mensaje viaja aparte y aparece entero en la conversacion al aceptarla.'));
+                D.t('Aqui no viene texto: lo que escribio no cabia en una presentacion. Su mensaje viaja aparte y aparece entero en la conversacion al aceptarla.')));
         }
 
         /* La hora va DEBAJO de la ficha y fuera de ella: es un dato nuestro
@@ -214,7 +209,8 @@
            texto ajeno. La marca de tiempo que viaja dentro del sobre la
            escribe el mismo que escribe el nombre. */
         b.appendChild(D.make('p', 'dim mt-s',
-            'Recibido en este aparato: ' + D.day(r.at) + ' ' + D.time(r.at)));
+            D.t('Recibido en este aparato: {cuando}',
+                { cuando: D.day(r.at) + ' ' + D.time(r.at) })));
 
         /* Los dos botones al mismo peso. Ni btn--primary, que es la unica cosa
            solida de cada pantalla y significa "esto es lo que hay que hacer":
@@ -257,9 +253,9 @@
         var n = cuantas();
         D.show(row, n > 0);
         if (n) {
-            D.text(D.$('requests-row-note'), n === 1
+            D.text(D.$('requests-row-note'), D.t(n === 1
                 ? '1 persona sin a\u00f1adir. Pulsa para verla.'
-                : n + ' personas sin a\u00f1adir. Pulsa para verlas.');
+                : '{n} personas sin a\u00f1adir. Pulsa para verlas.', { n: n }));
             D.text(D.$('requests-row-count'), String(n));
         }
 

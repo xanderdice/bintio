@@ -10,15 +10,9 @@
 
    Importa porque de esto depende que una invitacion se pueda ensenar en la
    pantalla: son unos 530 bytes, muy por encima de lo que cabia antes. */
-var V = require('./load')('49');
-var fails = 0, checks = 0;
-
-function ok(name, cond, extra) {
-    checks++;
-    if (cond) { console.log('  ok  ' + name); }
-    else { fails++; console.log('  FALLA ' + name + (extra ? '  -> ' + extra : '')); }
-}
-
+var ayuda = require('./ayuda');
+var ok = ayuda.ok;
+var V = ayuda.cargar('sin-interfaz');
 var ref;
 try { ref = require('qrcode'); }
 catch (e) {
@@ -196,6 +190,4 @@ ok('version impuesta a mano: avisa si el texto no cabe en ella',
    msgForzado.indexOf('version 14') >= 0, msgForzado || 'no salto ningun error');
 
 console.log('');
-console.log(fails ? fails + ' FALLOS de ' + checks + ' comprobaciones'
-                  : 'TODO CORRECTO: ' + checks + ' comprobaciones');
-process.exit(fails ? 1 : 0);
+ayuda.resumen();

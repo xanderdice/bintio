@@ -111,7 +111,7 @@
         /* Solo puede haber UNA invitacion esperando respuesta, y esto no es
            una simplificacion: es lo unico correcto que se puede hacer hoy.
            La respuesta que llega de vuelta no dice a que invitacion contesta
-           (el codigo no lleva identificador, ver 44-invite.js:240), asi que
+           (el codigo no lleva identificador, ver invite.js:240), asi que
            con dos invitaciones vivas acceptAnswer tendria que adivinar, y
            adivinar mal significa aplicarle la respuesta a la conexion
            equivocada: no falla con un error claro, se queda colgada.
@@ -119,7 +119,7 @@
            Asi que al crear una nueva se cierra la anterior que siguiera
            esperando. La consecuencia hay que saberla: una invitacion que
            pasaste antes deja de valer en cuanto creas otra. Por eso
-           50-app.js reutiliza la que ya hay en vez de crear una por cada vez
+           app.js reutiliza la que ya hay en vez de crear una por cada vez
            que se abre la pantalla. */
         R.dropPendingOffer();
 

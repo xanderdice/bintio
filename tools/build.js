@@ -94,11 +94,59 @@ function absoluteUrls(html) {
         .replace(/(<link rel="canonical" href=")[^"]*/, poner('/'));
 }
 
-function readSorted(dir, ext) {
-    return fs.readdirSync(dir)
-        .filter(function (f) { return f.slice(-ext.length) === ext; })
-        .sort()
-        .map(function (f) { return { name: f, code: fs.readFileSync(path.join(dir, f), 'utf8') }; });
+/* El codigo, en el orden que dice src/index.html.
+
+   Antes esto leia la carpeta y ordenaba por nombre, y por eso los ficheros
+   tenian que llamarse 00-ns.js, 10-util.js, 20-sha256.js: el orden de carga
+   iba escondido en el nombre. Meter un fichero entre dos obligaba a renumerar,
+   y "20" no le decia a nadie que ahi dentro habia un SHA-256.
+
+   Ahora el orden vive donde ya estaba a la vista: en las etiquetas <script> y
+   <link> de la propia pagina, agrupadas por capa. Un sitio, y ademas el sitio
+   evidente. Si un fichero no esta listado, no se compila, y aqui se avisa en
+   vez de dejarlo fuera en silencio. */
+function leerListados(html, tag, dir, ext) {
+    /* Buscar el bloque a pelo y no con una expresion regular montada a mano:
+       es una etiqueta fija entre dos comentarios fijos, y asi se lee. */
+    var abre = '<!-- BUILD:' + tag + ' -->';
+    var cierra = '<!-- /BUILD:' + tag + ' -->';
+    var desde = html.indexOf(abre);
+    var hasta = html.indexOf(cierra);
+    if (desde < 0 || hasta < desde) {
+        throw new Error('src/index.html no tiene el bloque BUILD:' + tag);
+    }
+    var dentro = html.slice(desde + abre.length, hasta);
+
+    var rutas = [], m;
+    var re = /(?:src|href)="((?:js|css)\/[^"]+)"/g;
+    while ((m = re.exec(dentro))) { rutas.push(m[1]); }
+    if (!rutas.length) { throw new Error('el bloque BUILD:' + tag + ' esta vacio'); }
+
+    /* Que lo listado y lo que hay en disco sea lo mismo. Un fichero nuevo que
+       nadie liste no aparece por ningun lado, y ese fallo no se ve hasta que
+       algo revienta en el navegador. */
+    var enDisco = [];
+    (function anda(d, base) {
+        fs.readdirSync(d).forEach(function (f) {
+            var p = path.join(d, f);
+            if (fs.statSync(p).isDirectory()) { anda(p, base + f + '/'); }
+            else if (f.slice(-ext.length) === ext) { enDisco.push(base + f); }
+        });
+    })(path.join(SRC, dir), dir + '/');
+
+    var sinListar = enDisco.filter(function (f) { return rutas.indexOf(f) < 0; });
+    if (sinListar.length) {
+        throw new Error('estos ficheros existen pero no los lista src/index.html: ' +
+            sinListar.join(', ') + '  (anadelos al bloque BUILD:' + tag + ')');
+    }
+
+    return rutas.map(function (r) {
+        var completa = path.join(SRC, r);
+        if (!fs.existsSync(completa)) {
+            throw new Error('src/index.html lista ' + r + ', que no existe');
+        }
+        return { name: r, code: fs.readFileSync(completa, 'utf8') };
+    });
 }
 
 /* --------------------------------------------------------------------------
@@ -714,16 +762,16 @@ function minifyHtml(html) {
    arme en tiempo de ejecucion. Cero concatenaciones, cero el.id = ..., cero
    setAttribute('id'|'for'|'aria-*'), cero getElementsBy*, cero
    querySelector('#...'). document.getElementById sale UNA sola vez en todo el
-   proyecto, dentro de D.$ (60-ui-dom.js), y los tres querySelector que hay
+   proyecto, dentro de D.$ (dom.js), y los tres querySelector que hay
    buscan por clase o por atributo. Los nodos que se crean en ejecucion no
    llevan id. Asi que los 103 aparecen siempre como cadena literal completa y
    una tabla viejo -> nuevo los cubre todos.
 
    Ojo con las formas INDIRECTAS, que si existen y por eso NO basta con
-   reescribir las llamadas a D.$(): el array VIEWS de 60-ui-dom.js, las
-   comparaciones contra D.current (60-ui-dom.js, 66-ui-connect.js dos veces y
-   99-boot.js), el ayudante bar('new-bar', ...) de 63-ui-lock.js y los arrays
-   de botones y de estadisticas de 63-ui-lock.js y 64-ui-roster.js. Aqui se
+   reescribir las llamadas a D.$(): el array VIEWS de dom.js, las
+   comparaciones contra D.current (dom.js, connect.js dos veces y
+   boot.js), el ayudante bar('new-bar', ...) de lock.js y los arrays
+   de botones y de estadisticas de lock.js y roster.js. Aqui se
    renombra por LITERAL, no por llamada, asi que todas esas entran solas. Si
    se hubiera hecho por llamada no saltaria ninguna excepcion: simplemente la
    barra de estado dejaria de borrarse al cerrar la boveda, que es justo lo
@@ -1140,7 +1188,8 @@ function build() {
     var t0 = Date.now();
 
     /* ---------------------------------------------------------------- JS */
-    var jsFiles = readSorted(path.join(SRC, 'js'), '.js');
+    var htmlFuente = fs.readFileSync(path.join(SRC, 'index.html'), 'utf8');
+    var jsFiles = leerListados(htmlFuente, 'JS', 'js', '.js');
     var jsSource = jsFiles.map(function (f) {
         return '/* ' + f.name + ' */\n' + f.code;
     }).join('\n');
@@ -1175,12 +1224,12 @@ function build() {
         var js = out.code;
 
         /* --------------------------------------------------------- CSS */
-        var cssFiles = readSorted(path.join(SRC, 'css'), '.css');
+        var cssFiles = leerListados(htmlFuente, 'CSS', 'css', '.css');
         var cssRaw = cssFiles.map(function (f) { return f.code; }).join('\n');
         var css = minifyCss(cssRaw);
 
         /* ------------------------------------------------------- HTML */
-        var html = fs.readFileSync(path.join(SRC, 'index.html'), 'utf8');
+        var html = htmlFuente;
 
         /* ------------------------------------------- ids nuevos
            Aqui, y no antes ni despues: es el unico punto donde los tres
@@ -1264,7 +1313,7 @@ function build() {
            iconos incrustados. Se le quitan start_url, scope e id: en una
            direccion data: no hay nada contra lo que resolverlos, y sin ellos
            el navegador usa por defecto la direccion del documento, que es
-           exactamente lo que se quiere. Cuando la pagina se sirve, 99-boot.js
+           exactamente lo que se quiere. Cuando la pagina se sirve, boot.js
            lo rehace como blob con esas tres claves ya absolutas.
 
            El JSON sale en ASCII puro (lo de fuera va escapado) para que en el

@@ -1,7 +1,7 @@
 /* ==========================================================================
    La PRESENTACION: el unico marco que puede abrir alguien que no te conoce.
 
-   Un sobre normal (32-envelope.js) mezcla tres secretos, y uno de ellos,
+   Un sobre normal (envelope.js) mezcla tres secretos, y uno de ellos,
    ss2 = X25519(estatica del remitente, estatica del destinatario), exige que
    el destinatario TE TENGA DADO DE ALTA para poder recalcularlo. Eso autentica
    al remitente sin firmar nada, pero obliga a un paso de vuelta que la gente
@@ -89,7 +89,7 @@
          V.presenta  el cable (sellar, abrir, minar, recibir)
          V.requests  el modelo de solicitudes que usa la interfaz
        Se crean aqui con "|| {}" para que este fichero funcione tanto si
-       00-ns.js los declara como si no: es el unico sitio que los escribe. */
+       ns.js los declara como si no: es el unico sitio que los escribe. */
     var P = V.presenta = V.presenta || {};
     var R = V.requests = V.requests || {};
 
@@ -259,7 +259,7 @@
     /* Identificador del mensaje que viaja dentro. Es determinista sobre la
        efimera y lo calculan los dos lados, y eso resuelve dos cosas de golpe:
        dos copias de la misma presentacion no duplican el mensaje, y el sobre
-       normal que sale con ESTE mismo identificador (36-chat.js) tampoco lo
+       normal que sale con ESTE mismo identificador (chat.js) tampoco lo
        duplica cuando el otro nos da de alta y la malla se lo entrega. */
     P.midOf = function (ephPk) {
         return U.toHex(C.sha256(U.fromString('bintio/pres-mid/v1'), ephPk).subarray(0, 8));
@@ -321,7 +321,7 @@
        Sellar
        --------------------------------------------------------------------- */
 
-    /* Un par efimero por adelantado. 36-chat.js lo pide antes de sellar nada
+    /* Un par efimero por adelantado. chat.js lo pide antes de sellar nada
        para poder usar P.midOf como identificador del mensaje tambien en el
        sobre normal que sale a la vez. */
     P.prepare = function () {
@@ -712,7 +712,7 @@
     }
 
     function aviso(pkHex, que) {
-        /* Por el mismo camino que los mensajes: 50-app.js reemite lo que sale
+        /* Por el mismo camino que los mensajes: app.js reemite lo que sale
            de V.chat y la interfaz ya escucha ahi. Un segundo canal seria un
            segundo sitio que enganchar, y engancharlo dos veces es un fallo que
            este proyecto ya ha pagado una vez. */
@@ -777,7 +777,7 @@
             if (l[i].pk === a.pk) {
                 l[i].name = a.name.substr(0, 40);
                 /* Una presentacion SIN texto no borra el que ya habia: puede ser
-                   el reintento que manda 36-chat.js cuando la suya se perdio
+                   el reintento que manda chat.js cuando la suya se perdio
                    antes de salir, y ese va vacio porque el texto viaja aparte.
                    Sin esta condicion, un reintento dejaria la solicitud muda y
                    el usuario tendria que decidir sin haber leido nada. */
@@ -926,7 +926,7 @@
                      guarda MARCADA como esperando sitio, y se reenvia */
     /* El buzon: si esta cerrado, para escribirte hay que estar en tu lista.
 
-       Va CERRADO de serie (31-vault.js). Cerrado, una presentacion es para
+       Va CERRADO de serie (vault.js). Cerrado, una presentacion es para
        nosotros exactamente lo mismo que un sobre de un desconocido: se sigue
        transportando -para que le llegue a quien si lo quiera- pero no se abre,
        no se paga su curva y no gasta cupo. Por eso la comprobacion esta la
@@ -955,7 +955,7 @@
 
     /* Las que se quedaron sin cupo esperan en la mochila con la marca p sin
        poner. Esto las reintenta, y lo llama el reloj de un minuto de
-       50-app.js. En regimen normal no hay ninguna y no cuesta nada.
+       app.js. En regimen normal no hay ninguna y no cuesta nada.
 
        Las que se quedaron sin SITIO llevan ademas la marca w. Esas no se vuelven
        a abrir mientras la lista siga llena: ya sabemos lo que son -una solicitud

@@ -61,7 +61,7 @@
     }
 
     /* Una solicitud de presentacion no es una conversacion, pero su aviso
-       tiene que llegar por el MISMO camino: 50-app.js reemite lo que sale de
+       tiene que llegar por el MISMO camino: app.js reemite lo que sale de
        aqui y la interfaz ya escucha ahi. Un canal aparte seria un segundo
        sitio que enganchar, y enganchar dos veces es un fallo que este
        proyecto ya ha pagado una vez (ver el comentario de A.start). */
@@ -128,7 +128,7 @@
     }
 
     /* Un mensaje entrante que NO viene de abrir un sobre: hoy solo lo usa una
-       solicitud aceptada (37-presenta.js), que trae su primer mensaje dentro.
+       solicitud aceptada (presenta.js), que trae su primer mensaje dentro.
        No manda acuse a proposito: aceptar no puede avisar al otro lado del
        momento exacto en que lo hiciste. Devuelve null si ese identificador ya
        estaba, que es lo que impide duplicarlo cuando el sobre normal con el
@@ -163,7 +163,7 @@
 
     function tocaPresentarse(contact) {
         if (!V.presenta || !V.presenta.prepare) { return false; }
-        /* contact.mutuo lo pone 34-session.js cuando algo suyo se abre aqui:
+        /* contact.mutuo lo pone session.js cuando algo suyo se abre aqui:
            mientras sea falso, esta persona no nos tiene dados de alta y NO
            puede abrir un sobre normal nuestro. */
         if (contact.mutuo) { return false; }
@@ -382,7 +382,7 @@
     Chat.recontar = recontar;
 
     /* El cuerpo de un mensaje de grupo: la ficha entera del grupo mas el
-       texto. Va junto y no en dos sobres a proposito (ver 38-groups.js): asi
+       texto. Va junto y no en dos sobres a proposito (ver groups.js): asi
        un grupo se arregla solo con el siguiente mensaje que llegue. */
     function cuerpoGrupo(group, text) {
         var card = V.groups.card(group);
@@ -483,6 +483,17 @@
         return t.quien;
     };
 
+    /* Un sobre suelto de un tipo cualquiera: acuse, presencia, ficha o
+       "te he quitado". Los cuatro hacian exactamente lo mismo -sellar, mandar y
+       tragarse el error- escrito cuatro veces. Que el error se trague es a
+       proposito y por eso esta aqui una vez y explicado: ninguno de los cuatro
+       es un mensaje, asi que si no sale no hay nada que contarle a nadie ni
+       nada que reintentar; lo que SI es un mensaje va por otro camino y lleva
+       su estado. */
+    function mandar(contact, tipo, cuerpo, ttl) {
+        try { M.send(S.seal(contact, tipo, cuerpo, null, ttl)); } catch (e) {}
+    }
+
     /* ---------------------------------------------------------------------
        Quitar a alguien, avisandole
        --------------------------------------------------------------------- */
@@ -502,18 +513,18 @@
     Chat.unlink = function (pkHex) {
         var contact = K.get(pkHex);
         if (!contact) { return false; }
-        try { M.send(S.seal(contact, S.T_UNLINK, null, null, 4)); } catch (e) {}
+        mandar(contact, S.T_UNLINK, null, 4);
         K.remove(pkHex);
         fire('contact', null);
         return true;
     };
 
     Chat.sendPresence = function (contact) {
-        try { M.send(S.seal(contact, S.T_PRESENCE, U.fromString('1'), null, 2)); } catch (e) {}
+        mandar(contact, S.T_PRESENCE, U.fromString('1'), 2);
     };
 
     Chat.sendProfile = function (contact, name) {
-        try { M.send(S.seal(contact, S.T_PROFILE, U.fromString(JSON.stringify({ n: name })))); } catch (e) {}
+        mandar(contact, S.T_PROFILE, U.fromString(JSON.stringify({ n: name })));
     };
 
     /* El acuse va SIEMPRE a quien escribio, tambien en un grupo: es el unico
@@ -525,9 +536,7 @@
         if (!V.vault.state.settings.receipts) { return; }
         var cuerpo = { m: midHex, s: kind };
         if (gid) { cuerpo.g = gid; }
-        try {
-            M.send(S.seal(contact, S.T_RECEIPT, U.fromString(JSON.stringify(cuerpo)), null, 4));
-        } catch (e) {}
+        mandar(contact, S.T_RECEIPT, U.fromString(JSON.stringify(cuerpo)), 4);
     }
 
     /* ---------------------------------------------------------------------

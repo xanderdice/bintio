@@ -1,0 +1,91 @@
+/* Que no quede ni una frase sin traducir.
+
+   El esquema de traduccion de este proyecto usa el texto en espanol como
+   clave (ver interfaz/idioma.js). Eso hace el codigo legible -se lee lo que
+   va a salir en pantalla- y tiene un precio: si alguien cambia una coma en una
+   frase espanola, su traduccion deja de encontrarse y esa linea vuelve al
+   espanol sin que nadie se entere.
+
+   Esta prueba es lo que convierte ese precio en un error de compilacion. Busca
+   TODAS las frases marcadas -las del marcado con data-t y las que pasan por
+   D.t()- y comprueba que cada una esta en la tabla. Si falta alguna, la dice.
+
+   Y busca una segunda cosa: textos que se pintan sin pasar por D.t. Esos no
+   fallarian nunca, saldrian siempre en espanol y nadie lo notaria hasta que
+   alguien abriera la aplicacion en ingles y viera media pantalla en el otro
+   idioma. Es el fallo silencioso que este fichero existe para cazar.        */
+var fs = require('fs');
+var path = require('path');
+var vm = require('vm');
+var ayuda = require('./ayuda');
+var frases = require('./frases');
+
+var ok = ayuda.ok;
+
+console.log('Idioma');
+
+/* La tabla, leida como la lee el navegador. */
+var caja = { BINTIO: {} };
+vm.createContext(caja);
+vm.runInContext(
+    fs.readFileSync(path.join(__dirname, '..', 'src', 'js', 'interfaz', 'textos.js'), 'utf8'),
+    caja, { filename: 'textos.js' });
+var TABLA = caja.BINTIO.textos;
+
+ok('la tabla existe', !!TABLA && !!TABLA.en);
+
+var idiomas = Object.keys(TABLA);
+ok('hay al menos un idioma ademas del espanol', idiomas.length >= 1, idiomas.join(', '));
+
+/* ---------------------------------------------------------------- completa */
+var todas = frases.todas();
+ok('hay frases marcadas', todas.length > 50, String(todas.length));
+
+idiomas.forEach(function (cod) {
+    var faltan = todas.filter(function (f) { return TABLA[cod][f] === undefined; });
+    ok('no falta ni una frase en "' + cod + '"', faltan.length === 0,
+       faltan.length + ' sin traducir, la primera: ' + (faltan[0] || '').slice(0, 70));
+
+    /* Y al reves: una traduccion cuya clave ya no existe es una frase que
+       alguien cambio y una traduccion que no se usa. No es grave, pero se
+       acumula y confunde. */
+    var sobran = Object.keys(TABLA[cod]).filter(function (k) { return todas.indexOf(k) < 0; });
+    ok('no sobra ninguna traduccion en "' + cod + '"', sobran.length === 0,
+       sobran.length + ' de mas, la primera: ' + (sobran[0] || '').slice(0, 70));
+});
+
+/* ------------------------------------------------------------- sin traducir */
+var sueltas = frases.sinMarcar();
+ok('no hay textos que se pinten sin pasar por D.t', sueltas.length === 0,
+   sueltas.slice(0, 3).join(' | '));
+
+/* --------------------------------------------------------------- los huecos */
+/* Un hueco {quien} que este en el espanol tiene que estar tambien en el
+   ingles: si se pierde, el nombre de la persona desaparece de la frase. */
+function huecos(s) {
+    var m = s.match(/\{[a-z]+\}/g) || [];
+    return m.sort().join(',');
+}
+idiomas.forEach(function (cod) {
+    var rotas = [];
+    todas.forEach(function (f) {
+        var t = TABLA[cod][f];
+        if (t === undefined) { return; }
+        if (huecos(f) !== huecos(t)) { rotas.push(f.slice(0, 60)); }
+    });
+    ok('los huecos cuadran en "' + cod + '"', rotas.length === 0, rotas.join(' | '));
+});
+
+/* -------------------------------------------------------- nada de etiquetas */
+/* Una traduccion se mete en el DOM como texto, nunca como marcado. Aun asi, si
+   alguna trajera una etiqueta seria senal de que alguien esta intentando
+   maquetar desde aqui, y eso no se hace. */
+var conEtiquetas = [];
+idiomas.forEach(function (cod) {
+    Object.keys(TABLA[cod]).forEach(function (k) {
+        if (/<[a-zA-Z\/]/.test(TABLA[cod][k])) { conEtiquetas.push(k.slice(0, 50)); }
+    });
+});
+ok('ninguna traduccion lleva etiquetas dentro', conEtiquetas.length === 0, conEtiquetas.join(' | '));
+
+ayuda.resumen();

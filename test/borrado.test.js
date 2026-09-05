@@ -1,6 +1,6 @@
 /* Empezar de cero: que no quede NADA.
 
-   31-vault.js promete que el borrado "deja el aparato como si BINTIO nunca
+   vault.js promete que el borrado "deja el aparato como si BINTIO nunca
    hubiera estado". Es la clase de promesa que se rompe sin que nadie se entere,
    porque lo que queda atras no se ve por ninguna pantalla: hay que ir a mirar
    el almacen del navegador.
@@ -16,14 +16,8 @@
    nuestro no se toca. Lo segundo importa igual: un borrado que se lleva por
    delante los datos de otra aplicacion del mismo dominio seria un fallo peor
    que el que viene a arreglar.                                              */
-var load = require('./load');
-var fails = 0, checks = 0;
-
-function ok(name, cond, extra) {
-    checks++;
-    if (cond) { console.log('  ok  ' + name); }
-    else { fails++; console.log('  FALLA ' + name + (extra ? '  -> ' + extra : '')); }
-}
+var ayuda = require('./ayuda');
+var ok = ayuda.ok;
 
 /* Un almacen como el del navegador: con length, key(i) y removeItem, que es de
    lo que se sirve el barrido. */
@@ -43,7 +37,7 @@ function almacen() {
 console.log('Empezar de cero');
 
 var local = almacen(), sesion = almacen();
-var V = load('39', { localStorage: local, sessionStorage: sesion });
+var V = ayuda.cargar('nucleo', { localStorage: local, sessionStorage: sesion });
 
 ok('la boveda usa el almacen del navegador, no el de memoria',
    V.vault.isPersistent() === true);
@@ -115,12 +109,7 @@ cuandoEste(function () {
         ok('y sin sobres en la mochila',
            (V.vault.state.carrier || []).length === 0);
 
-        console.log('');
-        if (fails) {
-            console.log('FALLOS: ' + fails + ' de ' + checks);
-            process.exit(1);
-        }
-        console.log('TODO CORRECTO: ' + checks + ' comprobaciones');
+        ayuda.resumen();
     });
 
     setTimeout(function () {

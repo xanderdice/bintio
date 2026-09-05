@@ -8,7 +8,7 @@
    documento no declara de que color es, Windows la abre en blanco y el texto
    claro se pierde dentro. Esto es lo unico que lo arregla de verdad; el color
    de <option> de mas abajo es el cinturon por si el navegador es viejo.
-   El tema claro lo vuelve a poner en "light" en 90-themes.css. */
+   El tema claro lo vuelve a poner en "light" en themes.css. */
 html { color-scheme: dark; }
 
 html, body {

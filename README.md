@@ -224,6 +224,63 @@ tienes anadido.
 
 ---
 
+## Espanol e ingles
+
+El idioma se elige en **Ajustes > Aspecto** y cambia al momento, sin recargar y
+sin cerrar la boveda. De serie sale el del navegador; si no es ninguno de los
+dos, el espanol.
+
+Se guarda **fuera de la boveda**, en `bintio.lang`. Dentro no serviria: la
+pantalla donde se escribe la contrasena sale ANTES de que haya boveda que
+abrir, y ahi tambien hay que leer. Tampoco es un dato privado -el idioma que
+prefieres es justo lo que tu navegador ya le cuenta a cualquier pagina- y el
+borrado se lo lleva igual, porque empieza por `bintio.`.
+
+### La clave es el texto en espanol
+
+Lo normal en estas cosas es inventarse identificadores y tener dos tablas. Aqui
+la clave **es la frase en espanol**, asi que el codigo sigue diciendo lo que va
+a salir en pantalla:
+
+```js
+D.toast(D.t('Guardado'));            // y no D.t('ajustes.guardado')
+```
+
+En el marcado basta un atributo, sin clave dentro. Se traduce cada trozo de
+texto por separado, asi que un parrafo con una parte en negrita sigue teniendo
+su negrita en su sitio:
+
+```html
+<p data-t>La contrasena cifra todo. <b data-t>Nadie puede recuperarla</b>.</p>
+```
+
+Y solo hay **una** tabla, la de ingles (`interfaz/textos.js`), porque el
+espanol ya esta escrito donde se usa.
+
+El precio es que si alguien cambia una coma en una frase espanola, su
+traduccion deja de encontrarse y esa linea vuelve al espanol. Por eso existe
+`test/idioma.test.js`, que no deja pasar eso:
+
+- que **no falte** ni una frase de las marcadas,
+- que **no sobre** ninguna traduccion cuya frase ya no existe,
+- que los huecos (`{quien}`, `{n}`) esten en los dos idiomas, porque perder uno
+  hace desaparecer el nombre de una persona de la frase,
+- y que no haya textos que se pinten **sin pasar por** `D.t`, que es el fallo
+  que nadie ve: saldrian siempre en espanol y no fallaria nada.
+
+```bash
+node test/frases.js        # la lista de todo lo que hay que traducir
+node test/idioma.test.js   # falla y dice que frase falta
+```
+
+### Anadir un idioma
+
+Una clave mas al lado de `en` en `textos.js` con la misma lista, y una linea en
+`D.IDIOMAS` (`interfaz/idioma.js`). Nada mas: el selector de Ajustes se rellena
+solo con lo que haya en esa lista.
+
+---
+
 ## El vinculo: quien te tiene y quien no
 
 Anadir a alguien va en **una sola direccion**, asi que "lo tengo en mi lista" y
@@ -514,38 +571,54 @@ La regla es una y no se rompe: **cada fichero sabe una cosa**.
 
 ```
 src/js/
-  0x  espacio de nombres y compatibilidad
-  1x  utilidades de bytes y texto
-  2x  criptografia         sha256, hmac/hkdf/pbkdf2, chacha20, x25519, caja
-  3x  nucleo               identidad, boveda, sobre, contactos, sesion, malla, chat
-  4x  transportes          registro, local, webrtc, bluetooth, codigos, qr
-  5x  controlador          une nucleo y transportes
-  6x  interfaz             SOLO toca el DOM
-  99  arranque
+  nucleo/       ns, compat, util, sha256, kdf, chacha, x25519, box,
+                identity, vault, envelope, contacts, session, mesh,
+                chat, presenta, groups
+  transportes/  transport, local, rtc, ble, invite, qr
+  app/          app
+  interfaz/     dom, theme, qr, lock, roster, chat, connect,
+                settings, requests, privacidad, boot
 ```
 
-- Los ficheros `1x`, `2x` y `3x` **no tocan el DOM** y no saben que existe una
-  pantalla. Por eso se pueden probar enteros en Node (`test/protocol.test.js`
-  levanta cinco nodos y los hace hablar entre si).
-- Los ficheros `6x` **no hacen criptografia**. Piden las cosas a `50-app.js`.
-- Nada de frameworks, nada de dependencias en el resultado, nada de modulos
-  ES: el build concatena por orden de nombre y ya esta. Se puede leer de
-  arriba abajo sin herramientas.
+- El **nucleo** no toca el DOM y no sabe que existe una pantalla. Por eso se
+  puede probar entero en Node (`test/protocol.test.js` levanta cinco nodos y
+  los hace hablar entre si).
+- Los **transportes** hablan con la red y tampoco tocan el DOM.
+- La **interfaz** no hace criptografia. Le pide las cosas a `app.js`.
+- Si un fichero rompe su regla, esta en la carpeta equivocada. Y se nota, que
+  es justo la gracia de que la carpeta lo diga.
 
-Anadir un transporte nuevo es escribir un fichero `4x` que llame a
-`transport.addPeer()` cuando consiga un enlace. Nada mas.
+### El orden de carga
+
+Los ficheros se llamaban `00-ns.js`, `10-util.js`, `20-sha256.js`... porque el
+build los concatenaba por orden de nombre: el orden iba escondido en el nombre.
+Funcionaba, pero meter un fichero entre dos obligaba a renumerar, y `20` no le
+decia a nadie que ahi dentro habia un SHA-256.
+
+Ahora ese orden vive donde ya estaba a la vista: en las etiquetas `<script>` de
+**`src/index.html`**, agrupadas por capa. Un solo sitio, y ademas el evidente.
+Lo leen `tools/build.js` para concatenar y `test/load.js` para montar la
+aplicacion en Node; si un fichero existe y nadie lo lista, la compilacion se
+para y lo dice, en vez de dejarlo fuera en silencio.
+
+Nada de frameworks, nada de dependencias en el resultado, nada de modulos ES:
+se concatena y ya esta. Se puede leer de arriba abajo sin herramientas.
+
+Anadir un transporte nuevo es escribir un fichero en `transportes/`, listarlo
+en `index.html` y llamar a `transport.addPeer()` cuando consigas un enlace.
+Nada mas.
 
 Los estilos siguen la misma idea:
 
 ```
-src/css/
-  00-tokens      color, tipografia y medidas de los dos acabados, en variables
-  10-base        reposicion, tipografia, capas de acumulacion de luz
-  20-layout      barra superior, escenario, paneles, portada, barra de estado
-  30-components  botones, campos, etiquetas, avisos
-  40-chat        la conversacion
-  70-flourish    el acabado: sombras del de casa y cromado CRT del terminal
-  90-themes      los otros siete temas, ocho lineas cada uno
+src/css/          (el orden de la cascada tambien lo dice index.html)
+  tokens      color, tipografia y medidas de los dos acabados, en variables
+  base        reposicion, tipografia, capas de acumulacion de luz
+  layout      barra superior, escenario, paneles, portada, barra de estado
+  components  botones, campos, etiquetas, avisos
+  chat        la conversacion
+  flourish    el acabado: sombras del de casa y cromado CRT del terminal
+  themes      los otros siete temas, ocho lineas cada uno
 ```
 
 ### Aspecto
@@ -567,12 +640,12 @@ cromado que comparte una familia de temas. Solo hay dos y se ponen con
 | `terminal` | los otros siete | monoespaciada, versalitas, fosforo y corchetes |
 
 Quien decide cual lleva cada tema es una lista de una linea en
-`61-ui-theme.js`, no la hoja de estilos. Si el atributo no esta, sale el de
+`theme.js`, no la hoja de estilos. Si el atributo no esta, sale el de
 casa: el acabado comercial es el suelo, no una opcion.
 
 Todo el color de la interfaz sale de cuatro variables (`--ice`, `--ice-hot`,
 `--ember`, `--deep`), asi que **un tema nuevo son ocho lineas** al final de
-`90-themes.css`: los trazos, las luces, los degradados y el cromado se recolorean
+`themes.css`: los trazos, las luces, los degradados y el cromado se recolorean
 solos. Vienen siete mas de serie: **Neon** (el rojo escarlata con todo el
 cromado encendido, que era el de casa hasta esta version), **Hielo** (el azul
 clinico original), Matrix, Brasa, Violeta, **Carbon** (sin efectos, para
@@ -809,12 +882,12 @@ gordos no estan en el dibujo, estan debajo:
 
 1. **El primer sobre ajeno tras desbloquear cuesta ~1,9 segundos.**
    `session.open` recorre todos los contactos y deriva el secreto de cada uno
-   la primera vez (34-session.js:116 y 33-contacts.js:34). Son 500 acuerdos
+   la primera vez (session.js:116 y contacts.js:34). Son 500 acuerdos
    X25519 en JavaScript puro, a 3,7 ms cada uno. Despues quedan cacheados y el
    mismo sobre cuesta 2,7 ms.
 2. **Cada guardado reescribe la boveda entera.** Con 1,94 MiB son 219 ms, y
    `mesh.handleEnvelope` pide un guardado por **cada** sobre que pasa
-   (35-mesh.js:162), agrupados en uno cada 400 ms. Con trafico de malla
+   (mesh.js:162), agrupados en uno cada 400 ms. Con trafico de malla
    sostenido eso es medio segundo de cada segundo con el hilo bloqueado.
 
 El banco lo dice sin rodeos: con 40 mensajes en **todas** las 500

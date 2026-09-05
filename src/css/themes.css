@@ -6,7 +6,7 @@
    retoques de ambiente.
 
    BINTIO  el de casa, azul de confianza y acabado de escaparate (no necesita
-           bloque: es el de 00-tokens.css)
+           bloque: es el de tokens.css)
    NEON    el rojo de siempre, con todo el cromado CRT encendido
    ICE     azul clinico, el lenguaje original de PCSE
    MATRIX  verde de fosforo
@@ -16,7 +16,7 @@
    PAPER   claro y de mucho contraste, para leer al sol o con poca vista
 
    Menos el de casa, todos van con data-skin="terminal": monoespaciada,
-   versalitas y esquinas rectas. Quien pone el atributo es 61-ui-theme.js, y
+   versalitas y esquinas rectas. Quien pone el atributo es theme.js, y
    ahi esta la lista de cuales lo llevan.
    ========================================================================== */
 
@@ -26,7 +26,7 @@
    cambiar el acabado de casa no es motivo para tirar el que ya funcionaba.
 
    Ojo con el estado: el acento ya es rojo, asi que "peligro" no puede serlo
-   tambien. Se distingue por tratamiento (rayas de peligro en 70-flourish.css)
+   tambien. Se distingue por tratamiento (rayas de peligro en flourish.css)
    y por ser mas claro y mas plano que el escarlata de la interfaz. */
 :root[data-theme="neon"] {
     --ice: 255, 40, 56;
@@ -192,7 +192,7 @@
 :root[data-theme="paper"] { color-scheme: light; }
 
 /* La marca y el titulo de la portada se rellenan con un degradado que empieza
-   en BLANCO (70-flourish.css): sobre tinta queda un brillo arriba, pero sobre
+   en BLANCO (flourish.css): sobre tinta queda un brillo arriba, pero sobre
    papel es blanco sobre blanco y la mitad de arriba de las letras desaparece.
    Aqui se apaga el relleno y se pinta con color plano, que es justo lo que
    este tema viene a hacer. */
@@ -206,7 +206,7 @@
 :root[data-theme="paper"] .bloom-layer,
 :root[data-theme="paper"] .bloom-ambient { display: none; }
 /* La pista de la barra de fuerza la pone el acabado terminal en negro al 45%
-   (70-flourish.css): sobre una tarjeta blanca es una franja negra. */
+   (flourish.css): sobre una tarjeta blanca es una franja negra. */
 :root[data-theme="paper"] .bar { background: rgba(20, 84, 120, .16); }
 :root[data-theme="paper"] .code { background: #fff; }
 :root[data-theme="paper"] .msg { background: #fff; }

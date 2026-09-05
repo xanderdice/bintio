@@ -3,35 +3,15 @@
    Ana y Beto no se conectan nunca directamente: solo hablan a traves de
    Carla, que reenvia sobres que no puede leer. Es el caso que justifica
    toda la malla, asi que es el que hay que probar.                        */
-var load = require('./load');
-var fails = 0, checks = 0;
+var ayuda = require('./ayuda');
+var ok = ayuda.ok;
 
-function ok(name, cond, extra) {
-    checks++;
-    if (cond) { console.log('  ok  ' + name); }
-    else { fails++; console.log('  FALLA ' + name + (extra ? '  -> ' + extra : '')); }
-}
-
-/* --------------------------------------------------------------------- */
+/* El nodo lo monta test/ayuda.js; aqui solo se le pone el nombre que usa esta
+   prueba a cada cosa. Antes este fichero se lo fabricaba entero, igual que
+   otros cinco: cada campo nuevo de la boveda habia que anadirlo seis veces. */
 function makeNode(label) {
-    var V = load('49');
-    var U = V.util;
-    /* Boveda en memoria (Node no tiene localStorage): el respaldo de
-       31-vault.js entra solo y nos vale para la prueba. */
-    var st = {
-        identity: null, contacts: [], chats: {}, carrier: [], seen: [],
-        settings: { relay: true, receipts: true, theme: 'ice' }
-    };
-    V.vault.state = st;
-    V.vault.save = function () {};
-    V.vault.saveNow = function () {};
-
-    var identity = V.id.create();
-    st.identity = { seed: U.toHex(identity.seed), name: label };
-    V.contacts.bind(identity);
-    V.mesh.init(function (opened) { V.chat.onIncoming(opened); });
-
-    return { V: V, U: U, id: identity, label: label, pk: U.toHex(identity.pk) };
+    var V = ayuda.nodo(label);
+    return { V: V, U: V.util, id: V.yo, label: label, pk: V.pkHex };
 }
 
 /* Todo lo que ha cruzado un cable durante la prueba, por sus dos primeros
@@ -80,17 +60,17 @@ function esperarPresentacion(cb) {
    inicial del nombre anterior porque estaban escritos en hexadecimal.
 
    Esta comprobacion existe para que eso no pueda repetirse en silencio, y
-   para que la documentacion (32-envelope.js, 35-mesh.js y el README) no pueda
+   para que la documentacion (envelope.js, mesh.js y el README) no pueda
    desviarse del codigo sin que algo se ponga rojo.
    --------------------------------------------------------------------- */
 console.log('Formato del cable');
 (function () {
-    var E = load('49').envelope;
+    var E = ayuda.cargar('sin-interfaz').envelope;
     ok("el byte de familia es 'B'", E.MAGIC0 === 0x42, 'es 0x' + E.MAGIC0.toString(16));
     ok("un sobre se marca con 'X'", E.MAGIC1 === 0x58, 'es 0x' + E.MAGIC1.toString(16));
     ok("una presentacion se marca con 'P'", E.MAGIC_PRES === 0x50,
        'es 0x' + E.MAGIC_PRES.toString(16));
-    /* 0x43 es 'C', el control de la malla (35-mesh.js). No se importa de alli
+    /* 0x43 es 'C', el control de la malla (mesh.js). No se importa de alli
        a proposito: si algun dia coincidieran, esto tiene que ponerse rojo. */
     ok('las tres clases de marco son distintas',
        E.MAGIC_PRES !== E.MAGIC1 && E.MAGIC_PRES !== 0x43 && E.MAGIC_PRES !== E.MAGIC0);
@@ -233,7 +213,7 @@ settle(function () {
             settle(function () {
                 /* Solo los sobres: dora no tiene todavia reciprocidad con eva,
                    asi que su primer mensaje sale ADEMAS como presentacion
-                   (36-chat.js) y la mula tambien la lleva encima. Contar las
+                   (chat.js) y la mula tambien la lleva encima. Contar las
                    dos cosas juntas haria que esta linea dependiera de cuanto
                    tardo en minarse una prueba de coste. */
                 var enBolsa = mula.V.vault.state.carrier, llevaSobres = 0;
@@ -290,10 +270,7 @@ settle(function () {
                             ok('ni un solo marco con otra marca', raros.length === 0,
                                raros.slice(0, 5).join(' / '));
 
-                            console.log('');
-                            console.log(fails ? fails + ' FALLOS de ' + checks + ' comprobaciones'
-                                              : 'TODO CORRECTO: ' + checks + ' comprobaciones');
-                            process.exit(fails ? 1 : 0);
+                            ayuda.resumen();
                         });
                     });
                 });

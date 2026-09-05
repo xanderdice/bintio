@@ -7,34 +7,34 @@
    mide nada mas. El criterio para elegirlas es siempre el mismo: o el usuario
    las espera mirando la pantalla, o crecen con el numero de contactos.
 
-     1. PBKDF2 con 150.000 iteraciones (31-vault.js:19). Es lo unico que hay
+     1. PBKDF2 con 150.000 iteraciones (vault.js:19). Es lo unico que hay
         entre el usuario y la aplicacion: se paga entera cada vez que se abre.
-        Se miden los DOS caminos de 21-kdf.js:67-90, porque el rapido solo
+        Se miden los DOS caminos de kdf.js:67-90, porque el rapido solo
         existe en contexto seguro: por file:// o por http:// a una IP de la
         red local, crypto.subtle no esta definido y se cae al bucle propio.
-     2. Alta de contacto (33-contacts.js:43). Se mide aparte del par de claves
+     2. Alta de contacto (contacts.js:43). Se mide aparte del par de claves
         para ver cual de los dos es el coste real.
-     3. contacts.secrets con la cache fria (33-contacts.js:34-41). K.bind la
+     3. contacts.secrets con la cache fria (contacts.js:34-41). K.bind la
         vacia en cada desbloqueo, y S.open la vuelve a llenar contacto por
         contacto: es un x25519 por cada uno, y todos caen sobre el primer
         sobre que entre. Es el peor numero de todo el codigo.
-     4. Sellar y abrir un sobre (32-envelope.js). Es la unidad de trabajo de
+     4. Sellar y abrir un sobre (envelope.js). Es la unidad de trabajo de
         mandar y de recibir; todo lo demas son multiplos de esto.
-     5. Emparejado de un sobre AJENO (34-session.js:116-158). Un sobre no dice
+     5. Emparejado de un sobre AJENO (session.js:116-158). Un sobre no dice
         a quien va, asi que hay que probar la etiqueta contacto por contacto.
         Es la unica operacion que crece con la lista, y por eso se mide con
         varios tamanos: la curva dice si es lineal o si hay algo peor dentro.
-     6. writeNow completo (31-vault.js:163-182). No hay escritura incremental:
+     6. writeNow completo (vault.js:163-182). No hay escritura incremental:
         cada mensaje reescribe, recifra y recodifica la boveda entera. Aqui
         interesa tanto el tiempo como el TAMANO, porque el techo de
         localStorage llega antes que el techo de la CPU.
-     7. unlock (31-vault.js:112). Es 1 mas el coste de descifrar y parsear la
+     7. unlock (vault.js:112). Es 1 mas el coste de descifrar y parsear la
         boveda ya crecida: lo que el usuario espera de verdad al entrar.
 
    Lo que NO se mide, y por que: el DOM (aqui no hay navegador; para eso estan
    las recetas de consola del informe de interfaz), los transportes 4x (no se
    cargan sin navegador) y el coste propio de localStorage.setItem (en Node la
-   boveda cae al respaldo en memoria, 31-vault.js:45-52). Los tiempos de
+   boveda cae al respaldo en memoria, vault.js:45-52). Los tiempos de
    escritura de abajo son, por tanto, un suelo: en Chrome hay que sumarles el
    commit sincrono de LevelDB.
 
@@ -55,10 +55,10 @@ var V = require('../test/load')('39');
 var U = V.util, C = V.crypto, E = V.envelope, S = V.session, K = V.contacts;
 
 /* Constantes leidas del codigo, no inventadas aqui. */
-var ITERS = 150000;                  /* 31-vault.js:19 */
+var ITERS = 150000;                  /* vault.js:19 */
 var CUOTA_BYTES = 5 * 1024 * 1024;   /* cuota tipica de localStorage por origen */
-var CLAVES_TRINQUETE = 2;            /* tope KEEP_RATCHET = 6 (34-session.js:28) */
-var MAX_PER_CHAT = 400;              /* tope real del modelo, 36-chat.js:17 */
+var CLAVES_TRINQUETE = 2;            /* tope KEEP_RATCHET = 6 (session.js:28) */
+var MAX_PER_CHAT = 400;              /* tope real del modelo, chat.js:17 */
 var PASS = 'banco de medida bintio';
 
 /* --------------------------------------------------------------------------
@@ -99,7 +99,7 @@ if (arg.ayuda || arg.help || arg.h) {
     console.log('  --contactos  cuantos contactos monta el banco. Entero, minimo 1:');
     console.log('               sin contactos no hay a quien sellarle un sobre.');
     console.log('  --mensajes   mensajes por conversacion. Entero de 0 a ' + MAX_PER_CHAT + ',');
-    console.log('               que es el tope por conversacion del modelo (36-chat.js:17).');
+    console.log('               que es el tope por conversacion del modelo (chat.js:17).');
     process.exit(0);
 }
 
@@ -128,7 +128,7 @@ var M = entero('mensajes', 40);
 
 if (N < 1) {
     /* Con cero contactos el bloque 4 le sella un sobre a contactos[0], que es
-       undefined, y el fallo acaba dentro del ['catch'] de 21-kdf.js:82, que
+       undefined, y el fallo acaba dentro del ['catch'] de kdf.js:82, que
        lo confunde con un fallo de crypto.subtle y reejecuta PBKDF2 entero. */
     abortar('--contactos tiene que ser 1 o mas, y ha llegado ' + N);
 }
@@ -140,7 +140,7 @@ if (M > MAX_PER_CHAT) {
        aplicacion no alcanza nunca: el modelo va tirando los mensajes viejos
        en cuanto la conversacion pasa de MAX_PER_CHAT. */
     abortar('--mensajes no puede pasar de ' + MAX_PER_CHAT + ' (ha llegado ' + M
-        + '): es el tope por conversacion del modelo, 36-chat.js:17');
+        + '): es el tope por conversacion del modelo, chat.js:17');
 }
 
 /* --------------------------------------------------------------------------
@@ -341,7 +341,7 @@ function idFalso(n) {
 
 /* Un banco pequeno de pares de trinquete reales que se reparte entre todos
    los contactos. En la boveda ocupa exactamente lo mismo (128 caracteres de
-   hexadecimal por clave, 34-session.js:37-38) y ahorra generar mil pares de
+   hexadecimal por clave, session.js:37-38) y ahorra generar mil pares de
    verdad, que serian seis segundos midiendo lo que ya mide el bloque 2. */
 function bancoTrinquete(cuantos) {
     var out = [], i, kp;
@@ -373,9 +373,9 @@ function sembrarTrinquete(contactos, banco, cuantas) {
 }
 
 /* Los mensajes se escriben DIRECTAMENTE en el estado. Nunca con chat.sendText:
-   sin transportes cargados todos acabarian en estado 'error' (36-chat.js:81-88)
+   sin transportes cargados todos acabarian en estado 'error' (chat.js:81-88)
    y ademas 'pendiente' y 'error' son estados vivos que Chat.retryPending
-   volveria a emitir (36-chat.js:96-112). Solo estados terminales. */
+   volveria a emitir (chat.js:96-112). Solo estados terminales. */
 function sembrarMensajes(contactos, porChat) {
     var st = V.vault.state, total = 0, k = 0, i, j, msgs, ts, saliente;
     var base = U.now();
@@ -439,16 +439,16 @@ function paso1(hecho) {
             medirAsync(9, function (fin) {
                 V.vault.create(PASS, null, function () { fin(); });
             }, function (crear) {
-                filas.push(filaDe('pbkdf2Async con crypto.subtle (21-kdf.js:73)', rapido));
-                filas.push(filaDe('pbkdf2Slow en JavaScript puro (21-kdf.js:93)', lento));
-                filas.push(filaDe('vault.create completo (31-vault.js:101)', crear));
+                filas.push(filaDe('pbkdf2Async con crypto.subtle (kdf.js:73)', rapido));
+                filas.push(filaDe('pbkdf2Slow en JavaScript puro (kdf.js:93)', lento));
+                filas.push(filaDe('vault.create completo (vault.js:101)', crear));
                 tabla(['operacion'].concat(COLS_T), filas);
 
                 var factor = lento.min / rapido.min;
                 veredicto('con crypto.subtle son ' + ms(rapido.min) + ', sin el son '
                     + ms(lento.min) + ': factor ' + num(factor, 0) + 'x (minimos).');
                 nota('           El camino lento es el que toca por file:// o por http:// a una IP');
-                nota('           de la red local, donde crypto.subtle no existe (21-kdf.js:68). En un');
+                nota('           de la red local, donde crypto.subtle no existe (kdf.js:68). En un');
                 nota('           movil modesto hay que multiplicar por entre 3 y 10.');
                 hecho();
             });
@@ -489,7 +489,7 @@ function paso2(hecho) {
 
     /* Se repite el alta entera vaciando la lista: asi el numero no depende de
        una sola pasada. K.add hace un barrido lineal para descartar repetidos
-       (33-contacts.js:46), asi que dar de alta N contactos es O(N^2).
+       (contacts.js:46), asi que dar de alta N contactos es O(N^2).
        Con presupuesto de tiempo en vez de tres vueltas fijas: el alta es
        barata, y con tres muestras el minimo no vale para nada. */
     var alta = medir(function () {
@@ -504,8 +504,8 @@ function paso2(hecho) {
     res.claves = claves;
 
     tabla(['operacion', 'minimo', 'mediana', 'media', 'maximo', 'reps'], [
-        filaDe('C.keypair(), UNO (23-x25519.js:117)', claves),
-        filaDe('contacts.add(), los ' + num(N, 0) + ' (33-contacts.js:43)', alta)
+        filaDe('C.keypair(), UNO (x25519.js:117)', claves),
+        filaDe('contacts.add(), los ' + num(N, 0) + ' (contacts.js:43)', alta)
     ]);
 
     log('');
@@ -528,7 +528,7 @@ function paso2(hecho) {
    -------------------------------------------------------------------------- */
 function paso3(hecho) {
     bloque(3, 'Derivar los secretos de los ' + num(N, 0) + ' contactos (contacts.secrets)');
-    nota('K.bind vacia la cache en cada desbloqueo (33-contacts.js:16-19) y S.open la');
+    nota('K.bind vacia la cache en cada desbloqueo (contacts.js:16-19) y S.open la');
     nota('rellena contacto a contacto. Todo esto cae de golpe sobre el primer sobre.');
     log('');
 
@@ -553,7 +553,7 @@ function paso3(hecho) {
     res.caliente = caliente;
 
     tabla(['operacion', 'minimo', 'mediana', 'media', 'maximo', 'reps'], [
-        filaDe('cache fria: ' + num(N, 0) + ' x x25519 (33-contacts.js:37)', frio),
+        filaDe('cache fria: ' + num(N, 0) + ' x x25519 (contacts.js:37)', frio),
         filaDe('cache caliente: ' + num(N, 0) + ' lecturas', caliente)
     ]);
 
@@ -598,7 +598,7 @@ function paso4(hecho) {
     var cuerpo = U.fromString(FRASES[0]);
 
     /* Una pasada en blanco: la primera vez S.seal crea la clave de trinquete
-       del contacto (34-session.js:47-50) y eso es un par de claves extra que
+       del contacto (session.js:47-50) y eso es un par de claves extra que
        no se paga en los mensajes siguientes. */
     S.seal(destino, S.T_TEXT, cuerpo, null);
 
@@ -624,9 +624,9 @@ function paso4(hecho) {
     res.abrir = abrir;
 
     tabla(['operacion', 'minimo', 'mediana', 'media', 'maximo', 'reps'], [
-        filaDe('session.seal, sobre completo (34-session.js:87)', sellar),
-        filaDe('envelope.parse, cabecera + id (32-envelope.js:132)', analizar),
-        filaDe('envelope.open, descifrado (32-envelope.js:174)', abrir)
+        filaDe('session.seal, sobre completo (session.js:87)', sellar),
+        filaDe('envelope.parse, cabecera + id (envelope.js:132)', analizar),
+        filaDe('envelope.open, descifrado (envelope.js:174)', abrir)
     ]);
 
     log('');
@@ -638,9 +638,9 @@ function paso4(hecho) {
 
        Estas dos operaciones se sabe de antemano en que se descomponen:
 
-         seal = C.keypair() + C.x25519()   (34-session.js:87-108, y el x25519
-                                            del sobre en 32-envelope.js:118)
-         open = C.x25519()                 (32-envelope.js:177)
+         seal = C.keypair() + C.x25519()   (session.js:87-108, y el x25519
+                                            del sobre en envelope.js:118)
+         open = C.x25519()                 (envelope.js:177)
 
        El resto -hkdf, chacha20 sobre unas decenas de bytes, pasar cuatro
        claves de hexadecimal a bytes- no llega al ruido al lado de una curva.
@@ -671,8 +671,8 @@ function paso4(hecho) {
     log('');
     log('  coherencia: seal y open remedidos contra sus piezas, en este mismo instante');
     tabla(['pieza', 'minimo', 'mediana', 'media', 'maximo', 'reps'], [
-        filaDe('C.keypair() (23-x25519.js:117)', refKp),
-        filaDe('C.x25519() (23-x25519.js:108)', refX)
+        filaDe('C.keypair() (x25519.js:117)', refKp),
+        filaDe('C.x25519() (x25519.js:108)', refX)
     ]);
     log('');
     log('  seal publicado ' + ms(sellar.mediana) + ' contra keypair+x25519 '
@@ -728,7 +728,7 @@ function paso4(hecho) {
    -------------------------------------------------------------------------- */
 function paso5(hecho) {
     bloque(5, 'Emparejar un sobre AJENO: la curva con el numero de contactos');
-    nota('Un sobre no dice a quien va (32-envelope.js:4-7), asi que hay que probar la');
+    nota('Un sobre no dice a quien va (envelope.js:4-7), asi que hay que probar la');
     nota('etiqueta con cada contacto. Si el sobre no es nuestro se prueban TODOS, y');
     nota('eso pasa en cada sobre que solo se reenvia. Es el peor caso y el habitual.');
     log('');
@@ -807,7 +807,7 @@ function paso5(hecho) {
 function paso6(hecho) {
     bloque(6, 'Guardar la boveda: ' + num(N, 0) + ' contactos y ' + num(M, 0)
         + ' mensajes por conversacion');
-    nota('No hay escritura incremental en ninguna parte (31-vault.js:163-182): cada');
+    nota('No hay escritura incremental en ninguna parte (vault.js:163-182): cada');
     nota('mensaje reescribe, recifra y recodifica la boveda entera, con nonce nuevo.');
     log('');
 
@@ -886,19 +886,19 @@ function paso6(hecho) {
         + num(mandaModelo ? MAX_PER_CHAT : cabenPorChat, 0) + ' mensajes por contacto');
     if (mandaModelo) {
         nota('           -y lo pone el modelo, no la cuota: el tope por conversacion son');
-        nota('           ' + num(MAX_PER_CHAT, 0) + ' mensajes (36-chat.js:17). Por cuota cabrian '
+        nota('           ' + num(MAX_PER_CHAT, 0) + ' mensajes (chat.js:17). Por cuota cabrian '
             + num(cabenPorChat, 0) + ', pero esos');
         nota('           no llegan a existir porque los viejos se van tirando.');
     } else {
         nota('           -y lo pone la cuota, que llega antes que los '
-            + num(MAX_PER_CHAT, 0) + ' del modelo (36-chat.js:17).');
+            + num(MAX_PER_CHAT, 0) + ' del modelo (chat.js:17).');
     }
     nota('           Guardar UN mensaje cuesta ' + ms(conMsg.min)
         + ' (minimo) de hilo principal, porque reescribe los');
     nota('           ' + num(total, 0) + ' mensajes y las ' + num(N * CLAVES_TRINQUETE, 0)
         + ' claves de trinquete enteros.');
     nota('           Faltan dos cosas por sumar: la bolsa de reenvio, que aqui va vacia y');
-    nota('           a tope anade 1,2 MB de base64 al mismo JSON (35-mesh.js:35), y el');
+    nota('           a tope anade 1,2 MB de base64 al mismo JSON (mesh.js:35), y el');
     nota('           localStorage.setItem, que en Node no existe (la boveda vive en');
     nota('           memoria) y en Chrome es sincrono y cae en el commit de LevelDB.');
     hecho();

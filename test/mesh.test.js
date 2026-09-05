@@ -11,35 +11,13 @@
    M.prune tira primero lo que antes caduca, y cada copia nueva nace con 72
    horas por delante, lo que se iba de la bolsa eran los sobres AJENOS: en
    cinco horas sin cobertura ya no llevabas ni uno de nadie.                  */
-var load = require('./load');
-var fails = 0, checks = 0;
+var ayuda = require('./ayuda');
+var ok = ayuda.ok;
 
-function ok(name, cond, extra) {
-    checks++;
-    if (cond) { console.log('  ok  ' + name); }
-    else { fails++; console.log('  FALLA ' + name + (extra ? '  -> ' + extra : '')); }
-}
-
-/* Un nodo completo en memoria, sin DOM y sin transportes: aqui se mide la
-   bolsa, no la red. */
-function nodo() {
-    var V = load('49');
-    var U = V.util;
-    var st = {
-        identity: null, contacts: [], chats: {}, carrier: [], seen: [],
-        settings: { relay: true, receipts: true, theme: 'bintio' }
-    };
-    V.vault.state = st;
-    V.vault.save = function () {};
-    V.vault.saveNow = function () {};
-    var id = V.id.create();
-    st.identity = { seed: U.toHex(id.seed), name: 'Yo' };
-    V.contacts.bind(id);
-    /* La entrega tiene que ser la de verdad: con una vacia, un sobre que se
-       abre no llega a la conversacion y la prueba mediria otra cosa. */
-    V.mesh.init(function (abierto) { V.chat.onIncoming(abierto); });
-    return V;
-}
+/* Un nodo completo en memoria, sin DOM y sin transportes de verdad: aqui se
+   mide la bolsa, no la red. Lo monta test/ayuda.js, que es donde vive desde
+   que seis pruebas dejaron de fabricarselo cada una por su cuenta. */
+function nodo() { return ayuda.nodo('Yo'); }
 
 console.log('Bolsa de la malla');
 
@@ -53,7 +31,7 @@ ok('sin enlaces el mensaje se queda pendiente', msg.state === 'pendiente', msg.s
 ok('y se guarda una copia en la bolsa', V.mesh.bagSize().count === 1,
    V.mesh.bagSize().count + ' piezas');
 
-/* Diez reintentos son diez minutos del reloj de 50-app.js. */
+/* Diez reintentos son diez minutos del reloj de app.js. */
 for (var i = 0; i < 10; i++) { V.chat.retryPending(); }
 ok('diez reintentos NO dejan diez copias', V.mesh.bagSize().count === 1,
    V.mesh.bagSize().count + ' piezas tras 10 reintentos');
@@ -68,11 +46,7 @@ var ajenos = 0, k;
 for (k = 0; k < 25; k++) {
     /* Un sobre que no es para nosotros: entra por la malla y se queda en la
        bolsa porque no se puede abrir. */
-    var otroNodo = load('49');
-    otroNodo.vault.state = {
-        identity: null, contacts: [], chats: {}, carrier: [], seen: [],
-        settings: { relay: true, receipts: true }
-    };
+    var otroNodo = ayuda.nodo('Ajeno');
     otroNodo.contacts.bind(tercero);
     var c2 = otroNodo.contacts.add(otroNodo.util.toHex(destino.pk), 'Otro').contact;
     var sobre = otroNodo.session.seal(c2, otroNodo.session.T_TEXT,
@@ -178,15 +152,8 @@ console.log('');
 console.log('Un marco roto no quema el identificador del bueno');
 
 var Q = nodo();
-var emisorQ = load('49');
-emisorQ.vault.state = {
-    identity: null, contacts: [], chats: {}, carrier: [], seen: [],
-    settings: { relay: true, receipts: true }
-};
-emisorQ.vault.save = function () {};
-emisorQ.vault.saveNow = function () {};
-var idQ = emisorQ.id.create();
-emisorQ.vault.state.identity = { seed: emisorQ.util.toHex(idQ.seed), name: 'Emisor' };
+var emisorQ = ayuda.nodo('Emisor');
+var idQ = emisorQ.yo;
 emisorQ.contacts.bind(idQ);
 var destQ = emisorQ.id.create();
 var cQ = emisorQ.contacts.add(emisorQ.util.toHex(destQ.pk), 'Destino').contact;
@@ -285,7 +252,7 @@ ok('mientras el que si transporta la publica',
    Contacto a medias: alguien te anade y te escribe ANTES de que tu le anadas.
 
    Un sobre solo se puede abrir si quien lo recibe tiene dado de alta a quien
-   lo manda (34-session.js recorre TUS contactos). Asi que ese mensaje llega al
+   lo manda (session.js recorre TUS contactos). Asi que ese mensaje llega al
    aparato, no se reconoce y se queda en la bolsa como el de un desconocido.
    Antes se perdia ahi para siempre; ahora, al dar de alta a esa persona, se
    vuelve a mirar la bolsa y aparece.
@@ -328,7 +295,7 @@ setTimeout(function () {
     ok('sin tenerle dado de alta, no se ve nada', visibles === 0, visibles + ' mensajes');
     /* Los DOS sobres estan en la mochila. Puede haber una pieza mas, y se
        cuenta aparte a proposito: al escribir a alguien que no te tiene, sale
-       ademas una presentacion (37-presenta.js). Ana la lleva como marco ajeno
+       ademas una presentacion (presenta.js). Ana la lleva como marco ajeno
        porque su buzon esta cerrado, que es como viene de serie. */
     var carrier = ana.vault.state.carrier, sobres = 0, presentaciones = 0;
     for (k = 0; k < carrier.length; k++) {
@@ -350,9 +317,6 @@ setTimeout(function () {
         ok('al darle de alta aparecen los mensajes que ya habia mandado', luego === 2,
            luego + ' mensajes');
 
-        console.log('');
-        console.log(fails ? fails + ' FALLOS de ' + checks + ' comprobaciones'
-                          : 'TODO CORRECTO: ' + checks + ' comprobaciones');
-        process.exit(fails ? 1 : 0);
+        ayuda.resumen();
     }, 300);
 }, 400);

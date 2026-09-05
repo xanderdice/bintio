@@ -67,6 +67,19 @@
         if (D.onViewChange) { D.onViewChange(name); }
     };
 
+    /* Si esta persona cuenta como conectada.
+
+       Dos minutos desde lo ultimo que llego suyo. El numero estaba escrito dos
+       veces -en la lista y en la cabecera de la conversacion- y cada copia
+       decidia por su cuenta lo mismo: cambiar el criterio obligaba a acordarse
+       de los dos sitios, y el punto verde de la lista podia acabar diciendo
+       una cosa y el de arriba otra. */
+    var EN_LINEA_MS = 120000;
+
+    D.enLinea = function (contact) {
+        return !!(contact && contact.lastSeen && (Date.now() - contact.lastSeen < EN_LINEA_MS));
+    };
+
     /* ------------------------------------------------------------- vinculo
 
        El estado del vinculo con una persona, en un icono. Son dos anillos: si
@@ -108,7 +121,7 @@
     D.copy = function (text) {
         if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(text).then(function () {
-                D.toast('Copiado', 'ok');
+                D.toast(D.t('Copiado'), 'ok');
             })['catch'](function () { legacyCopy(text); });
             return;
         }
@@ -124,9 +137,9 @@
             ta.select();
             var ok = document.execCommand && document.execCommand('copy');
             document.body.removeChild(ta);
-            D.toast(ok ? 'Copiado' : 'Copialo a mano desde el recuadro', ok ? 'ok' : null);
+            D.toast(D.t(ok ? 'Copiado' : 'Copialo a mano desde el recuadro'), ok ? 'ok' : null);
         } catch (e) {
-            D.toast('Copialo a mano desde el recuadro');
+            D.toast(D.t('Copialo a mano desde el recuadro'));
         }
     }
 
@@ -150,9 +163,9 @@
             a.click();
             document.body.removeChild(a);
             setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
-            D.toast('Copia descargada', 'ok');
+            D.toast(D.t('Copia descargada'), 'ok');
         } catch (e) {
-            D.toast('Tu navegador no deja descargar. Copia el texto a mano.', 'bad');
+            D.toast(D.t('Tu navegador no deja descargar. Copia el texto a mano.'), 'bad');
         }
     };
 
@@ -163,20 +176,27 @@
         var d = new Date(ts);
         return two(d.getHours()) + ':' + two(d.getMinutes());
     };
+    /* La fecha del separador de dias. Las dos palabras que salen -hoy y ayer-
+       se traducen; el formato numerico se deja en dia/mes/ano, que es el de
+       aqui y no depende del idioma de la interfaz sino de donde estas. */
     D.day = function (ts) {
         var d = new Date(ts), hoy = new Date();
-        if (d.toDateString() === hoy.toDateString()) { return 'Hoy'; }
+        if (d.toDateString() === hoy.toDateString()) { return D.t('Hoy'); }
         var ayer = new Date(hoy.getTime() - 86400000);
-        if (d.toDateString() === ayer.toDateString()) { return 'Ayer'; }
+        if (d.toDateString() === ayer.toDateString()) { return D.t('Ayer'); }
         return two(d.getDate()) + '/' + two(d.getMonth() + 1) + '/' + d.getFullYear();
     };
+
+    /* Cuanto hace, en corto: cabe en la esquina de una fila de la lista. Las
+       abreviaturas tambien cambian de idioma -en ingles no se dice "3 d"- y por
+       eso van con hueco y no pegando el numero a una letra. */
     D.ago = function (ts) {
         if (!ts) { return ''; }
         var s = Math.floor((Date.now() - ts) / 1000);
-        if (s < 90) { return 'ahora'; }
-        if (s < 3600) { return Math.floor(s / 60) + ' min'; }
-        if (s < 86400) { return Math.floor(s / 3600) + ' h'; }
-        return Math.floor(s / 86400) + ' d';
+        if (s < 90) { return D.t('ahora'); }
+        if (s < 3600) { return D.t('{n} min', { n: Math.floor(s / 60) }); }
+        if (s < 86400) { return D.t('{n} h', { n: Math.floor(s / 3600) }); }
+        return D.t('{n} d', { n: Math.floor(s / 86400) });
     };
     D.bytes = function (n) {
         if (n < 1024) { return n + ' B'; }

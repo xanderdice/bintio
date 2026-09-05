@@ -24,12 +24,23 @@
         }
     }
 
+    /* La pantalla de acceso tiene cuatro bloques y siempre se ve UNO. Estaban
+       listados en tres sitios distintos -abrir, recuperar y empezar de cero- y
+       cada sitio tenia que acordarse de apagar los otros tres; el bloque de
+       "empezar de cero", al anadirse, se olvido en dos de ellos y salia encima
+       del formulario de contrasena. Con la lista en un solo sitio eso no puede
+       volver a pasar. */
+    var BLOQUES = ['lock-new', 'lock-open', 'lock-restore', 'lock-wipe'];
+
+    function soloBloque(cual) {
+        for (var i = 0; i < BLOQUES.length; i++) {
+            D.show(D.$(BLOQUES[i]), BLOQUES[i] === cual);
+        }
+    }
+
     D.showLock = function () {
         var exists = V.vault.exists();
-        D.show(D.$('lock-new'), !exists);
-        D.show(D.$('lock-open'), exists);
-        D.show(D.$('lock-restore'), false);
-        D.show(D.$('lock-wipe'), false);
+        soloBloque(exists ? 'lock-open' : 'lock-new');
         D.view('view-lock');
         var f = D.$(exists ? 'open-pass' : 'new-name');
         if (f) { try { f.focus(); } catch (e) {} }
@@ -48,8 +59,8 @@
         D.on(D.$('btn-create'), 'click', function () {
             var name = (D.$('new-name').value || '').replace(/^\s+|\s+$/g, '');
             var p1 = D.$('new-pass').value, p2 = D.$('new-pass2').value;
-            if (p1.length < 8) { D.toast('La contrase\u00f1a necesita ocho caracteres como minimo', 'bad'); return; }
-            if (p1 !== p2) { D.toast('Las dos contrase\u00f1as no coinciden', 'bad'); return; }
+            if (p1.length < 8) { D.toast(D.t('La contrase\u00f1a necesita ocho caracteres como minimo'), 'bad'); return; }
+            if (p1 !== p2) { D.toast(D.t('Las dos contrase\u00f1as no coinciden'), 'bad'); return; }
             busy(true);
             V.vault.create(p1, function (p) { bar('new-bar', p); }, function (err) {
                 busy(false);
@@ -60,7 +71,7 @@
                 }
                 V.vault.saveNow();
                 opened();
-                D.toast('Identidad creada. Guarda tu Llave de Recuperacion desde Ajustes.', 'ok');
+                D.toast(D.t('Identidad creada. Guarda tu Llave de Recuperacion desde Ajustes.'), 'ok');
             });
         });
 
@@ -81,12 +92,7 @@
             if (ev.keyCode === 13) { D.$('btn-open').click(); }
         });
 
-        function showRestore() {
-            D.show(D.$('lock-new'), false);
-            D.show(D.$('lock-open'), false);
-            D.show(D.$('lock-wipe'), false);
-            D.show(D.$('lock-restore'), true);
-        }
+        function showRestore() { soloBloque('lock-restore'); }
         D.on(D.$('btn-show-restore'), 'click', showRestore);
         D.on(D.$('btn-show-restore2'), 'click', showRestore);
         D.on(D.$('btn-restore-cancel'), 'click', function () { D.showLock(); });
@@ -103,12 +109,7 @@
            cambio, sin esto una boveda que no se abre convierte el aparato en un
            ladrillo para siempre, porque aqui no hay ningun servidor que
            restablezca nada. */
-        D.on(D.$('btn-show-wipe'), 'click', function () {
-            D.show(D.$('lock-new'), false);
-            D.show(D.$('lock-open'), false);
-            D.show(D.$('lock-restore'), false);
-            D.show(D.$('lock-wipe'), true);
-        });
+        D.on(D.$('btn-show-wipe'), 'click', function () { soloBloque('lock-wipe'); });
 
         D.on(D.$('btn-wipe-no'), 'click', function () { D.showLock(); });
 
@@ -119,7 +120,7 @@
                protegido en vez de darlo por hecho. */
             try { V.app.stop(); } catch (e) {}
             V.vault.destroy();
-            D.toast('Borrado. Este aparato ya no sabe nada de ti.');
+            D.toast(D.t('Borrado. Este aparato ya no sabe nada de ti.'));
             /* Se recarga en vez de repintar: asi no queda ni un contacto en la
                cache de memoria, ni un sobre visto en la malla, ni un enlace
                abierto de la sesion anterior. Empezar de cero de verdad. */
@@ -129,8 +130,8 @@
         D.on(D.$('btn-restore'), 'click', function () {
             var text = (D.$('restore-key').value || '').replace(/^\s+|\s+$/g, '');
             var pass = D.$('restore-pass').value;
-            if (!text) { D.toast('Pega la llave o la copia', 'bad'); return; }
-            if (pass.length < 8) { D.toast('La contrase\u00f1a necesita ocho caracteres', 'bad'); return; }
+            if (!text) { D.toast(D.t('Pega la llave o la copia'), 'bad'); return; }
+            if (pass.length < 8) { D.toast(D.t('La contrase\u00f1a necesita ocho caracteres'), 'bad'); return; }
             busy(true);
 
             /* Una copia completa empieza por V1. ; cualquier otra cosa se
@@ -140,7 +141,7 @@
                     busy(false);
                     if (err) { D.toast(err.message, 'bad'); return; }
                     opened();
-                    D.toast('Copia restaurada', 'ok');
+                    D.toast(D.t('Copia restaurada'), 'ok');
                 });
                 return;
             }
@@ -148,7 +149,7 @@
             var identity = V.id.fromRecoveryKey(text);
             if (!identity) {
                 busy(false);
-                D.toast('Esa llave no es valida (mira si falta algun caracter)', 'bad');
+                D.toast(D.t('Esa llave no es valida (mira si falta algun caracter)'), 'bad');
                 return;
             }
             V.vault.create(pass, function (p) { bar('restore-bar', p); }, function (err) {
@@ -160,7 +161,7 @@
                 };
                 V.vault.saveNow();
                 opened();
-                D.toast('Identidad recuperada. Los contactos hay que volver a a\u00f1adirlos.', 'ok');
+                D.toast(D.t('Identidad recuperada. Los contactos hay que volver a a\u00f1adirlos.'), 'ok');
             });
         });
 
@@ -171,7 +172,7 @@
                los cuatro segundos: hasta entonces seguirian ahi los contactos
                y el tamano de la boveda de quien acaba de cerrar. */
             D.refreshStatus();
-            D.toast('Cerrado. Hace falta la contrase\u00f1a para volver a entrar.');
+            D.toast(D.t('Cerrado. Hace falta la contrase\u00f1a para volver a entrar.'));
         });
     };
 })(BINTIO);

@@ -19,10 +19,10 @@
         if (!c.random) { fatal.push('Tu navegador no puede generar numeros aleatorios seguros.'); }
 
         if (fatal.length) {
-            box.appendChild(D.make('p', null, 'BINTIO no puede funcionar aqui, y prefiere decirtelo a fingir:'));
+            box.appendChild(D.make('p', null, D.t('BINTIO no puede funcionar aqui, y prefiere decirtelo a fingir:')));
             for (var i = 0; i < fatal.length; i++) { box.appendChild(D.make('p', 'dim', fatal[i])); }
             box.appendChild(D.make('p', 'dim',
-                'Prueba con Firefox, Chrome, Edge o Safari en una version de los ultimos diez anos.'));
+                D.t('Prueba con Firefox, Chrome, Edge o Safari en una version de los ultimos diez anos.')));
             return false;
         }
 
@@ -32,7 +32,7 @@
         if (!c.localstorage) { avisos.push('Sin almacenamiento: lo que hagas se perdera al cerrar la pestana.'); }
         if (c.fileProtocol) { avisos.push('Abierto como fichero local: funciona, pero sin instalacion ni modo sin conexion.'); }
 
-        box.appendChild(D.make('p', null, 'Todo listo.'));
+        box.appendChild(D.make('p', null, D.t('Todo listo.')));
         for (var j = 0; j < avisos.length; j++) { box.appendChild(D.make('p', 'dim', avisos[j])); }
         return true;
     }
@@ -56,8 +56,8 @@
                 D.refreshRoster();
                 return;
             }
-            /* 'request' entra por aqui porque 37-presenta.js lo emite por
-               V.chat y 50-app.js reemite lo que sale de ahi. Un segundo canal
+            /* 'request' entra por aqui porque presenta.js lo emite por
+               V.chat y app.js reemite lo que sale de ahi. Un segundo canal
                seria un segundo sitio que enganchar. */
             if (what === 'contact' || what === 'presence' || what === 'request') { D.refreshRoster(); }
         });
@@ -73,7 +73,7 @@
                de quien ya estaba esperando, no una copia repetida por la malla
                -de esas se encarga el filtro de sobres ya vistos-. */
             if (what === 'request' && arg && (arg.what === 'new' || arg.what === 'update')) {
-                D.toast('Quieren escribirte. Lo tienes arriba, en Conversaciones.');
+                D.toast(D.t('Quieren escribirte. Lo tienes arriba, en Conversaciones.'));
                 return;
             }
             if (what !== 'message' || !arg || arg.msg.dir !== 'in') { return; }
@@ -83,12 +83,15 @@
             var quien;
             if (V.groups.isKey(arg.pk)) {
                 var g = V.groups.get(V.groups.idOf(arg.pk));
-                quien = (arg.msg.fromName || 'alguien') + ' en ' + (g ? g.name : 'un grupo');
+                quien = D.t('{quien} en {grupo}', {
+                    quien: arg.msg.fromName || D.t('alguien'),
+                    grupo: g ? g.name : D.t('un grupo')
+                });
             } else {
                 var c = V.contacts.get(arg.pk);
-                quien = c ? c.name : 'alguien';
+                quien = c ? c.name : D.t('alguien');
             }
-            D.toast('Mensaje de ' + quien);
+            D.toast(D.t('Mensaje de {quien}', { quien: quien }));
             try { document.title = '(' + V.chat.totalUnread() + ') BINTIO'; } catch (e) {}
         });
 
@@ -111,7 +114,7 @@
         setTimeout(function () {
             D.openConnect();
             D.$('paste-code').value = code;
-            D.toast('Han compartido un codigo contigo: revisalo y pulsa Usar codigo');
+            D.toast(D.t('Han compartido un codigo contigo: revisalo y pulsa Usar codigo'));
         }, 300);
     }
 
@@ -175,6 +178,11 @@
     }
 
     function boot() {
+        /* Lo primero de todo, antes de pintar nada: el idioma. Asi la pantalla
+           de acceso ya sale en el que toca en vez de cambiar delante de quien
+           la esta leyendo. */
+        D.aplicarIdioma(D.idiomaGuardado());
+
         D.initLock();
         D.initChat();
         D.initConnect();
@@ -213,7 +221,7 @@
        bateria que gastan las aplicaciones de mensajeria. Lo que llega despierta
        a la interfaz por evento -el canal de datos, el bluetooth o el
        BroadcastChannel entre pestanas- y lo unico que corre solo es el minuto
-       de mantenimiento de 50-app.js, que es el suelo al que los navegadores
+       de mantenimiento de app.js, que es el suelo al que los navegadores
        estrangulan cualquier temporizador en segundo plano.
 
        Quedaba este repaso de cuatro segundos, y corria siempre: con la ventana

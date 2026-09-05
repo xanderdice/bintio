@@ -1,15 +1,9 @@
 /* Compresion y codigos de enlace. Aqui un fallo silencioso significa
    "dos personas no consiguen conectarse", asi que se prueba a lo bruto. */
-var V = require('./load')('49');
+var ayuda = require('./ayuda');
+var ok = ayuda.ok;
+var V = ayuda.cargar('sin-interfaz');
 var U = V.util, C = V.crypto, I = V.invite;
-var fails = 0, checks = 0;
-
-function ok(name, cond, extra) {
-    checks++;
-    if (cond) { console.log('  ok  ' + name); }
-    else { fails++; console.log('  FALLA ' + name + (extra ? '  -> ' + extra : '')); }
-}
-
 var SDP = [
     'v=0', 'o=- 4611731400430051336 2 IN IP4 127.0.0.1', 's=-', 't=0 0',
     'a=group:BUNDLE 0', 'a=extmap-allow-mixed', 'a=msid-semantic: WMS',
@@ -85,6 +79,4 @@ var abierto = I.decode(secreto, 'nos vemos en el bar');
 ok('con la clave correcta abre', abierto && abierto.sdp === SDP && abierto.pk === U.toHex(pk));
 
 console.log('');
-console.log(fails ? fails + ' FALLOS de ' + checks + ' comprobaciones'
-                  : 'TODO CORRECTO: ' + checks + ' comprobaciones');
-process.exit(fails ? 1 : 0);
+ayuda.resumen();

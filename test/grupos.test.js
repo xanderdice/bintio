@@ -21,51 +21,8 @@
      4. Y lo que se pidio con todas las letras: un mensaje de grupo NO se pone
         "leido" hasta que lo ha leido el ultimo. Con uno de dos se queda en
         "enviado" y contando; con los dos, y solo entonces, cambia.          */
-var load = require('./load');
-var fails = 0, checks = 0;
-
-function ok(name, cond, extra) {
-    checks++;
-    if (cond) { console.log('  ok  ' + name); }
-    else { fails++; console.log('  FALLA ' + name + (extra ? '  -> ' + extra : '')); }
-}
-
-/* ---------------------------------------------------------------- aparatos */
-
-function nodo(nombre) {
-    var V = load('49');
-    var U = V.util;
-    V.vault.state = {
-        identity: null, contacts: [], chats: {}, carrier: [], seen: [],
-        requests: [], groups: {},
-        settings: { relay: true, receipts: true, typing: true, theme: 'bintio' }
-    };
-    V.vault.save = function () {};
-    V.vault.saveNow = function () {};
-    var id = V.id.create();
-    V.vault.state.identity = { seed: U.toHex(id.seed), name: nombre };
-    V.contacts.bind(id);
-    V.mesh.init(function (abierto) { V.chat.onIncoming(abierto); });
-    V.nombre = nombre;
-    V.pkHex = U.toHex(id.pk);
-    return V;
-}
-
-/* Un cable entre dos nodos: lo que sale por uno entra por el otro tal cual. */
-function cablear(a, b) {
-    var haciaA = { id: a.nombre, kind: 'local', close: function () {},
-        send: function (bytes) { a.mesh.handleFrame(bytes, haciaB); } };
-    var haciaB = { id: b.nombre, kind: 'local', close: function () {},
-        send: function (bytes) { b.mesh.handleFrame(bytes, haciaA); } };
-    a.transport.addPeer(haciaB);
-    b.transport.addPeer(haciaA);
-}
-
-/* Que se conozcan: cada uno da de alta al otro por su clave publica. */
-function presentar(a, b) {
-    a.contacts.add(b.pkHex, b.nombre);
-    b.contacts.add(a.pkHex, a.nombre);
-}
+var ayuda = require('./ayuda');
+var ok = ayuda.ok, nodo = ayuda.nodo, cablear = ayuda.cablear, presentar = ayuda.presentar;
 
 function ultimo(V, clave) {
     var m = V.chat.get(clave).messages;
@@ -302,9 +259,4 @@ ok('salirse quita el grupo de la lista', R.chat.list().length === cuantosAntes -
 ok('y se lleva la conversacion con el', !R.vault.state.chats[clave]);
 ok('sin tocar los grupos de los demas', !!P.groups.get(grupo.id));
 
-console.log('');
-if (fails) {
-    console.log('FALLOS: ' + fails + ' de ' + checks);
-    process.exit(1);
-}
-console.log('TODO CORRECTO: ' + checks + ' comprobaciones');
+ayuda.resumen();

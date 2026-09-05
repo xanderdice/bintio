@@ -54,8 +54,8 @@
        cargarlos en la bolsa durante tres dias para nada.
 
        El byte 1 es la CLASE de marco: 'X' un sobre, 'P' una presentacion,
-       'C' control de la malla. El de control se arma en 35-mesh.js y la
-       presentacion en 37-presenta.js, pero el byte 0 lo sacan de aqui: la
+       'C' control de la malla. El de control se arma en mesh.js y la
+       presentacion en presenta.js, pero el byte 0 lo sacan de aqui: la
        familia se escribe UNA vez o acaba diciendo cosas distintas segun quien
        la escriba. Las tres clases son ASCII imprimible a proposito, para que
        se lean de un vistazo en un volcado hexadecimal.
@@ -69,7 +69,7 @@
        E.open sin tocar. */
     E.MAGIC0 = 0x42; /* B, la familia */
     E.MAGIC1 = 0x58; /* X, un sobre  */
-    E.MAGIC_PRES = 0x50; /* P, una presentacion (37-presenta.js) */
+    E.MAGIC_PRES = 0x50; /* P, una presentacion (presenta.js) */
     E.HEAD = 64;
     E.F_RATCHET_MINE = 1;
     E.F_RATCHET_THEIRS = 2;
@@ -171,7 +171,7 @@
                         poda lo echa en la misma llamada que lo mete. Sobrevive
                         al reinicio y solo lo cura vaciar la mochila a mano.
 
-           37-presenta.js ya hacia las tres para su clase de marco, con el
+           presenta.js ya hacia las tres para su clase de marco, con el
            comentario que describe este mismo ataque. Aqui faltaban. */
         if (b[2] !== V.PROTO) { return null; }
         if (b[4] > E.MAX_TTL) { return null; }

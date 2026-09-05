@@ -61,13 +61,13 @@
 <link rel="icon" href="icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <!-- BUILD:CSS -->
-<link rel="stylesheet" href="css/00-tokens.css">
-<link rel="stylesheet" href="css/10-base.css">
-<link rel="stylesheet" href="css/20-layout.css">
-<link rel="stylesheet" href="css/30-components.css">
-<link rel="stylesheet" href="css/40-chat.css">
-<link rel="stylesheet" href="css/70-flourish.css">
-<link rel="stylesheet" href="css/90-themes.css">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/chat.css">
+<link rel="stylesheet" href="css/flourish.css">
+<link rel="stylesheet" href="css/themes.css">
 <!-- /BUILD:CSS -->
 </head>
 <body data-bloom="on">
@@ -83,11 +83,11 @@
          botones estan escondidos tambien- y el nombre ya lo dice la portada
          en grande, justo debajo. -->
     <header id="menubar" class="hidden">
-        <div class="brand"><span class="brand-logo" aria-hidden="true"></span><b>BINTIO</b></div>
+        <div class="brand"><span class="brand-logo" aria-hidden="true"></span><b data-t>BINTIO</b></div>
         <div class="spacer"></div>
-        <button type="button" class="btn btn--sm hidden" id="btn-connect">Conectar</button>
-        <button type="button" class="btn btn--sm hidden" id="btn-settings">Ajustes</button>
-        <button type="button" class="btn btn--sm btn--ghost hidden" id="btn-lock">Cerrar</button>
+        <button type="button" class="btn btn--sm hidden" id="btn-connect" data-t>Conectar</button>
+        <button type="button" class="btn btn--sm hidden" id="btn-settings" data-t>Ajustes</button>
+        <button type="button" class="btn btn--sm btn--ghost hidden" id="btn-lock" data-t>Cerrar</button>
     </header>
 
     <main id="stage">
@@ -98,7 +98,7 @@
                 <div class="block">
                     <span class="bracket bracket--tl"></span><span class="bracket bracket--tr"></span>
                     <span class="bracket bracket--bl"></span><span class="bracket bracket--br"></span>
-                    <h2>Comprobando el aparato</h2>
+                    <h2 data-t>Comprobando el aparato</h2>
                     <div id="compat-report"></div>
                 </div>
             </div></div>
@@ -114,32 +114,32 @@
                      javascript detras, y desaparece con la vista. -->
                 <div class="hero">
                     <div class="hero-logo" aria-hidden="true"></div>
-                    <div class="hero-mark">BINTIO</div>
-                    <p class="hero-claim">Mensajes cifrados de punta a punta que no pasan por ningun servidor. Solo tu aparato y el de la otra persona.</p>
+                    <div class="hero-mark" data-t>BINTIO</div>
+                    <p class="hero-claim" data-t>Mensajes cifrados de punta a punta que no pasan por ningun servidor. Solo tu aparato y el de la otra persona.</p>
                 </div>
 
                 <div class="block" id="lock-new">
                     <span class="bracket bracket--tl"></span><span class="bracket bracket--tr"></span>
                     <span class="bracket bracket--bl"></span><span class="bracket bracket--br"></span>
-                    <h2>Crear tu identidad</h2>
-                    <p>BINTIO no pide telefono, ni correo, ni nombre real. Tu identidad es una clave que se genera aqui dentro y no sale nunca de este aparato.</p>
-                    <p class="dim">La contrase&ntilde;a cifra todo lo que se guarda. <b class="hot">Nadie puede recuperarla</b>. Si la pierdes, pierdes los mensajes.</p>
+                    <h2 data-t>Crear tu identidad</h2>
+                    <p data-t>BINTIO no pide telefono, ni correo, ni nombre real. Tu identidad es una clave que se genera aqui dentro y no sale nunca de este aparato.</p>
+                    <p class="dim" data-t>La contrase&ntilde;a cifra todo lo que se guarda. <b class="hot" data-t>Nadie puede recuperarla</b>. Si la pierdes, pierdes los mensajes.</p>
                     <div class="field">
-                        <label for="new-name">Como quieres que te vean</label>
+                        <label for="new-name" data-t>Como quieres que te vean</label>
                         <input class="input" type="text" id="new-name" maxlength="40" autocomplete="off" spellcheck="false">
                     </div>
                     <div class="field">
-                        <label for="new-pass">Contrase&ntilde;a</label>
+                        <label for="new-pass" data-t>Contrase&ntilde;a</label>
                         <input class="input" type="password" id="new-pass" autocomplete="new-password">
                     </div>
                     <div class="field">
-                        <label for="new-pass2">Repitela</label>
+                        <label for="new-pass2" data-t>Repitela</label>
                         <input class="input" type="password" id="new-pass2" autocomplete="new-password">
                     </div>
                     <div class="bar" id="new-bar"><i></i></div>
                     <div class="btn-row mt-l">
-                        <button type="button" class="btn btn--primary" id="btn-create">Crear identidad</button>
-                        <button type="button" class="btn btn--ghost" id="btn-show-restore">Ya tengo una</button>
+                        <button type="button" class="btn btn--primary" id="btn-create" data-t>Crear identidad</button>
+                        <button type="button" class="btn btn--ghost" id="btn-show-restore" data-t>Ya tengo una</button>
                     </div>
                 </div>
 
@@ -147,14 +147,14 @@
                     <span class="bracket bracket--tl"></span><span class="bracket bracket--tr"></span>
                     <span class="bracket bracket--bl"></span><span class="bracket bracket--br"></span>
                     <div class="field">
-                        <label for="open-pass">Contrase&ntilde;a</label>
+                        <label for="open-pass" data-t>Contrase&ntilde;a</label>
                         <input class="input" type="password" id="open-pass" autocomplete="current-password">
                     </div>
                     <div class="bar" id="open-bar"><i></i></div>
                     <div class="btn-row mt-l">
-                        <button type="button" class="btn btn--primary" id="btn-open">Abrir</button>
-                        <button type="button" class="btn btn--ghost" id="btn-show-restore2">Restaurar copia</button>
-                        <button type="button" class="btn btn--ghost" id="btn-show-wipe">Empezar de cero</button>
+                        <button type="button" class="btn btn--primary" id="btn-open" data-t>Abrir</button>
+                        <button type="button" class="btn btn--ghost" id="btn-show-restore2" data-t>Restaurar copia</button>
+                        <button type="button" class="btn btn--ghost" id="btn-show-wipe" data-t>Empezar de cero</button>
                     </div>
                 </div>
 
@@ -172,37 +172,37 @@
                 <div class="block hidden" id="lock-wipe">
                     <span class="bracket bracket--tl"></span><span class="bracket bracket--tr"></span>
                     <span class="bracket bracket--bl"></span><span class="bracket bracket--br"></span>
-                    <h2>Empezar de cero?</h2>
-                    <p>Vas a borrar de este aparato <b class="hot">todo lo que BINTIO guarda</b>, y despues podras crear una identidad nueva desde el principio.</p>
-                    <p class="dim">Desaparecen para siempre:</p>
-                    <p class="dim">&mdash; Tu identidad y tu clave. La persona que eras en BINTIO deja de existir: quien te tuviera anadido ya no podra escribirte.<br>
-                        &mdash; Todas las conversaciones y todos los mensajes, tuyos y de los demas.<br>
-                        &mdash; Tus contactos y tus grupos.<br>
+                    <h2 data-t>Empezar de cero?</h2>
+                    <p data-t>Vas a borrar de este aparato <b class="hot" data-t>todo lo que BINTIO guarda</b>, y despues podras crear una identidad nueva desde el principio.</p>
+                    <p class="dim" data-t>Desaparecen para siempre:</p>
+                    <p class="dim" data-t>&mdash; Tu identidad y tu clave. La persona que eras en BINTIO deja de existir: quien te tuviera anadido ya no podra escribirte.<br data-t>
+                        &mdash; Todas las conversaciones y todos los mensajes, tuyos y de los demas.<br data-t>
+                        &mdash; Tus contactos y tus grupos.<br data-t>
                         &mdash; Los sobres de otros que llevabas en la mochila y tus ajustes.</p>
-                    <p class="dim">Aqui no hay servidor ni copia en la nube: <b class="hot">nadie puede devolvertelo</b>, ni el desarrollador. Si tienes una Llave de Recuperacion o una copia de seguridad, vuelve atras y usa <b>Restaurar copia</b>; eso si recupera tu identidad.</p>
+                    <p class="dim" data-t>Aqui no hay servidor ni copia en la nube: <b class="hot" data-t>nadie puede devolvertelo</b>, ni el desarrollador. Si tienes una Llave de Recuperacion o una copia de seguridad, vuelve atras y usa <b data-t>Restaurar copia</b>; eso si recupera tu identidad.</p>
                     <div class="btn-row mt-l">
-                        <button type="button" class="btn btn--ghost" id="btn-wipe-no">No, volver</button>
-                        <button type="button" class="btn btn--danger" id="btn-wipe-yes">Si, borrar todo y empezar de cero</button>
+                        <button type="button" class="btn btn--ghost" id="btn-wipe-no" data-t>No, volver</button>
+                        <button type="button" class="btn btn--danger" id="btn-wipe-yes" data-t>Si, borrar todo y empezar de cero</button>
                     </div>
                 </div>
 
                 <div class="block hidden" id="lock-restore">
                     <span class="bracket bracket--tl"></span><span class="bracket bracket--tr"></span>
                     <span class="bracket bracket--bl"></span><span class="bracket bracket--br"></span>
-                    <h2>Recuperar</h2>
-                    <p class="dim">Con la Llave de Recuperacion vuelves a ser la misma persona en otro aparato, aunque el anterior este en el fondo del mar. Con una copia de seguridad completa recuperas ademas las conversaciones.</p>
+                    <h2 data-t>Recuperar</h2>
+                    <p class="dim" data-t>Con la Llave de Recuperacion vuelves a ser la misma persona en otro aparato, aunque el anterior este en el fondo del mar. Con una copia de seguridad completa recuperas ademas las conversaciones.</p>
                     <div class="field">
-                        <label for="restore-key">Llave de Recuperacion, o copia de seguridad completa</label>
+                        <label for="restore-key" data-t>Llave de Recuperacion, o copia de seguridad completa</label>
                         <textarea class="input" id="restore-key" spellcheck="false" autocomplete="off"></textarea>
                     </div>
                     <div class="field">
-                        <label for="restore-pass">Contrase&ntilde;a (la nueva, o la de la copia)</label>
+                        <label for="restore-pass" data-t>Contrase&ntilde;a (la nueva, o la de la copia)</label>
                         <input class="input" type="password" id="restore-pass" autocomplete="off">
                     </div>
                     <div class="bar" id="restore-bar"><i></i></div>
                     <div class="btn-row mt-l">
-                        <button type="button" class="btn btn--primary" id="btn-restore">Recuperar</button>
-                        <button type="button" class="btn btn--ghost" id="btn-restore-cancel">Volver</button>
+                        <button type="button" class="btn btn--primary" id="btn-restore" data-t>Recuperar</button>
+                        <button type="button" class="btn btn--ghost" id="btn-restore-cancel" data-t>Volver</button>
                     </div>
                 </div>
 
@@ -216,10 +216,10 @@
                 <span class="bracket bracket--tl"></span><span class="bracket bracket--tr"></span>
                 <span class="bracket bracket--bl"></span><span class="bracket bracket--br"></span>
                 <div class="panel-head">
-                    <span class="panel-title">Conversaciones</span>
+                    <span class="panel-title" data-t>Conversaciones</span>
                     <div class="panel-tools">
-                        <button type="button" class="btn btn--sm" id="btn-add">+ Contacto</button>
-                        <button type="button" class="btn btn--sm" id="btn-new-group">+ Grupo</button>
+                        <button type="button" class="btn btn--sm" id="btn-add" data-t>+ Contacto</button>
+                        <button type="button" class="btn btn--sm" id="btn-new-group" data-t>+ Grupo</button>
                     </div>
                 </div>
                 <div class="panel-body">
@@ -237,7 +237,7 @@
                          un estado. -->
                     <div class="list-item list-item--req hidden" id="requests-row">
                         <div class="who">
-                            <b>Quieren escribirte</b>
+                            <b data-t>Quieren escribirte</b>
                             <small id="requests-row-note"></small>
                         </div>
                         <div class="meta">
@@ -245,9 +245,9 @@
                         </div>
                     </div>
                     <div class="list" id="roster-list"></div>
-                    <div class="empty-msg" id="roster-empty">
-                        Todavia no conoces a nadie.<br>
-                        Pulsa <b class="hot">+ Contacto</b> y pasale tu codigo a alguien.
+                    <div class="empty-msg" id="roster-empty" data-t>
+                        Todavia no conoces a nadie.<br data-t>
+                        Pulsa <b class="hot" data-t>+ Contacto</b> y pasale tu codigo a alguien.
                     </div>
                 </div>
             </aside>
@@ -265,7 +265,7 @@
                         </span>
                     </div>
                     <div class="panel-tools">
-                        <button type="button" class="btn btn--sm btn--ghost" id="btn-peer">Ficha</button>
+                        <button type="button" class="btn btn--sm btn--ghost" id="btn-peer" data-t>Ficha</button>
                     </div>
                 </div>
                 <div class="panel-body" id="chat-body">
@@ -278,8 +278,8 @@
                      obligaria a repintarlo todo por un renglon. -->
                 <div id="typing-line" class="typing hidden"></div>
                 <div id="composer">
-                    <textarea id="composer-text" rows="1" placeholder="Escribe. Nadie mas lo vera." spellcheck="false"></textarea>
-                    <button type="button" class="btn btn--primary" id="btn-send">Enviar</button>
+                    <textarea id="composer-text" rows="1" placeholder="Escribe. Nadie mas lo vera." spellcheck="false" data-t-ph></textarea>
+                    <button type="button" class="btn btn--primary" id="btn-send" data-t>Enviar</button>
                 </div>
             </section>
 
@@ -292,7 +292,7 @@
              normal es que sea tu invitacion; cuando alguien te ense&ntilde;a la
              suya, ese mismo hueco pasa a ense&ntilde;ar tu respuesta, que es el
              segundo y ultimo paso. Por eso el titulo y el texto de debajo los
-             escribe 66-ui-connect.js y aqui van vacios.
+             escribe connect.js y aqui van vacios.
 
              El segundo bloque es el codigo del otro. No hay un tercer sitio
              donde "crear un enlace": eso era lo que partia en dos algo que es
@@ -303,59 +303,59 @@
                 <div class="block">
                     <span class="bracket bracket--tl"></span><span class="bracket bracket--tr"></span>
                     <span class="bracket bracket--bl"></span><span class="bracket bracket--br"></span>
-                    <h2 id="mine-title">Tu codigo para conectar</h2>
+                    <h2 id="mine-title" data-t>Tu codigo para conectar</h2>
                     <p class="dim" id="mine-note"></p>
                     <div class="qr-box qr-box--lg" id="my-qr"></div>
                     <div class="code mt-l" id="my-code"></div>
                     <div class="btn-row mt-m">
-                        <button type="button" class="btn" id="btn-copy-code">Copiar</button>
-                        <button type="button" class="btn" id="btn-share-code">Compartir</button>
-                        <button type="button" class="btn btn--ghost hidden" id="btn-show-mine">Volver a mi codigo</button>
+                        <button type="button" class="btn" id="btn-copy-code" data-t>Copiar</button>
+                        <button type="button" class="btn" id="btn-share-code" data-t>Compartir</button>
+                        <button type="button" class="btn btn--ghost hidden" id="btn-show-mine" data-t>Volver a mi codigo</button>
                     </div>
                     <div id="mine-lock" class="mt-l">
                         <div class="field">
-                            <label for="meet-pass">Clave de encuentro (opcional)</label>
-                            <input class="input" type="text" id="meet-pass" autocomplete="off" spellcheck="false" placeholder="algo que solo sepais los dos">
+                            <label for="meet-pass" data-t>Clave de encuentro (opcional)</label>
+                            <input class="input" type="text" id="meet-pass" autocomplete="off" spellcheck="false" placeholder="algo que solo sepais los dos" data-t-ph>
                         </div>
                         <div class="btn-row">
-                            <button type="button" class="btn btn--sm" id="btn-lock-code">Rehacer con esta clave</button>
+                            <button type="button" class="btn btn--sm" id="btn-lock-code" data-t>Rehacer con esta clave</button>
                         </div>
-                        <p class="dim mt-s">Con clave, el codigo va cifrado: si viaja por un chat y alguien lo intercepta, no le sirve de nada. Dile la clave por otra via, no en el mismo mensaje. Ense&ntilde;ando el QR en persona no hace falta.</p>
+                        <p class="dim mt-s" data-t>Con clave, el codigo va cifrado: si viaja por un chat y alguien lo intercepta, no le sirve de nada. Dile la clave por otra via, no en el mismo mensaje. Ense&ntilde;ando el QR en persona no hace falta.</p>
                     </div>
                 </div>
 
                 <div class="block">
                     <span class="bracket bracket--tl"></span><span class="bracket bracket--tr"></span>
                     <span class="bracket bracket--bl"></span><span class="bracket bracket--br"></span>
-                    <h2>Su codigo</h2>
-                    <p class="dim">Escanea el QR que te ense&ntilde;en, o pega el codigo que te pasen. Vale cualquiera de los tres (invitacion, respuesta o tarjeta): BINTIO sabe cual es y hace lo que toca.</p>
+                    <h2 data-t>Su codigo</h2>
+                    <p class="dim" data-t>Escanea el QR que te ense&ntilde;en, o pega el codigo que te pasen. Vale cualquiera de los tres (invitacion, respuesta o tarjeta): BINTIO sabe cual es y hace lo que toca.</p>
                     <div class="btn-row">
-                        <button type="button" class="btn" id="btn-scan">Escanear su QR</button>
+                        <button type="button" class="btn" id="btn-scan" data-t>Escanear su QR</button>
                     </div>
                     <div id="scan-area" class="hidden mt-l">
                         <video class="qr-scan" id="scan-video" playsinline muted></video>
                         <div class="btn-row mt-s">
-                            <button type="button" class="btn btn--sm" id="btn-scan-stop">Parar</button>
+                            <button type="button" class="btn btn--sm" id="btn-scan-stop" data-t>Parar</button>
                         </div>
                     </div>
                     <div class="field mt-l">
-                        <label for="paste-code">O pega aqui su codigo</label>
+                        <label for="paste-code" data-t>O pega aqui su codigo</label>
                         <textarea class="input" id="paste-code" spellcheck="false" autocomplete="off"></textarea>
                     </div>
                     <div class="field">
-                        <label for="paste-pass">Clave de encuentro (solo si os la habeis puesto)</label>
+                        <label for="paste-pass" data-t>Clave de encuentro (solo si os la habeis puesto)</label>
                         <input class="input" type="text" id="paste-pass" autocomplete="off" spellcheck="false">
                     </div>
                     <!-- El boton va DEBAJO del cuadro, no encima: actua sobre lo
                          que se acaba de pegar, y un boton que manda sobre algo
                          que todavia no has escrito no se entiende. -->
                     <div class="btn-row">
-                        <button type="button" class="btn btn--primary" id="btn-use-code">Usar el codigo pegado</button>
+                        <button type="button" class="btn btn--primary" id="btn-use-code" data-t>Usar el codigo pegado</button>
                     </div>
                     <div id="use-note" class="hidden mt-l">
                         <p class="dim" id="use-note-text"></p>
                         <div class="btn-row mt-s">
-                            <button type="button" class="btn btn--sm btn--ghost" id="btn-note-chat">Ver la conversacion</button>
+                            <button type="button" class="btn btn--sm btn--ghost" id="btn-note-chat" data-t>Ver la conversacion</button>
                         </div>
                     </div>
                 </div>
@@ -363,15 +363,15 @@
                 <div class="block">
                     <span class="bracket bracket--tl"></span><span class="bracket bracket--tr"></span>
                     <span class="bracket bracket--bl"></span><span class="bracket bracket--br"></span>
-                    <h2>Sin codigos: Bluetooth</h2>
-                    <p class="dim">Si cerca hay un nodo BINTIO de verdad (la version de escritorio, un movil con la aplicacion nativa o un cacharro con el perfil), engancharse a el abre camino sin pasarse nada. Dos pesta&ntilde;as de navegador no se ven asi: ningun navegador puede anunciarse por Bluetooth.</p>
+                    <h2 data-t>Sin codigos: Bluetooth</h2>
+                    <p class="dim" data-t>Si cerca hay un nodo BINTIO de verdad (la version de escritorio, un movil con la aplicacion nativa o un cacharro con el perfil), engancharse a el abre camino sin pasarse nada. Dos pesta&ntilde;as de navegador no se ven asi: ningun navegador puede anunciarse por Bluetooth.</p>
                     <div class="btn-row">
-                        <button type="button" class="btn" id="btn-ble">Buscar por Bluetooth</button>
+                        <button type="button" class="btn" id="btn-ble" data-t>Buscar por Bluetooth</button>
                     </div>
                 </div>
 
                 <div class="btn-row">
-                    <button type="button" class="btn btn--ghost" id="btn-connect-back">Volver</button>
+                    <button type="button" class="btn btn--ghost" id="btn-connect-back" data-t>Volver</button>
                 </div>
 
             </div></div>
@@ -383,25 +383,25 @@
                 <div class="block">
                     <span class="bracket bracket--tl"></span><span class="bracket bracket--tr"></span>
                     <span class="bracket bracket--bl"></span><span class="bracket bracket--br"></span>
-                    <h2 id="peer-title">Contacto</h2>
+                    <h2 id="peer-title" data-t>Contacto</h2>
                     <p class="dim" id="peer-estado"></p>
                     <div class="field">
-                        <label for="peer-alias">Como lo llamas tu</label>
+                        <label for="peer-alias" data-t>Como lo llamas tu</label>
                         <input class="input" type="text" id="peer-alias" maxlength="40" autocomplete="off">
                     </div>
-                    <p class="dim">Comparad esta huella en persona o por telefono. Si coincide, nadie se ha colado en medio. Es la unica comprobacion que de verdad importa.</p>
+                    <p class="dim" data-t>Comparad esta huella en persona o por telefono. Si coincide, nadie se ha colado en medio. Es la unica comprobacion que de verdad importa.</p>
                     <div class="key-grid" id="peer-fingerprint"></div>
                     <label class="check mt-m">
                         <input type="checkbox" id="peer-verified">
-                        <span>He comparado la huella y coincide
-                            <small>Marca esto solo si lo has comprobado por un canal distinto a este.</small>
+                        <span data-t>He comparado la huella y coincide
+                            <small data-t>Marca esto solo si lo has comprobado por un canal distinto a este.</small>
                         </span>
                     </label>
                     <div class="btn-row mt-l">
-                        <button type="button" class="btn" id="btn-peer-save">Guardar</button>
-                        <button type="button" class="btn btn--danger" id="btn-peer-clear">Borrar conversacion</button>
-                        <button type="button" class="btn btn--danger" id="btn-peer-remove">Eliminar contacto</button>
-                        <button type="button" class="btn btn--ghost" id="btn-peer-back">Volver</button>
+                        <button type="button" class="btn" id="btn-peer-save" data-t>Guardar</button>
+                        <button type="button" class="btn btn--danger" id="btn-peer-clear" data-t>Borrar conversacion</button>
+                        <button type="button" class="btn btn--danger" id="btn-peer-remove" data-t>Eliminar contacto</button>
+                        <button type="button" class="btn btn--ghost" id="btn-peer-back" data-t>Volver</button>
                     </div>
                 </div>
             </div></div>
@@ -418,22 +418,22 @@
                 <div class="block">
                     <span class="bracket bracket--tl"></span><span class="bracket bracket--tr"></span>
                     <span class="bracket bracket--bl"></span><span class="bracket bracket--br"></span>
-                    <h2 id="group-title">Nuevo grupo</h2>
-                    <p class="dim">Aqui no hay sala ni servidor: un grupo es una lista que guarda tu aparato. Cada mensaje sale cifrado por separado para cada persona, asi que nadie de fuera sabe siquiera que este grupo existe.</p>
+                    <h2 id="group-title" data-t>Nuevo grupo</h2>
+                    <p class="dim" data-t>Aqui no hay sala ni servidor: un grupo es una lista que guarda tu aparato. Cada mensaje sale cifrado por separado para cada persona, asi que nadie de fuera sabe siquiera que este grupo existe.</p>
                     <div class="field">
-                        <label for="group-name">Nombre del grupo</label>
+                        <label for="group-name" data-t>Nombre del grupo</label>
                         <input class="input" type="text" id="group-name" maxlength="40" autocomplete="off">
                     </div>
                     <div class="field">
-                        <label>Quien esta dentro</label>
+                        <label data-t>Quien esta dentro</label>
                         <div class="list list--pick" id="group-members"></div>
                     </div>
                     <p class="dim" id="group-note"></p>
                     <div class="btn-row mt-l">
-                        <button type="button" class="btn btn--primary" id="btn-group-save">Crear grupo</button>
-                        <button type="button" class="btn btn--danger hidden" id="btn-group-clear">Borrar conversacion</button>
-                        <button type="button" class="btn btn--danger hidden" id="btn-group-leave">Salir del grupo</button>
-                        <button type="button" class="btn btn--ghost" id="btn-group-back">Volver</button>
+                        <button type="button" class="btn btn--primary" id="btn-group-save" data-t>Crear grupo</button>
+                        <button type="button" class="btn btn--danger hidden" id="btn-group-clear" data-t>Borrar conversacion</button>
+                        <button type="button" class="btn btn--danger hidden" id="btn-group-leave" data-t>Salir del grupo</button>
+                        <button type="button" class="btn btn--ghost" id="btn-group-back" data-t>Volver</button>
                     </div>
                 </div>
             </div></div>
@@ -454,21 +454,21 @@
                 <div class="block">
                     <span class="bracket bracket--tl"></span><span class="bracket bracket--tr"></span>
                     <span class="bracket bracket--bl"></span><span class="bracket bracket--br"></span>
-                    <h2>Quieren escribirte</h2>
-                    <p>Alguien te ha escrito sin que lo tuvieras a&ntilde;adido. Su mensaje venia cifrado para tu clave y solo este aparato ha podido abrirlo. No entra en tus conversaciones hasta que tu lo aceptes.</p>
-                    <p class="dim">El nombre se lo pone quien escribe: puede poner el que quiera y no se comprueba. La huella si se comprueba, y es lo unico que se comprueba. Las horas son las de llegada a este aparato, no las que venian escritas dentro del sobre.</p>
+                    <h2 data-t>Quieren escribirte</h2>
+                    <p data-t>Alguien te ha escrito sin que lo tuvieras a&ntilde;adido. Su mensaje venia cifrado para tu clave y solo este aparato ha podido abrirlo. No entra en tus conversaciones hasta que tu lo aceptes.</p>
+                    <p class="dim" data-t>El nombre se lo pone quien escribe: puede poner el que quiera y no se comprueba. La huella si se comprueba, y es lo unico que se comprueba. Las horas son las de llegada a este aparato, no las que venian escritas dentro del sobre.</p>
                 </div>
 
                 <div id="requests-list"></div>
 
                 <!-- Aceptar la ultima ya no lleva solo a la conversacion: abrir
                      una conversacion es leerla, y leerla manda un acuse al otro
-                     lado con la hora exacta (ver 68-ui-requests.js). Asi que
+                     lado con la hora exacta (ver requests.js). Asi que
                      aqui se dice donde han quedado y por donde se sale. -->
-                <div class="empty-msg hidden" id="requests-empty">No queda ninguna solicitud.<br>Lo que aceptes aparece en tus conversaciones.</div>
+                <div class="empty-msg hidden" id="requests-empty" data-t>No queda ninguna solicitud.<br data-t>Lo que aceptes aparece en tus conversaciones.</div>
 
                 <div class="btn-row">
-                    <button type="button" class="btn btn--ghost" id="btn-requests-back">Volver</button>
+                    <button type="button" class="btn btn--ghost" id="btn-requests-back" data-t>Volver</button>
                 </div>
 
             </div></div>
@@ -481,41 +481,45 @@
                 <div class="block">
                     <span class="bracket bracket--tl"></span><span class="bracket bracket--tr"></span>
                     <span class="bracket bracket--bl"></span><span class="bracket bracket--br"></span>
-                    <h2>Tu identidad</h2>
+                    <h2 data-t>Tu identidad</h2>
                     <div class="field">
-                        <label for="me-name">Nombre visible</label>
+                        <label for="me-name" data-t>Nombre visible</label>
                         <input class="input" type="text" id="me-name" maxlength="40" autocomplete="off">
                     </div>
-                    <p class="dim">Tu huella. Quien te la lea puede comprobar que habla contigo y no con un impostor.</p>
+                    <p class="dim" data-t>Tu huella. Quien te la lea puede comprobar que habla contigo y no con un impostor.</p>
                     <div class="key-grid" id="me-fingerprint"></div>
                     <div class="btn-row mt-l">
-                        <button type="button" class="btn" id="btn-save-name">Guardar nombre</button>
+                        <button type="button" class="btn" id="btn-save-name" data-t>Guardar nombre</button>
                     </div>
                 </div>
 
                 <div class="block">
                     <span class="bracket bracket--tl"></span><span class="bracket bracket--tr"></span>
                     <span class="bracket bracket--bl"></span><span class="bracket bracket--br"></span>
-                    <h2>Aspecto</h2>
+                    <h2 data-t>Aspecto</h2>
                     <div class="field">
-                        <label for="set-theme">Tema</label>
+                        <label for="set-lang" data-t>Idioma</label>
+                        <select class="input" id="set-lang"></select>
+                    </div>
+                    <div class="field">
+                        <label for="set-theme" data-t>Tema</label>
                         <select class="input" id="set-theme">
-                            <option value="bintio">Bintio (por defecto)</option>
-                            <option value="neon">Neon (rojo)</option>
-                            <option value="ice">Hielo</option>
-                            <option value="matrix">Matrix</option>
-                            <option value="ember">Brasa</option>
-                            <option value="violet">Violeta</option>
-                            <option value="carbon">Carbon (sin efectos)</option>
-                            <option value="paper">Papel (claro)</option>
+                            <option value="bintio" data-t>Bintio (por defecto)</option>
+                            <option value="neon" data-t>Neon (rojo)</option>
+                            <option value="ice" data-t>Hielo</option>
+                            <option value="matrix" data-t>Matrix</option>
+                            <option value="ember" data-t>Brasa</option>
+                            <option value="violet" data-t>Violeta</option>
+                            <option value="carbon" data-t>Carbon (sin efectos)</option>
+                            <option value="paper" data-t>Papel (claro)</option>
                         </select>
                     </div>
                     <div class="field">
-                        <label for="set-bloom">Luz y efectos</label>
+                        <label for="set-bloom" data-t>Luz y efectos</label>
                         <select class="input" id="set-bloom">
-                            <option value="on">Completos</option>
-                            <option value="soft">Suaves</option>
-                            <option value="off">Apagados (mas bateria)</option>
+                            <option value="on" data-t>Completos</option>
+                            <option value="soft" data-t>Suaves</option>
+                            <option value="off" data-t>Apagados (mas bateria)</option>
                         </select>
                     </div>
                 </div>
@@ -523,45 +527,45 @@
                 <div class="block">
                     <span class="bracket bracket--tl"></span><span class="bracket bracket--tr"></span>
                     <span class="bracket bracket--bl"></span><span class="bracket bracket--br"></span>
-                    <h2>La malla</h2>
+                    <h2 data-t>La malla</h2>
                     <label class="check">
                         <input type="checkbox" id="set-relay">
-                        <span>Llevar mensajes de otros
-                            <small>Tu aparato guarda y reparte sobres ajenos que no puede leer. Es lo que hace que un mensaje llegue a alguien que estaba apagado. Si lo quitas, tu si usaras la malla pero no la sostendras.</small>
+                        <span data-t>Llevar mensajes de otros
+                            <small data-t>Tu aparato guarda y reparte sobres ajenos que no puede leer. Es lo que hace que un mensaje llegue a alguien que estaba apagado. Si lo quitas, tu si usaras la malla pero no la sostendras.</small>
                         </span>
                     </label>
                     <label class="check">
                         <input type="checkbox" id="set-shield">
-                        <span>Pantalla protegida
-                            <small id="set-shield-note">Tapa la conversacion en cuanto la ventana deja de estar delante, quita el menu del boton derecho y, si pulsas Impr Pant, borra lo que quede en el portapapeles. <b class="hot">No impide una captura</b>: desde una pagina web eso no se puede, y una camara apuntando a la pantalla se lo lleva todo igual.</small>
+                        <span data-t>Pantalla protegida
+                            <small id="set-shield-note" data-t>Tapa la conversacion en cuanto la ventana deja de estar delante, quita el menu del boton derecho y, si pulsas Impr Pant, borra lo que quede en el portapapeles. <b class="hot" data-t>No impide una captura</b>: desde una pagina web eso no se puede, y una camara apuntando a la pantalla se lo lleva todo igual.</small>
                         </span>
                     </label>
                     <label class="check">
                         <input type="checkbox" id="set-typing">
-                        <span>Avisar de que estas escribiendo
-                            <small>Mientras tecleas, la otra persona lo ve. No se guarda en ninguna parte y caduca en segundos, pero es un aviso cada cuatro mientras escribes; en un grupo, uno por miembro.</small>
+                        <span data-t>Avisar de que estas escribiendo
+                            <small data-t>Mientras tecleas, la otra persona lo ve. No se guarda en ninguna parte y caduca en segundos, pero es un aviso cada cuatro mientras escribes; en un grupo, uno por miembro.</small>
                         </span>
                     </label>
                     <label class="check">
                         <input type="checkbox" id="set-receipts">
-                        <span>Enviar acuses de recibo
-                            <small>Avisar de que has recibido y leido. Quitalo si prefieres no decir cuando estas.</small>
+                        <span data-t>Enviar acuses de recibo
+                            <small data-t>Avisar de que has recibido y leido. Quitalo si prefieres no decir cuando estas.</small>
                         </span>
                     </label>
                     <label class="check">
                         <input type="checkbox" id="set-inbox">
-                        <span>Dejar que te escriban sin tenerlos a&ntilde;adidos
-                            <small>Con esto puesto, cualquiera que tenga tu codigo puede mandarte un primer mensaje y te llega como solicitud, con su nombre y su huella, para que aceptes o descartes. Sin esto -que es como viene- para escribirte hay que estar en tu lista: tienes que a&ntilde;adirlo tu antes. Ojo: ese primer mensaje no va autenticado, asi que el nombre lo pone quien escribe hasta que compruebes la huella.</small>
+                        <span data-t>Dejar que te escriban sin tenerlos a&ntilde;adidos
+                            <small data-t>Con esto puesto, cualquiera que tenga tu codigo puede mandarte un primer mensaje y te llega como solicitud, con su nombre y su huella, para que aceptes o descartes. Sin esto -que es como viene- para escribirte hay que estar en tu lista: tienes que a&ntilde;adirlo tu antes. Ojo: ese primer mensaje no va autenticado, asi que el nombre lo pone quien escribe hasta que compruebes la huella.</small>
                         </span>
                     </label>
                     <div class="field mt-m">
-                        <label for="set-stun">Servidor STUN (opcional, vacio = ninguno)</label>
-                        <input class="input" type="text" id="set-stun" spellcheck="false" autocomplete="off" placeholder="stun:ejemplo.org:3478">
+                        <label for="set-stun" data-t>Servidor STUN (opcional, vacio = ninguno)</label>
+                        <input class="input" type="text" id="set-stun" spellcheck="false" autocomplete="off" placeholder="stun:ejemplo.org:3478" data-t-ph>
                     </div>
-                    <p class="dim">Sin STUN funcionan la red local, el cable y compartir datos desde el movil. Con uno, tambien enlaces a traves de internet, a cambio de que ese servidor vea que dos direcciones IP se buscan. Tu decides; por defecto no hay ninguno.</p>
+                    <p class="dim" data-t>Sin STUN funcionan la red local, el cable y compartir datos desde el movil. Con uno, tambien enlaces a traves de internet, a cambio de que ese servidor vea que dos direcciones IP se buscan. Tu decides; por defecto no hay ninguno.</p>
                     <div class="btn-row mt-m">
-                        <button type="button" class="btn" id="btn-save-net">Guardar</button>
-                        <button type="button" class="btn btn--danger" id="btn-empty-bag">Vaciar la mochila</button>
+                        <button type="button" class="btn" id="btn-save-net" data-t>Guardar</button>
+                        <button type="button" class="btn btn--danger" id="btn-empty-bag" data-t>Vaciar la mochila</button>
                     </div>
                     <p class="dim mt-s" id="bag-info"></p>
                 </div>
@@ -569,11 +573,11 @@
                 <div class="block">
                     <span class="bracket bracket--tl"></span><span class="bracket bracket--tr"></span>
                     <span class="bracket bracket--bl"></span><span class="bracket bracket--br"></span>
-                    <h2>Copias y recuperacion</h2>
-                    <p class="dim">La Llave de Recuperacion es tu identidad en 56 caracteres. Escribela en papel y guardala lejos del aparato. Quien la tenga puede hacerse pasar por ti.</p>
+                    <h2 data-t>Copias y recuperacion</h2>
+                    <p class="dim" data-t>La Llave de Recuperacion es tu identidad en 56 caracteres. Escribela en papel y guardala lejos del aparato. Quien la tenga puede hacerse pasar por ti.</p>
                     <div class="btn-row">
-                        <button type="button" class="btn" id="btn-show-key">Ver la llave</button>
-                        <button type="button" class="btn" id="btn-backup">Descargar copia cifrada</button>
+                        <button type="button" class="btn" id="btn-show-key" data-t>Ver la llave</button>
+                        <button type="button" class="btn" id="btn-backup" data-t>Descargar copia cifrada</button>
                     </div>
                     <div id="key-out" class="hidden mt-l">
                         <div class="key-grid" id="key-value"></div>
@@ -583,15 +587,15 @@
                 <div class="block">
                     <span class="bracket bracket--tl"></span><span class="bracket bracket--tr"></span>
                     <span class="bracket bracket--bl"></span><span class="bracket bracket--br"></span>
-                    <h2>Este aparato</h2>
+                    <h2 data-t>Este aparato</h2>
                     <div id="tech-report"></div>
                     <div class="btn-row mt-l">
-                        <button type="button" class="btn btn--danger" id="btn-panic">Borrar todo de este aparato</button>
+                        <button type="button" class="btn btn--danger" id="btn-panic" data-t>Borrar todo de este aparato</button>
                     </div>
                 </div>
 
                 <div class="btn-row">
-                    <button type="button" class="btn btn--ghost" id="btn-settings-back">Volver</button>
+                    <button type="button" class="btn btn--ghost" id="btn-settings-back" data-t>Volver</button>
                 </div>
 
             </div></div>
@@ -600,10 +604,10 @@
     </main>
 
     <footer id="statusbar">
-        <span class="stat" id="st-links">Enlaces <b>0</b></span>
-        <span class="stat" id="st-bag">Mochila <b>0</b></span>
-        <span class="stat" id="st-contacts">Contactos <b>0</b></span>
-        <span class="stat" id="st-store">Disco <b>0 KB</b></span>
+        <span class="stat" id="st-links" data-t>Enlaces <b>0</b></span>
+        <span class="stat" id="st-bag" data-t>Mochila <b>0</b></span>
+        <span class="stat" id="st-contacts" data-t>Contactos <b>0</b></span>
+        <span class="stat" id="st-store" data-t>Disco <b data-t>0 KB</b></span>
         <span class="spacer"></span>
         <span class="stat" id="st-mode"></span>
     </footer>
@@ -612,52 +616,76 @@
 
 <!-- La cortina de "pantalla protegida". Fuera de #app y por encima de todo,
      incluidos los avisos: si algo se cuela por delante, no tapa nada. Lo que
-     puede y lo que no puede hacer esta escrito en js/69-ui-privacidad.js. -->
+     puede y lo que no puede hacer esta escrito en js/privacidad.js. -->
 <div id="shield" class="shield hidden" aria-hidden="true">
     <div class="shield-inner">
         <div class="shield-logo" aria-hidden="true"></div>
-        <b>Pantalla protegida</b>
+        <b data-t>Pantalla protegida</b>
         <small id="shield-note"></small>
     </div>
 </div>
 
 <div id="toasts"></div>
 
+<!-- ==========================================================================
+     El codigo, en el orden en que se carga.
+
+     Este listado es la unica fuente de ese orden: lo leen tools/build.js para
+     concatenar y test/load.js para montar la aplicacion en Node. Antes el orden
+     iba escondido en los nombres (00-ns.js, 10-util.js, 20-sha256.js...), que
+     obligaba a renumerar medio proyecto para meter un fichero en medio y no
+     decia nada de lo que hacia cada capa. Ahora se lee aqui, de arriba abajo.
+
+     La regla de oro sigue siendo la misma, y la carpeta ya la dice:
+     el nucleo no toca el DOM, los transportes tampoco, y la interfaz no hace
+     criptografia. Si un fichero rompe su regla, esta en la carpeta equivocada.
+     ========================================================================== -->
 <!-- BUILD:JS -->
-<script src="js/00-ns.js"></script>
-<script src="js/01-compat.js"></script>
-<script src="js/10-util.js"></script>
-<script src="js/20-sha256.js"></script>
-<script src="js/21-kdf.js"></script>
-<script src="js/22-chacha.js"></script>
-<script src="js/23-x25519.js"></script>
-<script src="js/24-box.js"></script>
-<script src="js/30-identity.js"></script>
-<script src="js/31-vault.js"></script>
-<script src="js/32-envelope.js"></script>
-<script src="js/33-contacts.js"></script>
-<script src="js/34-session.js"></script>
-<script src="js/35-mesh.js"></script>
-<script src="js/36-chat.js"></script>
-<script src="js/37-presenta.js"></script>
-<script src="js/40-transport.js"></script>
-<script src="js/41-transport-local.js"></script>
-<script src="js/42-transport-rtc.js"></script>
-<script src="js/43-transport-ble.js"></script>
-<script src="js/44-invite.js"></script>
-<script src="js/45-qr.js"></script>
-<script src="js/50-app.js"></script>
-<script src="js/60-ui-dom.js"></script>
-<script src="js/61-ui-theme.js"></script>
-<script src="js/62-ui-qr.js"></script>
-<script src="js/63-ui-lock.js"></script>
-<script src="js/64-ui-roster.js"></script>
-<script src="js/65-ui-chat.js"></script>
-<script src="js/66-ui-connect.js"></script>
-<script src="js/67-ui-settings.js"></script>
-<script src="js/68-ui-requests.js"></script>
-<script src="js/69-ui-privacidad.js"></script>
-<script src="js/99-boot.js"></script>
+<!-- nucleo: De aqui no sale nada al DOM ni a la red. Es la aplicacion de
+         verdad: cifrado, boveda, contactos, malla y conversaciones. -->
+<script src="js/nucleo/ns.js"></script>
+<script src="js/nucleo/compat.js"></script>
+<script src="js/nucleo/util.js"></script>
+<script src="js/nucleo/sha256.js"></script>
+<script src="js/nucleo/kdf.js"></script>
+<script src="js/nucleo/chacha.js"></script>
+<script src="js/nucleo/x25519.js"></script>
+<script src="js/nucleo/box.js"></script>
+<script src="js/nucleo/identity.js"></script>
+<script src="js/nucleo/vault.js"></script>
+<script src="js/nucleo/envelope.js"></script>
+<script src="js/nucleo/contacts.js"></script>
+<script src="js/nucleo/session.js"></script>
+<script src="js/nucleo/mesh.js"></script>
+<script src="js/nucleo/chat.js"></script>
+<script src="js/nucleo/presenta.js"></script>
+<script src="js/nucleo/groups.js"></script>
+
+<!-- transportes: Hablan con la red. Tampoco tocan el DOM. -->
+<script src="js/transportes/transport.js"></script>
+<script src="js/transportes/local.js"></script>
+<script src="js/transportes/rtc.js"></script>
+<script src="js/transportes/ble.js"></script>
+<script src="js/transportes/invite.js"></script>
+<script src="js/transportes/qr.js"></script>
+
+<!-- app: El controlador: une el nucleo con los transportes. -->
+<script src="js/app/app.js"></script>
+
+<!-- interfaz: Solo DOM. Aqui no se hace criptografia. -->
+<script src="js/interfaz/dom.js"></script>
+<script src="js/interfaz/textos.js"></script>
+<script src="js/interfaz/idioma.js"></script>
+<script src="js/interfaz/theme.js"></script>
+<script src="js/interfaz/qr.js"></script>
+<script src="js/interfaz/lock.js"></script>
+<script src="js/interfaz/roster.js"></script>
+<script src="js/interfaz/chat.js"></script>
+<script src="js/interfaz/connect.js"></script>
+<script src="js/interfaz/settings.js"></script>
+<script src="js/interfaz/requests.js"></script>
+<script src="js/interfaz/privacidad.js"></script>
+<script src="js/interfaz/boot.js"></script>
 <!-- /BUILD:JS -->
 
 </body>
