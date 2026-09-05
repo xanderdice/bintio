@@ -40,9 +40,13 @@
     'use strict';
     var D = V.ui;
 
-    /* Los idiomas que hay. El primero es el de casa y el que se usa de clave. */
+    /* Los idiomas que hay. El primero es el de casa y el que se usa de clave.
+
+       El nombre va escrito en SU propio idioma, con su ene y sus tildes: es lo
+       que se lee en el desplegable de Ajustes, y quien lo busca es justo quien
+       no entiende el idioma en el que esta la pantalla. */
     D.IDIOMAS = [
-        { codigo: 'es', nombre: 'Espanol' },
+        { codigo: 'es', nombre: 'Espa\u00f1ol' },
         { codigo: 'en', nombre: 'English' }
     ];
 
@@ -117,6 +121,33 @@
     D.guardarIdioma = function (codigo) {
         try { localStorage.setItem(CLAVE, codigo); } catch (e) {}
         D.aplicarIdioma(codigo);
+    };
+
+    /* El desplegable de Ajustes, llenado desde la lista de arriba.
+
+       Las opciones se generan aqui y NO se escriben en index.html a proposito.
+       Escritas a mano, anadir un idioma serian tres sitios -la tabla en
+       textos.js, la linea en D.IDIOMAS y las opciones del marcado- y el tercero
+       es justo el que se olvida, porque los otros dos fallan en las pruebas y
+       este no. Generadas, anadir un idioma es lo que promete el README: una
+       linea en D.IDIOMAS y su tabla.
+
+       Los nombres NO llevan data-t, y esa es la parte que parece un descuido y
+       no lo es. Cada idioma se ensena en su propio nombre: "English" no se
+       convierte en "Ingles" por estar la pantalla en espanol, porque quien va a
+       buscar este desplegable es precisamente quien no entiende lo que hay
+       escrito alrededor. Ademas, marcarlos obligaria a "traducir" English a
+       otra cosa para que test/idioma.test.js pasara. */
+    D.montarIdiomas = function (sel) {
+        if (!sel) { return; }
+        D.clear(sel);
+        for (var i = 0; i < D.IDIOMAS.length; i++) {
+            var op = document.createElement('option');
+            op.value = D.IDIOMAS[i].codigo;
+            op.textContent = D.IDIOMAS[i].nombre;
+            sel.appendChild(op);
+        }
+        sel.value = actual;
     };
 
     /* ---------------------------------------------------------------------
@@ -208,6 +239,11 @@
            boveda, y entonces no hay ni lista ni conversacion. */
         if (V.app && V.app.ready) {
             if (D.refreshRoster) { D.refreshRoster(); }
+            /* La barra de abajo tambien lleva palabras -Enlaces, Mochila,
+               Contactos, Disco- y no se repasa sola: solo se repinta cuando
+               cambia algo de lo que cuenta, y cambiar de idioma no cambia
+               ningun numero. */
+            if (D.refreshStatus) { D.refreshStatus(); }
             if (D.activePk && D.renderMessages) { D.renderMessages(); }
             /* Y la pantalla de Ajustes, que es desde donde se cambia el idioma:
                si no se rehace, quien acaba de pulsar ve media pantalla en un

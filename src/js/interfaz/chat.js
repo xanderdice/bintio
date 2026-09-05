@@ -395,11 +395,7 @@
             D.clear(D.$('peer-title'));
             D.$('peer-title').appendChild(document.createTextNode(c.name + ' '));
             D.$('peer-title').appendChild(D.vinculo(c));
-            D.text(D.$('peer-estado'), D.t(c.mutuo
-                ? 'Vinculado: te tiene anadido, asi que lo que le escribas lo puede abrir.'
-                : c.unlinked
-                    ? 'Te ha quitado de sus contactos. Lo que le escribas ya no lo puede abrir.'
-                    : 'Sin vinculo todavia: no ha llegado nada suyo. Hasta que te anada, no puede abrir lo que le escribas.'));
+            D.text(D.$('peer-estado'), D.vinculoTexto(c));
             D.$('peer-alias').value = c.name;
             D.text(D.$('peer-fingerprint'), c.fingerprint);
             D.$('peer-verified').checked = !!c.verified;

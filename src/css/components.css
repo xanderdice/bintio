@@ -87,15 +87,41 @@ textarea.input { resize: vertical; min-height: 88px; line-height: 1.5; word-brea
 /* El desplegable se queda sin la flecha del sistema al quitarle el aspecto
    nativo, y un desplegable que parece un campo de texto es un desplegable que
    nadie abre. La flecha se dibuja con dos medios cuadrados girados: ni una
-   imagen, ni una fuente de iconos, ni una peticion de mas. */
+   imagen, ni una fuente de iconos, ni una peticion de mas.
+
+   Y el fondo va OPACO, que es lo que arregla la lista blanca.
+
+   La lista ABIERTA no la pinta esta hoja: la pinta el navegador en una ventana
+   aparte, fuera de la pagina, y de aqui solo se lleva una cosa: el
+   background-color de este <select>. El de los campos -var(--field-bg)- es un
+   tinte casi transparente, pensado para dejar ver el panel oscuro de detras.
+   En esa ventana no hay panel detras: el tinte se compone sobre SU fondo, que
+   es blanco, y la lista sale blanca con la letra clara encima. Medido en el
+   tema de casa: rgba(120,190,240,.05) sobre blanco da rgb(248,252,254) contra
+   un texto #f4faff, o sea 1.02:1. Ilegible, que es exactamente lo que se veia.
+
+   La regla de las opciones de mas abajo no bastaba: pinta las FILAS, no la
+   superficie de la ventana, y donde no hay ni una fila -el desplegable de
+   idioma estuvo vacio- la lista entera era esa superficie.
+
+   Asi que debajo va el mismo color opaco que llevan las opciones, y el tinte
+   de siempre se pinta ENCIMA como una capa mas de las que ya dibujan la
+   flecha. Cerrado se ve igual que antes -las capas de imagen no viajan a la
+   ventana emergente, el color de fondo si- y abierto la lista queda de un solo
+   color, con filas o sin ellas. */
 select.input {
     cursor: pointer;
     padding-right: 32px;
+    background-color: var(--bg-2);
     background-image:
         linear-gradient(45deg, transparent 50%, currentColor 50%),
-        linear-gradient(135deg, currentColor 50%, transparent 50%);
-    background-position: calc(100% - 18px) calc(50% + 1px), calc(100% - 13px) calc(50% + 1px);
-    background-size: 5px 5px, 5px 5px;
+        linear-gradient(135deg, currentColor 50%, transparent 50%),
+        linear-gradient(var(--field-bg), var(--field-bg));
+    background-position:
+        calc(100% - 18px) calc(50% + 1px),
+        calc(100% - 13px) calc(50% + 1px),
+        0 0;
+    background-size: 5px 5px, 5px 5px, 100% 100%;
     background-repeat: no-repeat;
 }
 

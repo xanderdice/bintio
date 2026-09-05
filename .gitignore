@@ -3,4 +3,9 @@ dist/
 .neutralino/
 *.log
 certs/
-bintio-semilla*.txt
+# La siembra de pruebas: la fabrica "npm run seed" y son megabytes de copia
+# cifrada. La regla decia solo "bintio-semilla*.txt", pero el fichero que habia
+# subido se llamaba "naxder-semilla.txt" -el nombre viejo del proyecto- asi que
+# no casaba y se colo en la historia: 2 MB, el 61% de lo que se descarga en un
+# clon. El comodin de delante evita que vuelva a pasar con el siguiente nombre.
+*semilla*.txt

@@ -88,4 +88,59 @@ idiomas.forEach(function (cod) {
 });
 ok('ninguna traduccion lleva etiquetas dentro', conEtiquetas.length === 0, conEtiquetas.join(' | '));
 
+/* ------------------------------------------------------- se puede elegir */
+/* Que la tabla este completa no sirve de nada si no hay forma de cambiar de
+   idioma, y eso es exactamente lo que paso: el <select id="set-lang"> se
+   publico VACIO -sin una sola opcion y sin nadie que se las pusiera- y ninguna
+   de las 443 comprobaciones lo vio. Todas miraban la tabla de textos o lo ya
+   compilado; ninguna miraba si se podia usar. La etiqueta de al lado,
+   "Idioma", si estaba traducida, asi que la prueba salia verde senalando justo
+   al sitio del fallo.
+
+   Hacen falta las DOS de aqui abajo, porque el fallo se cuela por cualquiera de
+   los dos huecos: que la funcion que llena el desplegable no funcione, o que
+   funcione y no la llame nadie. Lo segundo era el caso. */
+
+/* 1. La funcion llena de verdad. Se ejecuta idioma.js con lo justo de DOM que
+      necesita -crear una etiqueta y colgarla- y se le pide que llene un
+      desplegable de mentira. */
+var falsoDoc = {
+    createElement: function () { return { value: '', textContent: '' }; },
+    documentElement: { setAttribute: function () {} },
+    querySelectorAll: function () { return []; },
+    title: ''
+};
+var cajaUi = {
+    BINTIO: { ui: { clear: function (el) { el.opciones = []; } } },
+    document: falsoDoc,
+    localStorage: { getItem: function () { return null; }, setItem: function () {} },
+    navigator: { language: 'es' }
+};
+vm.createContext(cajaUi);
+vm.runInContext(
+    fs.readFileSync(path.join(__dirname, '..', 'src', 'js', 'interfaz', 'idioma.js'), 'utf8'),
+    cajaUi, { filename: 'idioma.js' });
+var UI = cajaUi.BINTIO.ui;
+
+var desplegable = { opciones: [], value: '', appendChild: function (o) { this.opciones.push(o); } };
+UI.montarIdiomas(desplegable);
+
+ok('el desplegable de idioma se llena con todos los idiomas',
+   desplegable.opciones.length === UI.IDIOMAS.length,
+   desplegable.opciones.length + ' opciones para ' + UI.IDIOMAS.length + ' idiomas');
+ok('y cada opcion lleva su codigo y su nombre',
+   desplegable.opciones.every(function (o, i) {
+       return o.value === UI.IDIOMAS[i].codigo && o.textContent === UI.IDIOMAS[i].nombre;
+   }),
+   desplegable.opciones.map(function (o) { return o.value + '=' + o.textContent; }).join(' '));
+
+/* 2. Y alguien la llama con el desplegable de verdad. Sin esta linea, la de
+      arriba pasaria en verde sobre una pantalla en la que no hay nada que
+      elegir, que es justo lo que se publico. */
+var ajustes = fs.readFileSync(
+    path.join(__dirname, '..', 'src', 'js', 'interfaz', 'settings.js'), 'utf8');
+ok('y Ajustes lo llena al arrancar',
+   ajustes.indexOf("D.montarIdiomas(D.$('set-lang'))") >= 0,
+   'nadie llama a D.montarIdiomas con set-lang');
+
 ayuda.resumen();

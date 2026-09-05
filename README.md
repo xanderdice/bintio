@@ -659,6 +659,32 @@ que "efectos apagados", los temas planos y `prefers-reduced-motion` los apagan
 solos. La aplicacion sigue siendo exactamente la misma sin una sola de esas
 luces.
 
+#### El fondo de un `<select>` tiene que ser opaco
+
+Es la unica regla de esta hoja que no se puede deducir mirandola, asi que va
+escrita: **`select.input` lleva un `background-color` opaco a proposito** y el
+tinte translucido de los demas campos se pinta encima como una capa mas de
+`background-image`.
+
+El motivo es que la lista ABIERTA de un desplegable no la pinta la hoja de
+estilos: la pinta el navegador en una ventana aparte, fuera de la pagina, y de
+la hoja solo se lleva una cosa, el `background-color` del `<select>`. El tinte
+de los campos —`--field-bg`— esta pensado para dejar ver el panel oscuro de
+detras. En esa ventana no hay panel detras, asi que se compone sobre SU fondo,
+que es blanco, y la lista salia blanca con la letra clara dentro. Medido en el
+tema de casa: `rgba(120,190,240,.05)` sobre blanco da `rgb(248,252,254)` contra
+un texto `#f4faff`, o sea **1.02:1**. Ilegible. Pasaba en los siete temas
+oscuros (1.02 a 1.14); con el fondo opaco quedan entre 15.6 y 18.3.
+
+La regla de `select.input option` no bastaba: pinta las **filas**, no la
+superficie de la ventana, y donde no hay ni una fila —el desplegable de idioma
+estuvo vacio— la lista entera era esa superficie translucida. `color-scheme:
+dark` tampoco basta: fija el fondo por defecto de esa ventana, pero el
+`background-color` del `<select>` se pinta encima igual.
+
+Cerrado no se nota: las capas de `background-image` **no** viajan a la ventana
+emergente, y el color de fondo si.
+
 ---
 
 ## Que hace el build
@@ -748,6 +774,17 @@ La pagina se presenta sola donde la peguen:
   Ninguna red ensena un SVG en una vista previa y muchas no entienden WebP:
   por eso todo sale en PNG. El nombre no se dibuja en la imagen, lo pone
   `og:title`, y ahi es texto de verdad.
+- **Quien firma**: `xander.dice`, dicho de las tres formas que hacen falta
+  porque cada maquina lee una distinta y ninguna lee las otras dos:
+  `<link rel="me">` a Instagram, YouTube y Facebook (Mastodon y las
+  herramientas de identidad), `article:publisher` (el rastreador de Meta) y un
+  bloque `application/ld+json` con `sameAs` (Google y Bing). El bloque de datos
+  lleva `type` a proposito: los hashes de la CSP se sacan buscando la etiqueta
+  `<script>` pelada, asi que con atributo no entra en la firma del codigo y no
+  necesita hash. Va en una sola linea porque el minificador no toca el cuerpo
+  de un `<script>` y el documento entero tiene que caber en una.
+  No hay `twitter:creator`: pide un nombre de usuario con arroba de X, no una
+  direccion, y no existe ninguno. Inventarlo seria atribuir la pagina a otro.
 - **Instalable (PWA)**: el manifiesto viaja **dentro del documento**, con sus
   iconos incrustados (192, y uno de 512 que hace ademas de recortable para
   Android), y al arrancar se rehace como `blob:` con `start_url`, `scope` e
@@ -755,24 +792,60 @@ La pagina se presenta sola donde la peguen:
   El trabajador de servicio guarda el documento entero: con el servidor
   apagado, la aplicacion sigue abriendo. Comprobado apagandolo.
 
+#### Para que la vista previa salga, hay que decir el dominio
+
+Esto no es un detalle: es el unico dato que le falta al proyecto para embeberse
+bien, y sin el la mitad de las redes no ensenan imagen.
+
 Las direcciones de las vistas previas salen relativas, que es lo correcto en
-localhost, en el fichero suelto y en el escritorio. Para publicar de verdad se
-dice el dominio al compilar, se vuelven absolutas y ademas sale un
-`sitemap.xml`:
+localhost, en el fichero suelto y en el escritorio. Pero **ninguna red resuelve
+una direccion relativa**: la descartan sin avisar y sin error. Medido, red por
+red: X, LinkedIn, Telegram y WhatsApp se quedan **sin imagen**; Facebook a veces
+la resuelve y a veces no; solo Slack y Discord la resuelven siempre. Y como
+Slack y Discord son las dos primeras donde uno prueba, el fallo pasa
+desapercibido justo al comprobarlo.
+
+Se arregla con un dato, y arregla las cuatro etiquetas de golpe (`og:url`,
+`og:image`, `twitter:image` y el canonico) y ademas saca `sitemap.xml`:
 
 ```bash
 BINTIO_URL=https://tu.dominio npm run build
 ```
 
+Para no depender de que alguien se acuerde de la variable, lo estable es poner
+el dominio una vez en `package.json`, que es el segundo sitio donde el build lo
+busca, y entonces cualquier `npm run build` sale ya correcto:
+
+```json
+"homepage": "https://tu.dominio"
+```
+
+Mientras no haya dominio, el build hace dos cosas para no publicar mentiras:
+quita `og:url` y el canonico en vez de dejarlos valiendo `"."` -son los dos que
+nombran a la pagina, y un punto no nombra nada; sin ellos cada red usa la
+direccion por la que llego, que es la buena- y deja `og:image` relativa, porque
+relativa la entienden unos pocos y borrada no la entiende ninguno. Y
+`npm run verify` lo avisa por escrito en vez de dar el visto bueno callando.
+
 ### Que audita npm run verify
 
-58 comprobaciones sobre lo compilado, no sobre las intenciones: hashes que
+66 comprobaciones sobre lo compilado, no sobre las intenciones: hashes que
 cuadran, cero peticiones externas, cero rastreadores, sin `eval`, sin
 manejadores ni estilos en linea, sin una sola via para convertir texto en HTML
 (`innerHTML` y compania estan prohibidos y se comprueba), que el renombrado se
 hizo de verdad, que el HTML sale en una linea y sin un solo comentario, y que
 la ficha, el manifiesto, los iconos y la tarjeta social de 1200x630 estan donde
 tienen que estar.
+
+De la ficha social no comprueba solo que las etiquetas **existan**, que era el
+agujero por donde se colaba el fallo de arriba: una compilacion con
+`og:image="social.png"` y `og:url="."` pasaba la auditoria entera sin una
+queja, y no se veia en ninguna red. Ahora mira que las direcciones esten
+**enteras**: `og:url` y el canonico, o absolutos o ausentes; las dos imagenes
+sociales diciendo lo mismo; y el bloque para buscadores leido de verdad con
+`JSON.parse`, exigiendo que diga quien firma y que enlace los tres perfiles.
+Si la imagen va relativa no falla -compilar sin dominio es legitimo- pero lo
+dice con un `aviso`, que no cuenta como comprobacion pero se lee.
 
 ---
 

@@ -15,8 +15,8 @@
         D.clear(box);
 
         var fatal = [];
-        if (!c.typedArrays) { fatal.push('Tu navegador no tiene Uint8Array (es de antes de 2011).'); }
-        if (!c.random) { fatal.push('Tu navegador no puede generar numeros aleatorios seguros.'); }
+        if (!c.typedArrays) { fatal.push(D.t('Tu navegador no tiene Uint8Array (es de antes de 2011).')); }
+        if (!c.random) { fatal.push(D.t('Tu navegador no puede generar numeros aleatorios seguros.')); }
 
         if (fatal.length) {
             box.appendChild(D.make('p', null, D.t('BINTIO no puede funcionar aqui, y prefiere decirtelo a fingir:')));
@@ -27,10 +27,10 @@
         }
 
         var avisos = [];
-        if (!c.webrtc) { avisos.push('Sin WebRTC: no habra enlace directo, pero si malla y tarjetas.'); }
-        if (!c.bluetooth) { avisos.push('Sin Web Bluetooth: no podras engancharte a nodos por Bluetooth desde este navegador.'); }
-        if (!c.localstorage) { avisos.push('Sin almacenamiento: lo que hagas se perdera al cerrar la pestana.'); }
-        if (c.fileProtocol) { avisos.push('Abierto como fichero local: funciona, pero sin instalacion ni modo sin conexion.'); }
+        if (!c.webrtc) { avisos.push(D.t('Sin WebRTC: no habra enlace directo, pero si malla y tarjetas.')); }
+        if (!c.bluetooth) { avisos.push(D.t('Sin Web Bluetooth: no podras engancharte a nodos por Bluetooth desde este navegador.')); }
+        if (!c.localstorage) { avisos.push(D.t('Sin almacenamiento: lo que hagas se perdera al cerrar la pestana.')); }
+        if (c.fileProtocol) { avisos.push(D.t('Abierto como fichero local: funciona, pero sin instalacion ni modo sin conexion.')); }
 
         box.appendChild(D.make('p', null, D.t('Todo listo.')));
         for (var j = 0; j < avisos.length; j++) { box.appendChild(D.make('p', 'dim', avisos[j])); }

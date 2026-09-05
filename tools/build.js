@@ -459,29 +459,57 @@ function leerPng(buf) {
    El color se promedia multiplicado por su opacidad y se divide al final por
    la opacidad total. Sin eso, los pixeles transparentes del borde -que suelen
    ser negros con alfa cero- arrastran el promedio y el logo sale con una orla
-   oscura alrededor. */
+   oscura alrededor.
+
+   Y el area se mide con DECIMALES, que es lo que arregla el defecto que tuvo
+   esto durante mucho tiempo. Antes los bordes de la caja se redondeaban a
+   pixeles enteros, y eso solo es correcto cuando la razon de reduccion es un
+   numero entero. En cuanto no lo es, unas columnas cogen un pixel de origen y
+   otras dos: media imagen sin promediar nada -vecino mas proximo puro- y la
+   otra media con el doble de desenfoque, alternandose. Es el borde a
+   dentelladas que este comentario decia estar evitando.
+
+   Se nota justo en los dibujos GRANDES, que son los mas mirados: de 1254 a 391
+   -la tarjeta social- la razon es 3,2, y a 328 -el icono recortable de
+   Android- es 3,8. Medido contra un remuestreo de area exacta, el error
+   cuadratico medio pasaba de 3,9 y 3,8 a cero.
+
+   Ahora cada pixel de origen pesa por la fraccion de si mismo que cae dentro
+   de la caja de destino. Cuando la razon SI es entera las fracciones valen 1 y
+   sale exactamente lo mismo que antes, byte a byte: esa es la comprobacion que
+   demuestra que el cambio no rompe nada. */
 function escalar(img, w1, h1) {
     var w0 = img.w, h0 = img.h, src = img.px;
     var out = Buffer.alloc(w1 * h1 * 4);
+    var anchoCaja = w0 / w1, altoCaja = h0 / h1;
     for (var y = 0; y < h1; y++) {
-        var y0 = Math.floor(y * h0 / h1);
-        var y1 = Math.max(y0 + 1, Math.floor((y + 1) * h0 / h1));
+        var ya = y * altoCaja, yb = ya + altoCaja;
+        var v0 = Math.floor(ya), v1 = Math.min(h0, Math.ceil(yb));
         for (var x = 0; x < w1; x++) {
-            var x0 = Math.floor(x * w0 / w1);
-            var x1 = Math.max(x0 + 1, Math.floor((x + 1) * w0 / w1));
-            var r = 0, g = 0, b = 0, a = 0, n = 0;
-            for (var v = y0; v < y1; v++) {
-                for (var u = x0; u < x1; u++) {
+            var xa = x * anchoCaja, xb = xa + anchoCaja;
+            var u0 = Math.floor(xa), u1 = Math.min(w0, Math.ceil(xb));
+            var r = 0, g = 0, b = 0, a = 0, area = 0;
+            for (var v = v0; v < v1; v++) {
+                /* Cuanto de esta fila de origen cae dentro de la caja. */
+                var alto = Math.min(yb, v + 1) - Math.max(ya, v);
+                if (alto <= 0) { continue; }
+                for (var u = u0; u < u1; u++) {
+                    var ancho = Math.min(xb, u + 1) - Math.max(xa, u);
+                    if (ancho <= 0) { continue; }
+                    var peso = alto * ancho;
                     var s = (v * w0 + u) * 4, al = src[s + 3];
-                    r += src[s] * al; g += src[s + 1] * al; b += src[s + 2] * al;
-                    a += al; n++;
+                    r += src[s] * al * peso;
+                    g += src[s + 1] * al * peso;
+                    b += src[s + 2] * al * peso;
+                    a += al * peso;
+                    area += peso;
                 }
             }
             var d = (y * w1 + x) * 4;
             out[d] = a ? Math.round(r / a) : 0;
             out[d + 1] = a ? Math.round(g / a) : 0;
             out[d + 2] = a ? Math.round(b / a) : 0;
-            out[d + 3] = Math.round(a / n);
+            out[d + 3] = area ? Math.round(a / area) : 0;
         }
     }
     return { w: w1, h: h1, px: out };
@@ -1350,9 +1378,25 @@ function build() {
                 '<link rel="apple-touch-icon" href="' + dataUri('image/png', pngApple) + '">')
             .replace(/(<meta name="msapplication-TileImage" content=")[^"]*/,
                 '$1' + dataUri('image/png', png192));
-        /* El enlace canonico solo tiene sentido si se sabe donde se publica.
-           Sin dominio se cae, que es mejor que un canonico apuntando a ".". */
-        if (!SITE) { page = page.replace(/<link rel="canonical"[^>]*>/, ''); }
+        /* Las dos etiquetas que NOMBRAN a la pagina solo tienen sentido si se
+           sabe donde se publica. Sin dominio se caen, que es mejor que dejarlas
+           apuntando a ".".
+
+           og:url es el destino del enlace de la vista previa y la identidad con
+           la que las redes agrupan las comparticiones de una misma pagina. Un
+           "." no es una direccion: no lleva esquema, no hay nada contra lo que
+           resolverlo, y quien lo lee acaba senalando al directorio en vez de a
+           la pagina. Sin la etiqueta, en cambio, cada red usa la direccion por
+           la que llego, que es justo la correcta.
+
+           og:image se queda AUNQUE sea relativa, y no es una incoherencia: es
+           la unica via para que salga imagen, y algunos (Slack, Discord, y a
+           veces Facebook) si la resuelven contra la direccion del documento.
+           Relativa funciona en unos pocos; borrada no funciona en ninguno. */
+        if (!SITE) {
+            page = page.replace(/<link rel="canonical"[^>]*>/, '')
+                       .replace(/<meta property="og:url"[^>]*>/, '');
+        }
         page = absoluteUrls(minifyHtml(page));
 
         /* Los hashes se sacan del documento ya minificado, no de las variables

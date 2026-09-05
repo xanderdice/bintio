@@ -22,6 +22,12 @@
         D.$('me-name').value = V.app.identity.name || '';
         D.text(D.$('me-fingerprint'), V.app.identity.fingerprint);
 
+        /* El idioma no vive en la boveda -se elige antes de abrirla- asi que
+           sale de idioma.js y no de los ajustes guardados. Se repasa aqui, con
+           los otros dos, porque aplicarIdioma vuelve a abrir esta pantalla cada
+           vez que se cambia y asi el desplegable no se queda senalando al
+           idioma anterior. */
+        D.$('set-lang').value = D.idioma();
         D.$('set-theme').value = s.theme || 'bintio';
         D.$('set-bloom').value = s.bloom || 'on';
         D.$('set-relay').checked = s.relay !== false;
@@ -63,7 +69,14 @@
 
         /* El idioma cambia al momento y no espera a ningun boton de guardar: la
            pantalla entera se reescribe delante de quien lo ha pulsado, que es
-           la unica forma de comprobar que ha elegido lo que queria. */
+           la unica forma de comprobar que ha elegido lo que queria.
+
+           Las opciones se ponen aqui y no en el marcado: las sabe idioma.js, que
+           es quien lleva la lista. Y se ponen ANTES de escuchar el cambio, que es
+           lo unico que hay que respetar del orden: un desplegable vacio no puede
+           emitir un cambio, asi que sin esta linea el oyente de abajo era codigo
+           al que no se llegaba nunca. */
+        D.montarIdiomas(D.$('set-lang'));
         D.on(D.$('set-lang'), 'change', function () {
             D.guardarIdioma(D.$('set-lang').value);
         });

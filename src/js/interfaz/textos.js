@@ -48,6 +48,8 @@ BINTIO.textos = {
             ': a web page cannot do that, and a camera pointed at the screen gets everything anyway.',
         '; eso si recupera tu identidad.':
             '; that does bring your identity back.',
+        'Abierto como fichero local: funciona, pero sin instalacion ni modo sin conexion.':
+            'Opened as a local file: it works, but with no install and no offline mode.',
         'Abre tu identidad y entra en Conectar: el codigo te espera ahi.':
             'Open your identity and go to Connect: the code is waiting there.',
         'Abrir':
@@ -406,6 +408,12 @@ BINTIO.textos = {
             'Yes, erase everything and start from scratch',
         'Sin STUN funcionan la red local, el cable y compartir datos desde el movil. Con uno, tambien enlaces a traves de internet, a cambio de que ese servidor vea que dos direcciones IP se buscan. Tu decides; por defecto no hay ninguno.':
             'Without STUN, the local network, a cable and phone tethering all work. With one, links across the internet work too, at the cost of that server seeing that two IP addresses are looking for each other. Your call; by default there is none.',
+        'Sin Web Bluetooth: no podras engancharte a nodos por Bluetooth desde este navegador.':
+            'No Web Bluetooth: you will not be able to hook onto nodes over Bluetooth from this browser.',
+        'Sin WebRTC: no habra enlace directo, pero si malla y tarjetas.':
+            'No WebRTC: there will be no direct link, but the mesh and cards still work.',
+        'Sin almacenamiento: lo que hagas se perdera al cerrar la pestana.':
+            'No storage: whatever you do will be lost when you close the tab.',
         'Sin codigos: Bluetooth':
             'No codes: Bluetooth',
         'Sin vinculo todavia: no ha llegado nada suyo. Hasta que te anada, no puede abrir lo que le escribas.':
@@ -454,6 +462,10 @@ BINTIO.textos = {
             'Your identity',
         'Tu navegador no deja descargar. Copia el texto a mano.':
             'Your browser does not allow downloads. Copy the text by hand.',
+        'Tu navegador no puede generar numeros aleatorios seguros.':
+            'Your browser cannot generate secure random numbers.',
+        'Tu navegador no tiene Uint8Array (es de antes de 2011).':
+            'Your browser has no Uint8Array (it is from before 2011).',
         'Tu tarjeta de contacto':
             'Your contact card',
         'Tu: ':
@@ -532,10 +544,16 @@ BINTIO.textos = {
             'and give your code to someone.',
         '{motivo} Con esta tarjeta pueden a\u00f1adirte y comprobar tu huella, pero NO abre camino de red: lo que os escribais se quedara guardado y sin salir hasta que aparezca un enlace por Bluetooth, por la malla o desde otro aparato.':
             '{motivo} With this card they can add you and check your fingerprint, but it opens NO network path: whatever you write each other stays stored and unsent until a link appears over Bluetooth, through the mesh or from another device.',
+        '{n} bluetooth':
+            '{n} bluetooth',
         '{n} d':
             '{n} d',
+        '{n} directo':
+            '{n} direct',
         '{n} h':
             '{n} h',
+        '{n} local':
+            '{n} local',
         '{n} min':
             '{n} min',
         '{n} personas':

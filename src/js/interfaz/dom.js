@@ -96,12 +96,34 @@
          te ha quitado  te lo ha dicho el. Ya no hay nada que esperar.
 
        Devuelve un nodo listo para colgar al lado del nombre. */
+    /* Que dice cada estado, con todas las letras.
+
+       Vive aqui y no en dos sitios porque estaba escrito DOS veces -una para el
+       globo del icono y otra para la ficha de la persona- con la misma idea y
+       distintas palabras. Eran seis frases que traducir en vez de tres, seis
+       que corregir si cambia el tono, y la puerta abierta a que el globo y la
+       ficha dijeran cosas distintas del mismo contacto.
+
+       Se pregunta por las propiedades del contacto y no por la cadena de
+       estado de aqui abajo, a proposito: dentro de un D.t(), un 'on' suelto en
+       la comparacion lo recoge test/frases.js como si fuera una frase que
+       traducir. */
+    D.vinculoTexto = function (contact) {
+        return D.t(contact.mutuo
+            ? 'Vinculado: te tiene anadido, asi que lo que le escribas lo puede abrir.'
+            : contact.unlinked
+                ? 'Te ha quitado de sus contactos. Lo que le escribas ya no lo puede abrir.'
+                : 'Sin vinculo todavia: no ha llegado nada suyo. Hasta que te anada, no puede abrir lo que le escribas.');
+    };
+
     D.vinculo = function (contact) {
         var estado = contact.mutuo ? 'on' : (contact.unlinked ? 'cut' : 'wait');
         var el = D.make('span', 'lnk lnk--' + estado);
-        el.title = estado === 'on' ? 'Vinculado: te tiene anadido, lo que le escribas le llega'
-            : estado === 'cut' ? 'Te ha quitado de sus contactos: lo que le escribas ya no lo puede abrir'
-            : 'Sin vinculo todavia: no ha llegado nada suyo, asi que puede que no te tenga anadido';
+        /* Estos son los unicos title de toda la aplicacion, y ademas se copian
+           a aria-label ahi abajo: antes iban en espanol crudo, asi que el
+           lector de pantalla los decia en espanol aunque la pagina estuviera
+           en ingles. */
+        el.title = D.vinculoTexto(contact);
         el.setAttribute('aria-label', el.title);
         return el;
     };

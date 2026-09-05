@@ -26,6 +26,15 @@ function ok(name, cond, extra) {
     else { fails++; console.log('  FALLA ' + name + (extra ? '  -> ' + extra : '')); }
 }
 
+/* Un aviso NO es un fallo y no cuenta como comprobacion: dice algo cierto de
+   lo compilado que no tiene por que estar mal.
+
+   Hace falta porque compilar sin dominio es legitimo -en local, para el
+   fichero suelto y para la aplicacion de escritorio- y no puede parar la
+   publicacion; pero compilar sin dominio y SUBIRLO es un fallo silencioso, y
+   hasta ahora nada lo decia. */
+function aviso(texto) { console.log('  aviso  ' + texto); }
+
 if (!fs.existsSync(path.join(DIST, 'index.html'))) {
     console.log('No hay nada compilado. Ejecuta antes: npm run build');
     process.exit(1);
@@ -61,9 +70,22 @@ ok('lleva el logo de la interfaz en los estilos',
 ok('lleva el icono de iOS dentro', /<link rel="apple-touch-icon"[^>]*href="data:image\/png/.test(page));
 ok('lleva el manifiesto dentro', /<link rel="manifest" href="data:application\/manifest\+json/.test(page));
 
-/* Cualquier src o href que no sea data: seria una llamada al exterior. El
-   enlace canonico no cuenta: no se descarga, solo dice donde vive la pagina. */
-var refs = page.replace(/<link rel="canonical"[^>]*>/g, '').match(/(?:src|href)="([^"]*)"/g) || [];
+/* Cualquier src o href que no sea data: seria una llamada al exterior.
+
+   Con dos excepciones, y las dos por el mismo motivo: hay relaciones de <link>
+   que el navegador NO descarga nunca, solo declara.
+
+     rel="canonical"  dice donde vive la pagina.
+     rel="me"         dice que perfiles son del autor. Lo leen Mastodon, los
+                      buscadores y las herramientas de identidad; el navegador
+                      no pide nada.
+
+   La lista es CERRADA y son solo esas dos. Cualquier otra relacion -stylesheet,
+   preload, prefetch, icon, manifest- si descarga, y por eso sigue contando.
+   Esta comprobacion existe para que la pagina no pida un fichero a nadie, no
+   para que no aparezca una direccion escrita. */
+var DECLARATIVAS = /<link rel="(?:canonical|me)"[^>]*>/g;
+var refs = page.replace(DECLARATIVAS, '').match(/(?:src|href)="([^"]*)"/g) || [];
 var externas = refs.filter(function (r) {
     var v = r.split('"')[1];
     return v && v.indexOf('data:') !== 0 && v.indexOf('#') !== 0 && v !== '';
@@ -111,6 +133,59 @@ ok('la vista previa declara 1200x630',
    meta(page, 'property', 'og:image:height') === '630');
 ok('tarjeta de Twitter grande',
    meta(page, 'name', 'twitter:card') === 'summary_large_image' && !!meta(page, 'name', 'twitter:image'));
+
+/* Que las direcciones de la vista previa esten ENTERAS, o no esten.
+
+   Hasta ahora solo se comprobaba que las etiquetas EXISTIERAN, y por eso una
+   compilacion con og:image="social.png" y og:url="." pasaba la auditoria
+   entera sin decir nada, aunque asi no sale imagen en X, LinkedIn, Telegram
+   ni WhatsApp: ninguno resuelve una direccion relativa, la descartan y ya.
+   Eso es justo lo que se estaba publicando.
+
+   La regla no puede ser "siempre absolutas", porque sin dominio no hay forma
+   de escribirlas y compilar sin dominio es legitimo. Es esta:
+
+     og:url y canonical      o enteras, o fuera. Son las dos que NOMBRAN a la
+                             pagina, y un "." no nombra nada; sin ellas cada
+                             red usa la direccion por la que llego, que es la
+                             buena. build.js las quita cuando no hay dominio.
+     og:image / twitter:image  iguales entre si. Una entera y la otra relativa
+                             solo puede ser un error de la tuberia. */
+function entera(v) { return /^https?:\/\//.test(v); }
+var ogUrl = meta(page, 'property', 'og:url');
+var ogImg = meta(page, 'property', 'og:image');
+var twImg = meta(page, 'name', 'twitter:image');
+var canon = (page.match(/<link rel="canonical" href="([^"]*)"/) || [])[1] || '';
+ok('og:url, o entera o ausente', !ogUrl || entera(ogUrl), ogUrl);
+ok('el canonico, o entero o ausente', !canon || entera(canon), canon);
+ok('las dos imagenes sociales dicen lo mismo', ogImg === twImg, ogImg + ' / ' + twImg);
+if (!entera(ogImg)) {
+    aviso('la imagen social va relativa ("' + ogImg + '"). Esta compilacion vale');
+    aviso('para local, para el fichero suelto y para el escritorio, pero si se');
+    aviso('publica NO saldra imagen en X, LinkedIn, Telegram ni WhatsApp.');
+    aviso('Para publicar de verdad:  BINTIO_URL=https://tu.dominio npm run build');
+}
+
+/* El bloque de datos para buscadores.
+
+   Ninguna otra parte de la tuberia lo mira: no entra en los hashes de la CSP
+   (lleva atributo type y la extraccion pide la etiqueta pelada), no lo toca el
+   minificador y no lo ve el control de traducciones. Eso esta bien -es lo que
+   lo hace inofensivo- pero significa que si sale roto se publica roto y nadie
+   se entera. Asi que aqui se lee de verdad, con JSON.parse. */
+var ld = (page.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/) || [])[1] || '';
+var ldObj = null;
+try { ldObj = JSON.parse(ld); } catch (e) { ldObj = null; }
+ok('el bloque para buscadores es JSON que se puede leer', !!ldObj,
+   ld ? 'esta, pero no se puede leer' : 'no esta');
+if (ldObj) {
+    var perfiles = (ldObj.author && ldObj.author.sameAs) || [];
+    ok('y dice quien firma la pagina',
+       ldObj['@context'] === 'https://schema.org' && !!(ldObj.author && ldObj.author.name),
+       ldObj.author && ldObj.author.name);
+    ok('y enlaza los perfiles del autor, todos enteros',
+       perfiles.length >= 3 && perfiles.every(entera), perfiles.join(' '));
+}
 
 /* Un PNG dice su tamano en los ocho bytes que siguen a la cabecera IHDR. */
 var social = path.join(DIST, 'social.png');

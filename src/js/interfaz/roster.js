@@ -121,8 +121,15 @@
         var s = V.app.status();
 
         /* Todo lo que la barra ensena, y nada mas: si esta firma no ha
-           cambiado, lo que hay en pantalla ya es correcto. */
-        var firma = [s.peers, s.rtc, s.ble, s.local, s.carrying,
+           cambiado, lo que hay en pantalla ya es correcto.
+
+           El idioma va DENTRO de la firma, y no es un adorno: la barra tambien
+           ensena palabras, no solo numeros. Sin el, cambiar de idioma no movia
+           ni un numero, la firma salia igual, se salia por la puerta de al lado
+           y la barra se quedaba en el idioma anterior. En una aplicacion en
+           reposo -sin enlaces, sin mensajes, sin contactos nuevos- esa firma no
+           vuelve a cambiar nunca, asi que se quedaba asi para siempre. */
+        var firma = [D.idioma(), s.peers, s.rtc, s.ble, s.local, s.carrying,
                      s.contacts, s.storage, s.persistent].join('|');
         if (firma === pintado) { return; }
         pintado = firma;
@@ -148,10 +155,13 @@
         st.appendChild(document.createTextNode(D.t('Disco ')));
         st.appendChild(D.make('b', null, D.bytes(s.storage)));
 
+        /* Con hueco y no pegando el numero delante de la palabra: en ingles
+           "2 directo" no se dice asi, y una frase partida en dos trozos no se
+           puede traducir entera. Es la misma regla que explica idioma.js. */
         var modes = [];
-        if (s.rtc) { modes.push(s.rtc + ' directo'); }
-        if (s.ble) { modes.push(s.ble + ' bluetooth'); }
-        if (s.local) { modes.push(s.local + ' local'); }
+        if (s.rtc) { modes.push(D.t('{n} directo', { n: s.rtc })); }
+        if (s.ble) { modes.push(D.t('{n} bluetooth', { n: s.ble })); }
+        if (s.local) { modes.push(D.t('{n} local', { n: s.local })); }
         D.text(D.$('st-mode'), modes.length ? modes.join(' / ')
             : D.t(s.persistent ? 'sin enlaces' : 'sin guardar en disco'));
 

@@ -16,22 +16,92 @@
      Twitter) a proposito: si alguien la cambia, tiene que cambiarla entera y
      no se queda una vista previa diciendo algo distinto que otra.
 
-     Las direcciones van relativas. Si se pasa BINTIO_URL al compilar,
-     tools/build.js las convierte en absolutas, que es lo que necesitan las
-     redes sociales para ir a buscar la imagen.
+     Las direcciones van relativas. Si se pasa BINTIO_URL al compilar (o si
+     package.json lleva "homepage"), tools/build.js las convierte en absolutas,
+     que es lo que necesitan las redes sociales: NINGUNA resuelve una direccion
+     relativa, la descartan sin avisar.
+
+     Y si NO se pasa, build.js quita og:url y el canonico en vez de publicarlos
+     valiendo ".", porque son los dos que nombran a la pagina y un "." no nombra
+     nada: sin ellos cada red usa la direccion por la que llego, que es la
+     correcta. og:image si se queda relativa, porque relativa la entienden unos
+     pocos y borrada no la entiende ninguno. "npm run verify" lo avisa.
      ========================================================================== -->
 <meta name="description" content="Mensajes cifrados de punta a punta que no pasan por ningun servidor. Sin cuentas, sin telefono y sin rastreadores. Funciona hasta sin conexion.">
-<meta name="author" content="BINTIO">
+<meta name="author" content="xander.dice">
 <meta name="keywords" content="mensajeria cifrada, cifrado de punta a punta, sin servidores, privacidad, malla, bluetooth, guardar y reenviar, PWA, sin conexion, codigo abierto">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="generator" content="BINTIO build">
 <link rel="canonical" href=".">
+
+<!-- ==========================================================================
+     Quien firma esto.
+
+     Dos formas de decir lo mismo porque cada maquina lee una:
+
+       rel="me"            es la forma estandar de decir "estos perfiles son
+                           mios". La leen Mastodon (para poner el tic de
+                           verificado cuando el perfil enlaza de vuelta), los
+                           buscadores y las herramientas de identidad.
+       article:publisher   es lo que lee el rastreador de Meta -Facebook,
+                           WhatsApp, Instagram, Messenger- para atribuir la
+                           pagina a una pagina de Facebook.
+
+     No hay ninguna etiqueta de X/Twitter para el autor: twitter:creator pide un
+     nombre de usuario con arroba, no una direccion, y aqui no hay ninguno que
+     poner. Inventarselo seria atribuir la pagina a quien no es.
+     ========================================================================== -->
+<link rel="me" href="https://www.instagram.com/xander.dice">
+<link rel="me" href="https://www.youtube.com/@xanderdice">
+<link rel="me" href="https://www.facebook.com/dj.xander.dice">
+<meta property="article:publisher" content="https://www.facebook.com/dj.xander.dice">
+
+<!-- ==========================================================================
+     Lo mismo otra vez, en el formato que leen los buscadores.
+
+     Ninguna etiqueta <meta> sabe decir "estos tres perfiles son de la misma
+     persona". rel="me" lo dice y lo leen Mastodon y las herramientas de
+     identidad; Meta lee article:publisher; Google y Bing no leen ninguna de
+     las dos: leen sameAs dentro de un bloque schema.org. Por eso los tres.
+
+     Esto NO cambia ninguna vista previa. Ni Telegram, ni Discord, ni Slack,
+     ni WhatsApp, ni Mastodon miran aqui: la tarjeta la pintan con og:*, que
+     esta arriba. Este bloque es solo para la atribucion en los buscadores.
+
+     Cuatro reglas para tocarlo, y las cuatro tienen su porque en la tuberia:
+
+       1. La etiqueta lleva type. Los hashes de la CSP se sacan con
+          /<script>(...)<\/script>/, que exige la etiqueta pelada; con type
+          no casa, y por eso este bloque no entra en la firma del codigo ni
+          hay que anadirle un hash. Sin el atributo, se firmaria este JSON
+          como si fuera la aplicacion.
+       2. Va en UNA sola linea. El minificador aparta el cuerpo de <script>
+          tal cual, asi que los saltos de linea llegarian hasta dist y
+          "npm run verify" pide que el documento entero quepa en una.
+       3. Dentro no puede aparecer la secuencia </script>: el analizador de
+          HTML cierra ahi el bloque, y el resto del JSON se derramaria al
+          documento. Si algun dia hace falta, se escapa la barra: <\/script>.
+       4. Ninguna direccion relativa. absoluteUrls() de tools/build.js solo
+          reescribe cuatro etiquetas concretas y no entra aqui, asi que lo
+          que se escriba relativo se publica relativo. Todo lo de dentro es
+          absoluto ya, y por eso no hay ni url ni image: eso ya lo dice
+          og:url y og:image, que si se absolutizan solas.
+     ========================================================================== -->
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"BINTIO","description":"Mensajes cifrados de punta a punta que no pasan por ningun servidor. Sin cuentas, sin telefono y sin rastreadores. Funciona hasta sin conexion.","applicationCategory":"CommunicationApplication","operatingSystem":"Any","inLanguage":["es","en"],"isAccessibleForFree":true,"license":"https://opensource.org/licenses/MIT","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"xander.dice","sameAs":["https://www.instagram.com/xander.dice","https://www.youtube.com/@xanderdice","https://www.facebook.com/dj.xander.dice"]}}</script>
 
 <!-- Open Graph: Facebook, WhatsApp, Telegram, LinkedIn, Slack, Discord,
      Signal, Mastodon y todo lo que copie el estandar (que es casi todo). -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="BINTIO">
 <meta property="og:locale" content="es_ES">
+<!-- La pagina esta en los dos idiomas, pero el cambio lo hace javascript al
+     vuelo y los rastreadores no ejecutan javascript: lo que ven es siempre
+     esta cabecera en castellano. Asi que el alternate dice la verdad para una
+     persona y no la sirve a una maquina, porque no hay una segunda direccion
+     que devuelva el documento en ingles. Se queda porque no rompe ninguna
+     vista previa; para que valiera de verdad haria falta publicar un segundo
+     documento estatico en ingles, que es cambio de tuberia, no de etiqueta. -->
+<meta property="og:locale:alternate" content="en_US">
 <meta property="og:title" content="BINTIO - mensajes cifrados que no pasan por ningun servidor">
 <meta property="og:description" content="Mensajes cifrados de punta a punta que no pasan por ningun servidor. Sin cuentas, sin telefono y sin rastreadores. Funciona hasta sin conexion.">
 <meta property="og:url" content=".">
@@ -39,14 +109,14 @@
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="BINTIO">
+<meta property="og:image:alt" content="El logo de BINTIO centrado sobre un fondo oscuro">
 
 <!-- Twitter / X: la tarjeta grande, que es la que ensena la imagen entera. -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="BINTIO - mensajes cifrados que no pasan por ningun servidor">
 <meta name="twitter:description" content="Mensajes cifrados de punta a punta que no pasan por ningun servidor. Sin cuentas, sin telefono y sin rastreadores. Funciona hasta sin conexion.">
 <meta name="twitter:image" content="social.png">
-<meta name="twitter:image:alt" content="BINTIO">
+<meta name="twitter:image:alt" content="El logo de BINTIO centrado sobre un fondo oscuro">
 
 <!-- Aplicacion instalada: navegador, iOS y Windows. -->
 <meta name="theme-color" content="#0a0d1a">
