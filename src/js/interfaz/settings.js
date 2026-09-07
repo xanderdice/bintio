@@ -61,6 +61,11 @@
             ['Comunicacion entre pestanas', c.broadcast]
         ]);
 
+        /* La Llave de Recuperacion se pinta solo al pulsar "Ver la llave", pero
+           una vez pintada se quedaba en el nodo hasta recargar: legible desde la
+           consola incluso con la boveda ya cerrada. Se borra al abrir Ajustes y
+           al cerrar (btn-lock). Es la llave que abre la identidad entera. */
+        D.clear(D.$('key-value'));
         D.show(D.$('key-out'), false);
         D.view('view-settings');
     };

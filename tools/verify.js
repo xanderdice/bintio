@@ -237,6 +237,13 @@ ok('llevan HSTS de al menos seis meses', /max-age=63072000/.test(netlify));
 ok('llevan la misma CSP que el documento', netlify.indexOf(HEAD.cspFor(page)) >= 0);
 ok('la CSP publicada prohibe los marcos ajenos',
    HEAD.cspFor(page).indexOf("frame-ancestors 'none'") >= 0);
+/* La videollamada pide camara y microfono; el lector de QR, camara. Si las
+   cabeceras publicadas cierran cualquiera de las dos, la pagina las pide y el
+   navegador dice que no sin explicar por que. Y todo lo demas tiene que
+   seguir cerrado: no se abre una puerta para abrirlas todas. */
+ok('las cabeceras dejan camara y microfono, y nada mas',
+   /camera=\(self\)/.test(netlify) && /microphone=\(self\)/.test(netlify) &&
+   /geolocation=\(\)/.test(netlify) && /display-capture=\(\)/.test(netlify));
 
 /* --------------------------------------------------------------- minificado */
 console.log('Minificado');

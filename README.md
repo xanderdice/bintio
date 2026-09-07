@@ -224,6 +224,129 @@ tienes anadido.
 
 ---
 
+## La auditoria de seguridad
+
+El codigo se reviso entero buscando fallos y ataques: ocho auditores en
+paralelo por angulos distintos (las primitivas y su uso, el parseo de lo que
+llega de la red, la malla y el agotamiento de recursos, los transportes y el
+primer contacto, la boveda, la interfaz, el build y la logica de estados), y
+cada hallazgo grave lo intentaron tumbar despues dos refutadores independientes,
+uno reproduciendolo y otro buscando la defensa que ya existiera. Sobrevivieron
+**dieciocho**, casi todos con una prueba que los demostraba.
+
+Estan **todos arreglados menos uno** -la clave de trinquete en claro, explicada
+en "Como esta cifrado", que es un cambio del formato del cable- y cada arreglo
+tiene su comprobacion en `test/seguridad.test.js`, escrita de forma que **falla
+si alguien deshace el arreglo**. Comprobado: con la poda vieja, la prueba de la
+mochila deja 0 de 20 sobres honrados.
+
+Lo que se cerro, en una linea cada uno:
+
+| | Que se podia hacer |
+|---|---|
+| Prototipo | una ficha de grupo con `__proto__` de id escribia en `Object.prototype` |
+| Marcos gigantes | cuatro marcos de 200 KB inutilizaban la mochila 96 horas |
+| Inundacion | 300 marcos con la caducidad al maximo echaban todo lo honrado |
+| Clave de encuentro | un codigo SIN cifrar se aceptaba aunque hubieras escrito la clave: suplantacion en el primer contacto |
+| Secretos en el DOM | la contrasena y la Llave de Recuperacion se quedaban en los campos despues de cerrar |
+| Borrado de panico | otra pestana volvia a escribir la boveda al minuto siguiente |
+| Vueltas de PBKDF2 | una copia con otro numero de vueltas se volvia inabrible al primer guardado |
+| Nombres | un nombre de 255 bytes con saltos de linea pintaba un falso aviso del sistema |
+| Grupos | guardar la ficha echaba a los miembros que no tenias anadidos, y se lo contaba a todos |
+| Trinquete | quien te quitaba dejaba tus mensajes siguientes ilegibles para siempre |
+| Repeticion | un aviso viejo de "te he quitado" volvia a valer tras desbordar la memoria de vistos |
+| Cuota llena | todo lo nuevo dejaba de guardarse sin un solo aviso |
+| nginx | los tres ficheros que importan salian sin CSP, sin HSTS y sin nada |
+
+Quedan fuera veinticuatro observaciones de gravedad baja (endurecimiento) que no
+se han tocado, y las dos limitaciones que dice "Lo que NO puede hacer".
+
+---
+
+## Videollamadas
+
+Entre dos personas, de aparato a aparato, sin que el video pase por ningun
+sitio. El boton **Llamar** sale en la cabecera de la conversacion cuando hay
+vinculo con esa persona; con un grupo no sale, porque una llamada de punta a
+punta tiene dos puntas.
+
+### Por que es de punta a punta, y de quien depende
+
+El video de WebRTC va cifrado siempre (DTLS-SRTP), pero eso por si solo no
+vale: quien controle el intercambio de descripciones (SDP) puede ponerse en
+medio y cifrar dos tramos en vez de uno. Todas las aplicaciones de
+videollamada tienen ese punto debil en su **servidor de senalizacion**.
+
+Aqui no hay servidor de senalizacion. Las descripciones viajan **dentro de
+sobres normales de BINTIO**, sellados por `session.js`: solo esa persona
+puede abrirlos y solo esa persona puede haberlos sellado (`ss2` exige su clave
+estatica). La huella DTLS que va en el SDP queda asi autenticada por la misma
+criptografia que autentica un mensaje, y un intermediario no puede cambiarla
+sin romper el sobre. **La seguridad de la llamada es exactamente la de la
+identidad del contacto**: si comprobaste su huella en persona, la llamada es
+con esa persona. La pantalla de la llamada la ensena por eso.
+
+### Lo que viaja, y cuando
+
+| | Que dice | Lleva SDP? |
+|---|---|---|
+| `ring` | te llamo | **no** |
+| `ok` | acepto | no |
+| `offer` | mi descripcion, con mi huella DTLS | si |
+| `answer` | la mia | si |
+| `bye` | cuelgo, o no puedo, o no quiero, con el motivo | no |
+
+El timbre va **sin descripcion a proposito**. Reunir candidatos de red para el
+SDP revela las direcciones IP del aparato, y eso no se hace hasta que el otro
+ha dicho que si: quien recibe una llamada y la rechaza no ha soltado nada, y
+quien llama tampoco hasta que le contestan. Por lo mismo, la camara de quien
+recibe no se enciende hasta que pulsa **Aceptar**; la de quien llama, al
+pulsar **Llamar**, que es su decision.
+
+Los sobres de llamada viven **40 segundos y no dan saltos** (`ttl 0`): igual
+que el "escribiendo", no entran en ninguna mochila y solo salen por los cables
+abiertos en ese instante. Una llamada solo tiene sentido con camino vivo, y un
+timbre guardado que suena tres horas despues seria un fallo, no una funcion.
+Tampoco se guarda nada en la boveda: no hay registro de llamadas.
+
+### Lo que hace cuando las cosas se tuercen
+
+- **Ocupado**: si te llaman mientras estas en otra, al que llama le llega
+  `ocupado` y tu llamada no se entera de nada.
+- **Los dos a la vez**: si os llamais en el mismo instante, sigue llamando el
+  de la clave mas baja y el otro coge ese timbre. Es una regla que los dos
+  aplican sin hablar, y por eso sale una llamada y no cero ni dos.
+- **Nadie contesta**: un timbre se apaga solo a los 45 s; aceptada pero sin
+  conectar el video, a los 30 s. Un solo temporizador, y solo mientras hay
+  llamada: en reposo no hay ninguno.
+- **Cerrar la boveda cuelga**, con los cables todavia abiertos, para que al
+  otro le llegue el `bye` en vez de una pantalla congelada. Y apaga la camara
+  de verdad, no solo la esconde.
+- **Una descripcion que no es SDP** -texto ajeno que no empieza por `v=0`, o
+  de mas de 32 KB- no llega al navegador. `setRemoteDescription` es codigo del
+  navegador leyendo texto de otra persona, y esa es la puerta.
+
+Todo esto esta probado sin camara ni navegador en `test/llamada.test.js`: la
+maquina de estados (`nucleo/llamada.js`) no sabe que existe WebRTC. El video
+lo pone `transportes/videollamada.js` en una conexion **aparte** de la del
+canal de datos -para poder colgar sin tirar los mensajes, y porque las dos
+personas pueden estar unidas por bluetooth o por la malla- y la pantalla,
+`interfaz/videollamada.js`.
+
+### Lo que NO hace
+
+- Sin STUN, solo en la misma red: lo mismo que el enlace directo de mensajes,
+  y por la misma decision. Con un STUN en Ajustes, tambien a traves de
+  internet.
+- No hay TURN y no lo habra: un TURN es un servidor por el que pasa el video.
+  Si vuestras dos redes no se alcanzan, la llamada no sale, y lo dice.
+- Grupos, no. Compartir pantalla, no.
+- La **pantalla protegida** tapa tambien la llamada cuando la ventana deja de
+  estar delante. Es la misma promesa de siempre; si molesta, se apaga en
+  Ajustes.
+
+---
+
 ## Espanol e ingles
 
 El idioma se elige en **Ajustes > Aspecto** y cambia al momento, sin recargar y
@@ -413,8 +536,26 @@ clave = HKDF(ss1 || ss2 || ss3, sal = clave efimera, "bintio/env/v1")
   clave estatica del aparato**.
 
 El sobre que viaja por la malla **no lleva ni remitente ni destinatario**. Solo
-una etiqueta de 8 bytes que unicamente el destinatario sabe recalcular. Quien
-lo transporta ve bytes opacos, una fecha de caducidad y un contador de saltos.
+una etiqueta de 8 bytes que unicamente el destinatario sabe recalcular: cambia
+en cada mensaje, porque se calcula sobre la clave efimera, asi que por ella no
+se pueden agrupar dos sobres.
+
+**Pero si lleva una cosa que si los agrupa, y hay que decirlo**: la clave de
+trinquete del remitente viaja en la cabecera, en claro (32 bytes), porque el
+que recibe la necesita para calcular `ss3` antes de poder descifrar nada. Esa
+clave solo cambia cuando el OTRO publica una nueva, asi que veinte mensajes
+seguidos de la misma persona llevan la misma. Quien solo transporta no puede
+leer nada, pero **si puede agrupar los sobres de una misma conversacion y
+enlazar la ida con la vuelta**, y con eso reconstruir el grafo de quien habla
+con quien y a que horas. Lo encontro la auditoria de seguridad de este
+proyecto, con una prueba que lo demuestra mirando solo los bytes del cable.
+
+Arreglarlo es mover esa clave DENTRO del texto cifrado y usar para `ss3` la
+clave que se aprendio del mensaje anterior. Es un cambio del formato del cable
+y del momento en que gira el trinquete, asi que va aparte y todavia **no esta
+hecho**. Mientras tanto la promesa correcta es esta: quien transporta no lee
+nada y no sabe quien eres, pero puede contar cuantos sobres se cruzan dos
+desconocidos suyos.
 
 En disco, todo (identidad, contactos, mensajes y sobres ajenos) vive dentro de
 un unico bloque cifrado con una clave derivada de tu contrase&ntilde;a con
@@ -448,6 +589,15 @@ contrase&ntilde;a y la Llave de Recuperacion, tus datos son ruido. Eso es el pro
   desde aqui ni desde ninguna: la pantalla es del sistema operativo. En el
   navegador solo cabe estorbarla, y eso es lo que se hace. En Windows si hay
   salida de verdad, y tiene su propio ejecutable: ver la seccion siguiente.
+- **Quien transporta puede agrupar los sobres de una conversacion.** No leerlos:
+  agruparlos. La clave de trinquete va en claro en la cabecera y aguanta varios
+  mensajes. Esta explicado arriba, en "Como esta cifrado", con el arreglo
+  pendiente.
+- **Dos pestanas a la vez editando la misma boveda pueden pisarse.** La
+  escritura de mantenimiento cede ante la pestana que se esta usando, y el
+  borrado ya no se resucita nunca, pero si las dos se usan a la vez lo ultimo
+  que se guarde es lo que queda. Lo correcto seria un cerrojo de escritura de
+  verdad.
 
 ---
 

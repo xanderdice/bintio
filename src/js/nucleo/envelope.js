@@ -74,6 +74,17 @@
     E.F_RATCHET_MINE = 1;
     E.F_RATCHET_THEIRS = 2;
     E.MAX_TTL = 12;
+    /* El marco mas grande que este programa produce es un mensaje de grupo con
+       la ficha de 32 miembros: unos 3,6 KB. Dieciseis mil bytes deja holgura
+       de sobra para eso y para cualquier campo que se anada, y corta en seco lo
+       que no cabe. Sin este tope, cuatro marcos de 200 KB con la caducidad al
+       maximo llenaban la mochila -propia y ajena- durante noventa y seis horas
+       sin una sola operacion de criptografia: la poda echaba primero lo honrado
+       (que caduca antes) y el marco gigante era inmortal. WebRTC admite 256 KB
+       por mensaje y por Bluetooth no hay tope, asi que el limite tiene que
+       ponerlo la aplicacion. Se comprueba en M.handleFrame, antes de parsear
+       nada, y aqui otra vez como red de debajo. */
+    E.MAX_FRAME = 16384;
     E.DEFAULT_TTL = 6;
     E.DEFAULT_LIFE = 72 * 3600; /* segundos que un sobre puede vagar por la malla */
     /* Lo maximo que se acepta al parsear: la vida normal mas un dia de holgura,
@@ -147,7 +158,7 @@
        Leer la cabecera sin descifrar nada. Devuelve null si no es un sobre.
        ----------------------------------------------------------------- */
     E.parse = function (b) {
-        if (!b || b.length < E.HEAD + C.TAG + 1) { return null; }
+        if (!b || b.length < E.HEAD + C.TAG + 1 || b.length > E.MAX_FRAME) { return null; }
         if (b[0] !== E.MAGIC0 || b[1] !== E.MAGIC1) { return null; }
 
         /* Tres topes que cuestan tres comparaciones y sin los cuales la mochila

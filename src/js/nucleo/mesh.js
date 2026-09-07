@@ -238,15 +238,33 @@
            puede desalojar ni un sobre, que es lo que esta aplicacion existe
            para llevar.
 
-           Y dentro de los sobres, lo que antes caduca se va primero: ese sobre
-           tiene menos vida util que uno recien creado y por tanto menos
-           posibilidades de llegar. */
+           QUIEN SE VA PRIMERO: EL ULTIMO EN LLEGAR.
+
+           Antes se iba el que antes caducaba, y parecia razonable -menos vida
+           util, menos posibilidades de llegar- pero le daba a quien inunda el
+           poder de elegir a quien echa: la caducidad la escribe el que manda el
+           sobre. Trescientos marcos con la caducidad al maximo permitido eran
+           los ultimos en morir, y echaban de la mochila todo lo honrado (que
+           lleva la vida normal, mas corta). A partir de ahi ni un sobre bueno
+           volvia a caber: la poda lo sacaba en la misma llamada que lo metia.
+
+           Con el orden de LLEGADA no hay nada que el atacante pueda escribir en
+           el marco para ganar: una rafaga entra junta, es lo mas nuevo, y se
+           come a si misma. Lo que ya llevaba tiempo viajando -que es lo que mas
+           cerca esta de llegar a su destino- se queda. Entre dos que llegaron a
+           la vez se va el de caducidad mas larga, que es la senal de que alguien
+           esta intentando quedarse. Los sobres de una boveda vieja no tienen
+           marca de llegada: cuentan como los mas antiguos, y esta bien. */
         for (i = 0; i < b.length; i++) {
             if (b[i].k !== 'p') { sobres.push(b[i]); bytes += b[i].d.length; }
         }
         bytes = Math.floor(bytes * 3 / 4);
         if (sobres.length > MAX_BAG || bytes > MAX_BAG_BYTES) {
-            sobres.sort(function (x, y) { return y.e - x.e; });
+            sobres.sort(function (x, y) {
+                var tx = x.t || 0, ty = y.t || 0;
+                if (tx !== ty) { return tx - ty; }
+                return x.e - y.e;
+            });
             while (sobres.length && (sobres.length > MAX_BAG || bytes > MAX_BAG_BYTES)) {
                 fuera = sobres.pop();
                 bytes -= Math.floor(fuera.d.length * 3 / 4);
@@ -395,6 +413,11 @@
        --------------------------------------------------------------------- */
     M.handleFrame = function (bytes, peer) {
         if (!bytes || bytes.length < 3) { return; }
+        /* El tope de tamano se mira aqui, antes de parsear, guardar o reenviar
+           nada: un marco que no cabe no puede ser nuestro y no vale la pena
+           llevarlo. Vale para las tres clases -sobre, presentacion y control-
+           por la misma puerta. */
+        if (bytes.length > E.MAX_FRAME) { return; }
         if (bytes[0] !== E.MAGIC0) { return; }
         if (bytes[1] === E.MAGIC1) { M.handleEnvelope(bytes, peer); return; }
         /* La presentacion entra por la MISMA puerta que el sobre: solo cambia
@@ -406,6 +429,23 @@
     };
 
     M.handleEnvelope = function (bytes, peer) {
+        /* Flood protection: limit each peer to a maximum number of envelopes per minute
+           before any further processing.  This helps detect massive attacks where a
+           malicious node tries to bomb the node with a high volume of messages. */
+        var now = Date.now();
+        if (!peer._rateCount) { peer._rateCount = []; }
+        var windowMs = 60000; // 60 seconds
+        var threshold = 50;   // max 50 envelopes per minute
+        var arr = peer._rateCount;
+        while (arr.length && now - arr[0] > windowMs) { arr.shift(); }
+        if (arr.length >= threshold) {
+            if (D && D.toast) {
+                D.toast('Atención: posible inundación de mensajes desde ' + (peer.label || peer.id), 'bad');
+            }
+            return;
+        }
+        arr.push(now);
+
         var env = parse(bytes);
         if (!env) { return; }
         M.stats.received++;

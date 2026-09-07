@@ -38,15 +38,48 @@
         }
     }
 
+    /* Vaciar todo lo que se escribio en la pantalla de acceso.
+
+       Los campos ocultos NO se vacian solos: un display:none deja el valor
+       dentro. Asi, tras cerrar la boveda, la contrasena seguia en new-pass o en
+       restore-pass y la Llave de Recuperacion en restore-key, en claro,
+       legibles desde la consola o una extension -y esa contrasena vuelve a
+       abrir la boveda-. El cierre con contrasena no protege nada si la
+       contrasena se queda en el DOM. Se llama al entrar en la pantalla y al
+       terminar cada intento, salga bien o mal. */
+    var CAMPOS = ['new-name', 'new-pass', 'new-pass2', 'open-pass', 'restore-key', 'restore-pass'];
+    function limpiarCampos() {
+        for (var i = 0; i < CAMPOS.length; i++) {
+            var el = D.$(CAMPOS[i]);
+            if (el) { el.value = ''; }
+        }
+    }
+
     D.showLock = function () {
+        limpiarCampos();
         var exists = V.vault.exists();
         soloBloque(exists ? 'lock-open' : 'lock-new');
         D.view('view-lock');
+        /* Si ya existe la bóveda muestra el nombre del usuario para que no
+           sea un dato sin contexto. */
+        var elName = D.$('identity-name');
+        if (elName) {
+            try {
+                if (exists && V.vault.state.identity && V.vault.state.identity.name) {
+                    elName.textContent = V.vault.state.identity.name;
+                } else {
+                    elName.textContent = '';
+                }
+            } catch (e) { /* ignore */ }
+        }
         var f = D.$(exists ? 'open-pass' : 'new-name');
         if (f) { try { f.focus(); } catch (e) {} }
     };
 
     function opened() {
+        /* Ya estamos dentro: no queda ninguna razon para conservar la
+           contrasena ni la llave escritas en la pantalla de acceso. */
+        limpiarCampos();
         D.applySettings();
         V.app.start();
         D.view('view-main');
@@ -167,7 +200,10 @@
 
         D.on(D.$('btn-lock'), 'click', function () {
             V.app.stop();
-            D.showLock();
+            /* La Llave de Recuperacion pudo quedar pintada en Ajustes: fuera
+               antes de soltar la pantalla, que cerrar es cerrar. */
+            D.clear(D.$('key-value'));
+            D.showLock();      /* limpia los campos: ver limpiarCampos() */
             /* Que la barra de abajo se vacie YA, no en el siguiente repaso de
                los cuatro segundos: hasta entonces seguirian ahi los contactos
                y el tamano de la boveda de quien acaba de cerrar. */

@@ -177,6 +177,42 @@
         } catch (e) {}
     }
 
+    /* Los dos avisos que la boveda sabe dar y que no escuchaba nadie.
+
+       Sin esto, los dos fallaban EN SILENCIO, que es lo peor que puede hacer
+       algo que guarda datos: con la cuota agotada la aplicacion seguia
+       diciendo "guardado" y todo lo nuevo -contactos, mensajes- vivia solo en
+       memoria hasta que se recargaba la pestana; y con la boveda borrada desde
+       otra pestana, esta seguia como si nada. */
+    function wireBoveda() {
+        V.vault.onQuotaError = function () {
+            /* Lo que mas ocupa y menos duele soltar son los sobres ajenos que
+               llevamos por la malla: se sueltan y se reintenta una vez. Si aun
+               asi no cabe, se dice, porque callarlo seria mentir. */
+            var libre = false;
+            try { V.mesh.bagClear(); libre = true; } catch (e) {}
+            if (libre) {
+                V.vault.lastError = null;
+                V.vault.saveNow();
+            }
+            if (V.vault.lastError) {
+                D.toast(D.t('No cabe en este aparato: lo nuevo no se esta guardando. Descarga una copia y borra conversaciones.'), 'bad');
+            } else {
+                D.toast(D.t('No habia sitio: se han soltado los sobres ajenos que llevabas.'), 'bad');
+            }
+            D.refreshStatus();
+        };
+
+        V.vault.onWiped = function () {
+            /* Otra pestana ha borrado la boveda. Esta se queda con datos en
+               memoria que ya no existen en disco: no se resucitan (eso lo
+               impide la propia boveda), se cierra y se vuelve a empezar. */
+            try { V.app.stop(); } catch (e) {}
+            D.toast(D.t('Se ha borrado la boveda desde otra pestana.'), 'bad');
+            setTimeout(function () { location.reload(); }, 900);
+        };
+    }
+
     function boot() {
         /* Lo primero de todo, antes de pintar nada: el idioma. Asi la pantalla
            de acceso ya sale en el que toca en vez de cambiar delante de quien
@@ -189,7 +225,9 @@
         D.initSettings();
         D.initRequests();
         D.initPrivacidad();
+        D.initVideollamada();
         wireApp();
+        wireBoveda();
         registerWorker();
         anchorManifest();
         D.on(document, 'visibilitychange', latido);

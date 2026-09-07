@@ -40,7 +40,7 @@
 
     /* ------------------------------------------------------------- vistas */
     var VIEWS = ['view-boot', 'view-lock', 'view-main', 'view-connect', 'view-peer',
-                 'view-group', 'view-requests', 'view-settings'];
+                 'view-group', 'view-requests', 'view-settings', 'view-call'];
     D.current = 'view-boot';
 
     D.view = function (name) {

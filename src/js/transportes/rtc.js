@@ -30,6 +30,15 @@
 
     R.available = function () { return !!PC(); };
 
+    /* La videollamada (videollamada.js) abre su propia conexion, con los
+       mismos servidores y la misma espera de candidatos que esta. Se le
+       prestan en vez de copiarlos: un STUN que se cambie en Ajustes tiene que
+       valer para las dos. */
+    R.PC = PC;
+    R.SD = SD;
+    R.iceConfig = function () { return iceConfig(); };
+    R.waitIce = function (pc, done) { waitIce(pc, done); };
+
     function iceConfig() {
         var s = V.vault.state && V.vault.state.settings;
         var urls = (s && s.stun) ? String(s.stun).split(/[\s,]+/) : [];

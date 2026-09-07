@@ -45,11 +45,15 @@ var FRAME_ANCESTORS = "frame-ancestors 'none'";
 /* Permisos del navegador. Solo nombres reconocidos: una funcion inventada
    hace que Chrome escupa "Unrecognized feature" en la consola, que es
    justo el tipo de cabecera rara que no queremos.
-   camera=(self) es obligatorio: sin eso no se puede leer un QR. */
+   camera=(self) es obligatorio: sin eso no se puede leer un QR.
+   microphone=(self) tambien: sin eso no hay videollamada, y el fallo es de
+   los que no se ven en local -serve.js manda estas mismas cabeceras, asi que
+   si esta mal aqui, falla en local y en produccion por igual, que es lo que
+   se quiere-. Todo lo demas sigue cerrado: el programa no lo usa. */
 var PERMISSIONS =
     'accelerometer=(), autoplay=(), camera=(self), display-capture=(), ' +
     'encrypted-media=(), fullscreen=(self), geolocation=(), gyroscope=(), ' +
-    'magnetometer=(), microphone=(), midi=(), payment=(), usb=()';
+    'magnetometer=(), microphone=(self), midi=(), payment=(), usb=()';
 
 function cspFor(html) {
     if (!html) { return CSP_BASE + '; ' + FRAME_ANCESTORS; }
@@ -129,13 +133,26 @@ function deployConfigs(csp) {
         '  RewriteCond %{HTTPS} off\n' +
         '  RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]\n</IfModule>\n';
 
+    /* Los add_header de nginx NO se heredan: en cuanto un bloque location
+       pone UNO solo, se pierden todos los del server. Asi que el location que
+       marca "no cachear la aplicacion" borraba de un plumazo la CSP, el HSTS y
+       todo lo demas justo para index.html, bintio.html y sw.js, que son los tres
+       ficheros que importan. Se resuelve repitiendo la lista entera DENTRO del
+       location: con Cache-Control anadido, esos tres salen con todo. */
+    function addHeaders(indent) {
+        return list.map(function (p) {
+            return indent + 'add_header ' + p[0] + ' "' + p[1].replace(/"/g, '\\"') + '" always;';
+        }).join('\n');
+    }
     var nginx = '# Cabeceras de BINTIO para nginx. Va dentro del bloque server{}.\n' +
-        list.map(function (p) {
-            return 'add_header ' + p[0] + ' "' + p[1].replace(/"/g, '\\"') + '" always;';
-        }).join('\n') +
-        '\n\n# La aplicacion y su trabajador de servicio se piden siempre.\n' +
-        'location ~* (index\\.html|bintio\\.html|sw\\.js)$ { add_header Cache-Control "' +
-        noCache + '" always; }\n' +
+        addHeaders('') +
+        '\n\n# La aplicacion y su trabajador de servicio se piden siempre. OJO:\n' +
+        '# nginx no hereda los add_header en un location que tenga los suyos, asi\n' +
+        '# que aqui se repiten TODOS o esos tres ficheros se quedan sin seguridad.\n' +
+        'location ~* (index\\.html|bintio\\.html|sw\\.js)$ {\n' +
+        addHeaders('    ') + '\n' +
+        '    add_header Cache-Control "' + noCache + '" always;\n' +
+        '}\n' +
         '\n# Y el redirector, en su propio server{}:\n' +
         '# server { listen 80; server_name _; return 301 https://$host$request_uri; }\n';
 

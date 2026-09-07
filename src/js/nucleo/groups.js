@@ -63,7 +63,16 @@
     G.isKey = function (k) { return String(k).substr(0, 2) === 'g:'; };
     G.idOf = function (k) { return String(k).substr(2); };
 
-    G.get = function (id) { return todos()[id] || null; };
+    /* Con hasOwnProperty y no todos()[id] a secas: un id que llegara de fuera
+       valiendo "__proto__" devolvia Object.prototype -que existe y es truthy- y
+       la ficha acababa escribiendo name/members/rev SOBRE el prototipo de todos
+       los objetos del proceso. La ficha viene por la malla de un contacto, asi
+       que no hacia falta ni enlace directo. fromCard ademas exige que el id
+       tenga forma de identificador de grupo; esto es la red de debajo. */
+    G.get = function (id) {
+        var m = todos();
+        return Object.prototype.hasOwnProperty.call(m, id) ? m[id] : null;
+    };
 
     G.all = function () {
         var m = todos(), out = [], id;
@@ -129,7 +138,7 @@
     G.create = function (name, pks) {
         var yo = G.mePk();
         if (!yo) { return { error: 'No hay identidad abierta' }; }
-        name = String(name || '').replace(/^\s+|\s+$/g, '');
+        name = U.nombreLimpio(name);
         if (!name) { return { error: 'El grupo necesita un nombre' }; }
 
         var vistos = {}, members = [{ pk: yo, name: nombreDe(yo) }], i, pk;
@@ -177,6 +186,11 @@
        gente que conoce, que es exactamente lo que un grupo es. */
     G.fromCard = function (card, fromPkHex) {
         if (!card || !card.g || !card.m || !card.m.length) { return null; }
+        /* El id de grupo tiene una forma fija: 16 hex, los que produce G.create
+           con U.toHex(C.random(8)). Exigirla aqui descarta de un plumazo un
+           "__proto__" o cualquier otra cosa que no sea un id nuestro, y ademas
+           deja el mapa de grupos con claves de una sola forma. */
+        if (typeof card.g !== 'string' || !/^[0-9a-f]{16}$/.test(card.g)) { return null; }
         var yo = G.mePk();
         if (!yo) { return null; }
 
@@ -188,7 +202,11 @@
             vistos[pk] = 1;
             if (pk === yo) { dentroYo = true; }
             if (pk === fromPkHex) { dentroEl = true; }
-            members.push({ pk: pk, name: String(fila[1] || '').substr(0, 40) || nombreDe(pk) });
+            /* El nombre lo pone quien manda la ficha: se limpia igual que en el
+               alta, porque de aqui va directo a un aviso de la conversacion y
+               sin limpiar admitia saltos de linea con los que se fabricaba un
+               falso mensaje del sistema de varios renglones. */
+            members.push({ pk: pk, name: U.nombreLimpio(fila[1]) || nombreDe(pk) });
         }
         if (!dentroYo || !dentroEl || members.length < 2) { return null; }
 
@@ -199,13 +217,13 @@
                llegara -que puede ser de hace dos dias, la malla no ordena-
                resucitaria a quien acaba de salirse del grupo. */
             if (rev < (group.rev || 1)) { return group; }
-            group.name = String(card.n || group.name).substr(0, 40);
+            group.name = U.nombreLimpio(card.n) || group.name;
             group.members = members;
             group.rev = rev;
         } else {
             group = {
                 id: card.g,
-                name: String(card.n || 'Grupo').substr(0, 40),
+                name: U.nombreLimpio(card.n) || 'Grupo',
                 members: members,
                 rev: rev,
                 created: U.now()
@@ -221,23 +239,34 @@
        --------------------------------------------------------------------- */
     G.rename = function (id, name) {
         var g = G.get(id);
-        name = String(name || '').replace(/^\s+|\s+$/g, '');
+        name = U.nombreLimpio(name);
         if (!g || !name) { return false; }
-        g.name = name.substr(0, 40);
+        g.name = name;
         g.rev = (g.rev || 1) + 1;
         V.vault.save();
         return true;
     };
 
+    /* Fijar la lista de miembros. Los que pasa la interfaz salen de las
+       casillas, y las casillas solo existen para los contactos que TIENES: los
+       miembros que no tienes anadidos se pintan sin casilla. Si a esos se les
+       filtrara aqui, guardar el grupo -aunque fuera solo para cambiar el
+       nombre- los echaria a todos sin que nadie lo decidiera, y el cambio se
+       propagaria a los demas. Por eso a los que YA estaban en el grupo se les
+       conserva aunque no los tengas; el filtro de "solo gente que tienes" vale
+       para los que se ANADEN, no para los que ya estaban. */
     G.setMembers = function (id, pks) {
         var g = G.get(id), yo = G.mePk();
         if (!g) { return false; }
-        var vistos = {}, members = [{ pk: yo, name: nombreDe(yo) }], i;
+        var yaEstaba = {}, j;
+        for (j = 0; j < g.members.length; j++) { yaEstaba[g.members[j].pk] = 1; }
+        var vistos = {}, members = [{ pk: yo, name: nombreDe(yo) }], i, pk;
         vistos[yo] = 1;
         for (i = 0; i < pks.length; i++) {
-            if (vistos[pks[i]] || !K.get(pks[i])) { continue; }
-            vistos[pks[i]] = 1;
-            members.push({ pk: pks[i], name: nombreDe(pks[i]) });
+            pk = pks[i];
+            if (vistos[pk] || (!K.get(pk) && !yaEstaba[pk])) { continue; }
+            vistos[pk] = 1;
+            members.push({ pk: pk, name: nombreDe(pk) });
         }
         if (members.length < 2 || members.length > G.MAX) { return false; }
         g.members = members;

@@ -221,6 +221,8 @@
                         <input class="input" type="password" id="open-pass" autocomplete="current-password">
                     </div>
                     <div class="bar" id="open-bar"><i></i></div>
+                    <!-- Nombre del usuario que abre la bóveda -->
+                    <p id="identity-name" class="dim" data-t=""></p>
                     <div class="btn-row mt-l">
                         <button type="button" class="btn btn--primary" id="btn-open" data-t>Abrir</button>
                         <button type="button" class="btn btn--ghost" id="btn-show-restore2" data-t>Restaurar copia</button>
@@ -335,6 +337,7 @@
                         </span>
                     </div>
                     <div class="panel-tools">
+                        <button type="button" class="btn btn--sm hidden" id="btn-call" data-t>Llamar</button>
                         <button type="button" class="btn btn--sm btn--ghost" id="btn-peer" data-t>Ficha</button>
                     </div>
                 </div>
@@ -545,6 +548,33 @@
         </section>
 
         <!-- ============================================ AJUSTES ======== -->
+        <!-- ============================================ VIDEOLLAMADA === -->
+        <!-- Los dos <video> van sin autoplay: se arrancan desde el codigo, en
+             el momento en que hay algo que ensenar. El propio va con muted
+             para no oirse a uno mismo; el remoto NO, que es de lo que se trata.
+             playsinline es para iOS: sin el, el video se abre a pantalla
+             completa por su cuenta. -->
+        <section class="view" id="view-call">
+            <div class="call">
+                <video class="call-remote" id="call-remote" playsinline></video>
+                <video class="call-local" id="call-local" playsinline muted></video>
+                <div class="call-head">
+                    <b id="call-name"></b>
+                    <small class="call-fp" id="call-fp"></small>
+                    <small id="call-status"></small>
+                </div>
+                <div class="call-tools" id="call-ring-tools">
+                    <button type="button" class="btn btn--primary" id="btn-call-accept" data-t>Aceptar</button>
+                    <button type="button" class="btn btn--danger" id="btn-call-decline" data-t>Rechazar</button>
+                </div>
+                <div class="call-tools" id="call-live-tools">
+                    <button type="button" class="btn" id="btn-call-mic" data-t>Silenciar</button>
+                    <button type="button" class="btn" id="btn-call-cam" data-t>Sin camara</button>
+                    <button type="button" class="btn btn--danger" id="btn-call-hangup" data-t>Colgar</button>
+                </div>
+            </div>
+        </section>
+
         <section class="view" id="view-settings">
             <div class="sheet"><div class="sheet-inner">
 
@@ -730,11 +760,13 @@
 <script src="js/nucleo/chat.js"></script>
 <script src="js/nucleo/presenta.js"></script>
 <script src="js/nucleo/groups.js"></script>
+<script src="js/nucleo/llamada.js"></script>
 
 <!-- transportes: Hablan con la red. Tampoco tocan el DOM. -->
 <script src="js/transportes/transport.js"></script>
 <script src="js/transportes/local.js"></script>
 <script src="js/transportes/rtc.js"></script>
+<script src="js/transportes/videollamada.js"></script>
 <script src="js/transportes/ble.js"></script>
 <script src="js/transportes/invite.js"></script>
 <script src="js/transportes/qr.js"></script>
@@ -751,6 +783,7 @@
 <script src="js/interfaz/lock.js"></script>
 <script src="js/interfaz/roster.js"></script>
 <script src="js/interfaz/chat.js"></script>
+<script src="js/interfaz/videollamada.js"></script>
 <script src="js/interfaz/connect.js"></script>
 <script src="js/interfaz/settings.js"></script>
 <script src="js/interfaz/requests.js"></script>

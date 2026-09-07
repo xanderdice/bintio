@@ -97,6 +97,10 @@
             dot.className = 'dot' + (D.enLinea(contact) ? ' dot--live' : '');
         }
         D.text(D.$('btn-peer'), D.t(group ? 'Grupo' : 'Ficha'));
+        /* Llamar solo a una persona con la que hay vinculo: sin vinculo no
+           puede abrir el timbre, y a un grupo no se le llama (es de punta a
+           punta, y un grupo tiene tantas puntas como miembros). */
+        D.show(D.$('btn-call'), !group && !!contact.mutuo && !!D.puedeLlamar && D.puedeLlamar());
 
         var main = D.$('view-main');
         main.className = 'view is-active show-chat';
@@ -438,6 +442,15 @@
         D.on(D.$('btn-group-save'), 'click', function () {
             var name = (D.$('group-name').value || '').replace(/^\s+|\s+$/g, '');
             var pks = elegidos();
+
+            /* Los miembros que no tienes anadidos se pintan sin casilla, asi que
+               no salen de elegidos(). Se anaden a mano: si no, guardar -aunque
+               fuera solo para cambiar el nombre- los echaba del grupo sin que
+               nadie lo decidiera, y el cambio llegaba a todos los demas. */
+            if (editando) {
+                var fuera = V.groups.missing(editando), f;
+                for (f = 0; f < fuera.length; f++) { pks.push(fuera[f].pk); }
+            }
 
             if (!editando) {
                 var hecho = V.groups.create(name, pks);

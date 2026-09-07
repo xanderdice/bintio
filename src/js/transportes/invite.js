@@ -188,7 +188,11 @@
         var pk = b.subarray(0, 32);
         var nLen = b[32];
         if (b.length < 33 + nLen + 2) { return null; }
-        var name = U.toString(b.subarray(33, 33 + nLen));
+        /* El nombre lo escribio quien fabrico el codigo, y un codigo se puede
+           fabricar a mano con un nombre de 255 bytes lleno de saltos de linea:
+           con eso se colaba un falso aviso del sistema de varios renglones en
+           la conversacion. Se limpia aqui, en cuanto se lee del cable. */
+        var name = U.nombreLimpio(U.toString(b.subarray(33, 33 + nLen)));
         var p = 33 + nLen;
         var sLen = (b[p] << 8) | b[p + 1];
         p += 2;
@@ -255,6 +259,13 @@
         try { payload = U.fromB64(text.substr(4)); } catch (e) { return null; }
         if (!payload.length) { return null; }
         if (payload[0] === 1 && !pass) { return { needPass: true, kind: kind }; }
+        /* Si el usuario ha escrito una clave de encuentro pero el codigo NO va
+           cifrado, no es el codigo que esperaba: es justo la sustitucion que la
+           clave existe para atrapar. Antes unlock devolvia el cuerpo en claro
+           sin mirar la clave, asi que un atacante que controla el canal cambiaba
+           la respuesta cifrada por una suya SIN cifrar y se colaba como el
+           contacto, con la pantalla diciendo "enlace abierto". Ahora se dice. */
+        if (payload[0] !== 1 && pass) { return { sinCifrar: true, kind: kind }; }
         var body = unlock(payload, pass);
         if (!body) { return { badPass: true, kind: kind }; }
         var parsed = unpackBody(body);

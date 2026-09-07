@@ -66,6 +66,7 @@
             });
             V.transport.on('gone', function (peer) { A.emit('link', peer); });
             V.chat.onChange(function (what, arg) { A.emit(what, arg); });
+            if (V.llamada) { V.llamada.onChange(function (what, arg) { A.emit(what, arg); }); }
         }
 
         A.startTransports();
@@ -80,7 +81,9 @@
                solicitudes que llevan demasiado tiempo sin que nadie decida. En
                regimen normal las dos son cero y no cuestan nada. */
             try { V.presenta.retry(); V.requests.prune(); } catch (e) {}
-            V.vault.save();
+            /* De mantenimiento: no lleva ningun cambio del usuario, asi que si
+               hay otra pestana trabajando, cede en vez de pisarle lo suyo. */
+            V.vault.saveMaintenance();
             A.emit('tick');
         }, 60000);
 
@@ -95,6 +98,12 @@
     A.stop = function () {
         if (timer) { clearInterval(timer); timer = null; }
         invitacionViva = null;
+        /* Lo primero, con los cables todavia abiertos: que al otro le llegue
+           el "cuelgo" en vez de quedarse mirando una pantalla congelada. Y la
+           camara se apaga aqui, no en la interfaz: cerrar la boveda tiene que
+           dejar el aparato como si nunca hubiera habido llamada. */
+        try { if (V.llamada) { V.llamada.colgar('bloqueo'); } } catch (e) {}
+        try { if (V.transport.videollamada) { V.transport.videollamada.cerrar(); } } catch (e) {}
         try { V.transport.rtc.closeAll(); } catch (e) {}
         try { V.transport.ble.closeAll(); } catch (e) {}
         try { V.transport.local.stop(); } catch (e) {}
@@ -133,6 +142,10 @@
         if (!parsed) { cb(new Error('Eso no es un codigo de BINTIO')); return; }
         if (parsed.needPass) { cb(null, { needPass: true }); return; }
         if (parsed.badPass) { cb(new Error('La clave de encuentro no es la correcta')); return; }
+        if (parsed.sinCifrar) {
+            cb(new Error('Ese codigo NO lleva clave de encuentro y tu has puesto una. No es el que esperabas: no lo aceptes.'));
+            return;
+        }
         if (parsed.pk === U.toHex(A.identity.pk)) { cb(new Error('Ese codigo es tuyo')); return; }
 
         var res = V.contacts.add(parsed.pk, parsed.name);

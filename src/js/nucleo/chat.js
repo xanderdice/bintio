@@ -557,6 +557,13 @@
         var contact = opened.contact;
         var pk = contact.pk;
 
+        /* Videollamada: el papeleo lo lleva llamada.js. No se guarda nada y no
+           se acusa, como el "escribiendo". */
+        if (opened.type === S.T_CALL) {
+            if (V.llamada) { V.llamada.recibir(opened); }
+            return;
+        }
+
         if (opened.type === S.T_TEXT) {
             if (findMsg(pk, opened.mid)) { return; }   /* copia repetida por la malla */
             var msg = {
@@ -660,8 +667,13 @@
         if (opened.type === S.T_PROFILE) {
             try {
                 var p = JSON.parse(U.toString(opened.body));
-                if (p.n && !contact.nameLocked) {
-                    contact.name = String(p.n).substr(0, 40);
+                /* El nombre nuevo lo pone el otro lado, asi que se limpia igual
+                   que en el alta: sin esto un contacto se renombraba a distancia
+                   con saltos de linea o marcas bidi. Si tras limpiar no queda
+                   nada, se ignora en vez de dejar el contacto sin nombre. */
+                var nuevo = U.nombreLimpio(p && p.n);
+                if (nuevo && !contact.nameLocked) {
+                    contact.name = nuevo;
                     V.vault.save();
                     fire('contact', contact);
                 }
@@ -680,6 +692,16 @@
            No se le borra a el: eso lo decide el usuario. Aqui solo se apunta,
            y la lista y la conversacion lo ensenan. */
         if (opened.type === S.T_UNLINK) {
+            /* Y que no valga uno VIEJO repetido. La malla descarta lo repetido
+               con un anillo de 800 identificadores en memoria; quien haya
+               transportado un sobre tuyo puede desbordarlo con basura y despues
+               volver a soltar aquel, que ya no consta como visto. Con un aviso
+               de texto no pasa nada -saldria un mensaje duplicado- pero este
+               cambia un estado, y volvia a marcar como "te ha quitado" a alguien
+               con quien ya te habias reconciliado. Contra eso no hace falta mas
+               memoria: basta mirar la hora que trae dentro. Si es anterior a lo
+               ultimo que sabemos de esta persona, ya no manda. */
+            if (opened.ts && contact.lastSeen && opened.ts < contact.lastSeen) { return; }
             K.desenlazado(contact);
             delete escriben[pk];
             V.vault.save();

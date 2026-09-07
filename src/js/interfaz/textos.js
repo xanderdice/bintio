@@ -54,6 +54,8 @@ BINTIO.textos = {
             'Open your identity and go to Connect: the code is waiting there.',
         'Abrir':
             'Open',
+        'Aceptar':
+            'Accept',
         'Ahora mismo llevas {n} sobres ajenos ({tam}) que no puedes leer.':
             'You are currently carrying {n} envelopes for other people ({tam}) that you cannot read.',
         'Ajustes':
@@ -118,6 +120,8 @@ BINTIO.textos = {
             'Locked. The password is needed to get back in.',
         'Cerrar':
             'Lock',
+        'Cifrada de punta a punta':
+            'End-to-end encrypted',
         'Clave de encuentro (opcional)':
             'Meeting key (optional)',
         'Clave de encuentro (solo si os la habeis puesto)':
@@ -128,6 +132,8 @@ BINTIO.textos = {
             'QR code with your answer',
         'Codigo QR con tu tarjeta de contacto':
             'QR code with your contact card',
+        'Colgar':
+            'Hang up',
         'Como lo llamas tu':
             'What you call them',
         'Como quieres que te vean':
@@ -140,14 +146,20 @@ BINTIO.textos = {
             'Full',
         'Comprobando el aparato':
             'Checking the device',
+        'Con camara':
+            'Camera on',
         'Con clave, el codigo va cifrado: si viaja por un chat y alguien lo intercepta, no le sirve de nada. Dile la clave por otra via, no en el mismo mensaje. Ense\u00f1ando el QR en persona no hace falta.':
             'With a key, the code travels encrypted: if it goes through a chat and someone intercepts it, it is useless to them. Tell them the key by another route, not in the same message. Showing the QR in person makes it unnecessary.',
         'Con esto puesto, cualquiera que tenga tu codigo puede mandarte un primer mensaje y te llega como solicitud, con su nombre y su huella, para que aceptes o descartes. Sin esto -que es como viene- para escribirte hay que estar en tu lista: tienes que a\u00f1adirlo tu antes. Ojo: ese primer mensaje no va autenticado, asi que el nombre lo pone quien escribe hasta que compruebes la huella.':
             'With this on, anyone holding your code can send you a first message and it arrives as a request, with their name and fingerprint, for you to accept or discard. Without it -which is how it ships- writing to you requires being in your list: you have to add them first. Careful: that first message is not authenticated, so the name is whatever the sender types until you check the fingerprint.',
         'Con la Llave de Recuperacion vuelves a ser la misma persona en otro aparato, aunque el anterior este en el fondo del mar. Con una copia de seguridad completa recuperas ademas las conversaciones.':
             'With the Recovery Key you become the same person again on another device, even if the old one is at the bottom of the sea. With a full backup you also get the conversations back.',
+        'Con sonido':
+            'Unmute',
         'Conectado por Bluetooth a {quien}':
             'Connected over Bluetooth to {quien}',
+        'Conectando...':
+            'Connecting...',
         'Conectar':
             'Connect',
         'Contacto':
@@ -294,10 +306,20 @@ BINTIO.textos = {
             'The password needs eight characters',
         'La contrase\u00f1a necesita ocho caracteres como minimo':
             'The password needs at least eight characters',
+        'La llamada se ha cortado':
+            'The call dropped',
         'La malla':
             'The mesh',
         'Las dos contrase\u00f1as no coinciden':
             'The two passwords do not match',
+        'Llamada perdida de {quien}':
+            'Missed call from {quien}',
+        'Llamada terminada':
+            'Call ended',
+        'Llamando...':
+            'Calling...',
+        'Llamar':
+            'Call',
         'Llave de Recuperacion, o copia de seguridad completa':
             'Recovery Key, or full backup',
         'Llevar mensajes de otros':
@@ -330,6 +352,10 @@ BINTIO.textos = {
             'Nobody can recover it',
         'Neon (rojo)':
             'Neon (red)',
+        'No cabe en este aparato: lo nuevo no se esta guardando. Descarga una copia y borra conversaciones.':
+            'There is no room on this device: new things are not being saved. Download a backup and delete conversations.',
+        'No habia sitio: se han soltado los sobres ajenos que llevabas.':
+            'There was no room: the envelopes you were carrying for others have been dropped.',
         'No hay nada que copiar todavia':
             'There is nothing to copy yet',
         'No impide una captura':
@@ -338,6 +364,8 @@ BINTIO.textos = {
             'No requests left.',
         'No se ha abierto el enlace con {quien}. Esa respuesta puede ser de una sesion anterior: pidele que te ense\u00f1e su codigo otra vez.':
             'The link with {quien} did not open. That answer may be from an earlier session: ask them to show you their code again.',
+        'No se pudo abrir la camara o el microfono':
+            'Could not open the camera or the microphone',
         'No, volver':
             'No, go back',
         'Nombre del grupo':
@@ -376,6 +404,8 @@ BINTIO.textos = {
             'Someone wants to write to you',
         'Quieren escribirte. Lo tienes arriba, en Conversaciones.':
             'Someone wants to write to you. It is at the top, under Conversations.',
+        'Rechazar':
+            'Decline',
         'Recibido en este aparato: {cuando}':
             'Received on this device: {cuando}',
         'Recuperar':
@@ -396,6 +426,8 @@ BINTIO.textos = {
             'Leave group',
         'Salir del grupo? Se borra de este aparato con su conversacion. Los demas no reciben ningun aviso.':
             'Leave the group? It is deleted from this device along with its conversation. The others get no notice.',
+        'Se ha borrado la boveda desde otra pestana.':
+            'The vault was wiped from another tab.',
         'Se presenta con este nombre. Lo escribe quien manda y no lo comprueba nadie.':
             'They introduce themselves with this name. The sender types it and nobody checks it.',
         'Segundo y ultimo paso. En cuanto lea esta respuesta, el camino queda abierto por los dos lados y no hace falta ningun codigo mas. Si no puede escanear, copiala y pasasela.':
@@ -406,6 +438,8 @@ BINTIO.textos = {
             'If there is a real BINTIO node nearby (the desktop version, a phone with the native app or a gadget with the profile), hooking onto it opens a path without exchanging anything. Two browser tabs cannot see each other this way: no browser can advertise itself over Bluetooth.',
         'Si, borrar todo y empezar de cero':
             'Yes, erase everything and start from scratch',
+        'Silenciar':
+            'Mute',
         'Sin STUN funcionan la red local, el cable y compartir datos desde el movil. Con uno, tambien enlaces a traves de internet, a cambio de que ese servidor vea que dos direcciones IP se buscan. Tu decides; por defecto no hay ninguno.':
             'Without STUN, the local network, a cable and phone tethering all work. With one, links across the internet work too, at the cost of that server seeing that two IP addresses are looking for each other. Your call; by default there is none.',
         'Sin Web Bluetooth: no podras engancharte a nodos por Bluetooth desde este navegador.':
@@ -414,6 +448,8 @@ BINTIO.textos = {
             'No WebRTC: there will be no direct link, but the mesh and cards still work.',
         'Sin almacenamiento: lo que hagas se perdera al cerrar la pestana.':
             'No storage: whatever you do will be lost when you close the tab.',
+        'Sin camara':
+            'Camera off',
         'Sin codigos: Bluetooth':
             'No codes: Bluetooth',
         'Sin vinculo todavia: no ha llegado nada suyo. Hasta que te anada, no puede abrir lo que le escribas.':
@@ -432,6 +468,8 @@ BINTIO.textos = {
             'Covers the conversation as soon as the window stops being in front, removes the right-click menu and, if you press Print Screen, wipes whatever is left on the clipboard.',
         'Te ha quitado de sus contactos. Lo que le escribas ya no lo puede abrir.':
             'They removed you from their contacts. They can no longer open what you write.',
+        'Te llama':
+            'is calling you',
         'Te lo a\u00f1ade como contacto, pero no conecta: falta un codigo de los de arriba':
             'It adds them as a contact, but does not connect: one of the codes above is still missing',
         'Tema':
@@ -442,6 +480,8 @@ BINTIO.textos = {
             'Nothing from {quien} has arrived yet. Adding someone goes one way only: until {quien} has you, they cannot open what you write. If you gave them your code, they have to send you their answer back; if you added them with their code, give them yours.',
         'Todavia no hay nada. Lo que escribas aqui solo lo puede leer esta persona.':
             'Nothing here yet. What you write can only be read by this person.',
+        'Todavia no hay vinculo con esta persona':
+            'There is no link with this person yet',
         'Todavia no tienes a nadie. Un grupo se hace con gente que ya has anadido.':
             'You have nobody yet. A group is made of people you have already added.',
         'Todavia se esta preparando':
@@ -492,6 +532,8 @@ BINTIO.textos = {
             'Back',
         'Volver a mi codigo':
             'Back to my code',
+        'Ya hay una llamada':
+            'There is already a call',
         'Ya tengo una':
             'I already have one',
         'Ya tienes a {quien}. Falta un paso: ense\u00f1ale la respuesta de arriba.':
@@ -564,8 +606,14 @@ BINTIO.textos = {
             '{n} people, nothing written yet',
         '{quien} en {grupo}':
             '{quien} in {grupo}',
+        '{quien} esta en otra llamada':
+            '{quien} is on another call',
         '{quien} esta escribiendo...':
             '{quien} is typing...',
+        '{quien} no contesta':
+            '{quien} is not answering',
+        '{quien} no puede ahora':
+            '{quien} cannot right now',
         '{quien} te ha quitado de sus contactos. Lo que escribas aqui saldra del aparato, pero {quien} ya no lo puede abrir: para eso tendria que volver a anadirte. Lo que ya os disteis sigue aqui; si no lo quieres, borra la conversacion desde Ficha.':
             '{quien} removed you from their contacts. What you write here will leave the device, but {quien} can no longer open it: for that they would have to add you again. What you already exchanged is still here; if you do not want it, delete the conversation from Details.',
         '\u2014 Los sobres de otros que llevabas en la mochila y tus ajustes.':

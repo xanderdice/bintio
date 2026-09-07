@@ -16,12 +16,24 @@
 
     var STORE_KEY = 'bintio.vault.v1';
     var SESSION_KEY = 'bintio.session.v1';
+    var OWNER_KEY = 'bintio.owner.v1';
     var ITERS = 150000;      /* coste por intento de fuerza bruta */
     var SAVE_DELAY = 400;    /* ms de espera antes de escribir en disco */
+    var OWNER_STALE = 90000; /* ms: un arriendo mas viejo que esto se da por muerto */
 
     var backend = null;
     var key = null;          /* clave de cifrado en memoria, nunca en disco */
+    var keyIters = ITERS;    /* con cuantas vueltas se derivo la clave que hay en memoria */
     var saveTimer = null;
+
+    /* Limites de sensatez para las vueltas que declara un blob. Sin ellos se
+       confiaba en el numero a ciegas: una copia con un numero distinto de
+       150000 se abria bien -se deriva con el numero del blob- pero el primer
+       guardado la reescribia diciendo 150000, y al volver a abrir ya no
+       cuadraba: perdida total con la contrasena correcta y sin un aviso. Se
+       arregla guardando las vueltas de verdad (keyIters) y usandolas al
+       escribir; esto es la red de debajo contra un blob absurdo. */
+    var MIN_ITERS = 10000, MAX_ITERS = 10000000;
 
     /* Lo que ocupa el blob en disco, apuntado en vez de medido.
 
@@ -71,6 +83,50 @@
         return backend;
     }
 
+    /* ---------------------------------------------------------------------
+       Varias pestanas del mismo navegador comparten el MISMO localStorage.
+       Sin coordinacion pasaban tres cosas, las tres demostradas:
+
+         - "Borrar todo" en una pestana borraba el disco, pero la otra, con la
+           boveda todavia en memoria, la volvia a escribir al minuto siguiente.
+           El borrado de panico -la promesa mas fuerte- no borraba.
+         - Dos pestanas guardando por turnos: la ultima en escribir pisaba lo
+           que hizo la otra. Contactos y mensajes desaparecian del disco.
+
+       Se arregla con dos cosas de aqui abajo:
+
+         GUARDA ANTI-RESURRECCION: antes de escribir se mira si el blob sigue en
+         disco. Si habia uno y ha desaparecido, alguien lo borro (otra pestana,
+         o el panico): NO se vuelve a escribir, se avisa (onWiped) y punto.
+
+         ARRIENDO DE ESCRITURA: un testigo con el nombre de esta pestana y la
+         hora. La escritura de MANTENIMIENTO -el reloj de un minuto, que no lleva
+         cambios del usuario- cede si otra pestana tiene el arriendo fresco: asi
+         una pestana inactiva no pisa lo que hace la que se esta usando. Las
+         escrituras de un CAMBIO real siempre escriben y renuevan el arriendo.
+       --------------------------------------------------------------------- */
+    var ownerToken = null;
+    function token() {
+        if (!ownerToken) { ownerToken = U.toHex(C.random(8)); }
+        return ownerToken;
+    }
+    function tomarArriendo() {
+        try { be().set(OWNER_KEY, token() + '|' + U.now()); } catch (e) {}
+    }
+    function soltarArriendo() {
+        try { if (be().get(OWNER_KEY) && be().get(OWNER_KEY).split('|')[0] === token()) { be().del(OWNER_KEY); } } catch (e) {}
+    }
+    /* True si el arriendo es nuestro o esta muerto: en los dos casos podemos
+       escribir. Solo cede ante un arriendo AJENO y FRESCO. */
+    function tenemosVia() {
+        var v;
+        try { v = be().get(OWNER_KEY); } catch (e) { return true; }
+        if (!v) { return true; }
+        var p = v.split('|');
+        if (p[0] === token()) { return true; }
+        return (U.now() - (parseInt(p[1], 10) || 0)) > OWNER_STALE;
+    }
+
     Vault.isPersistent = function () { return be().persistent; };
     Vault.exists = function () { return !!be().get(STORE_KEY); };
     Vault.isOpen = function () { return !!key; };
@@ -84,7 +140,9 @@
     function decode(text) {
         var p = String(text).split('.');
         if (p.length !== 5 || p[0] !== 'V1') { return null; }
-        return { salt: U.fromB64(p[1]), iters: parseInt(p[2], 10), nonce: U.fromB64(p[3]), ct: U.fromB64(p[4]) };
+        var iters = parseInt(p[2], 10);
+        if (!(iters >= MIN_ITERS && iters <= MAX_ITERS)) { return null; }
+        return { salt: U.fromB64(p[1]), iters: iters, nonce: U.fromB64(p[3]), ct: U.fromB64(p[4]) };
     }
 
     function emptyState() {
@@ -152,6 +210,7 @@
         var salt = C.random(16);
         C.pbkdf2Async(pass, salt, ITERS, 32, onProgress, function (k) {
             key = k;
+            keyIters = ITERS;
             Vault.state = emptyState();
             Vault.state.saltHint = U.toB64(salt);
             writeNow(salt);
@@ -172,6 +231,7 @@
             catch (e) { U.wipe(k); cb(new Error('La boveda esta danada')); return; }
             U.wipe(plain);
             key = k;
+            keyIters = rec.iters;   /* con las que se derivo: writeNow las respeta */
             Vault.state = obj;
             Vault.state.saltHint = U.toB64(rec.salt);
             cb(null, Vault.state);
@@ -180,6 +240,7 @@
 
     Vault.lock = function () {
         Vault.saveNow();
+        soltarArriendo();   /* que otra pestana pueda escribir sin esperar 90 s */
         if (key) { U.wipe(key); }
         key = null;
         Vault.state = null;
@@ -205,6 +266,7 @@
             var plain = C.open(kk, rec.nonce, U.fromString('bintio/vault/v1'), rec.ct);
             if (!plain) { return false; }
             key = kk;
+            keyIters = rec.iters;
             Vault.state = JSON.parse(U.toString(plain));
             Vault.state.saltHint = U.toB64(rec.salt);
             return true;
@@ -214,8 +276,22 @@
     /* ---------------------------------------------------------------------
        Escritura. save() agrupa rafagas de cambios; saveNow() fuerza.
        --------------------------------------------------------------------- */
-    function writeNow(saltOverride) {
+    function writeNow(saltOverride, mantenimiento) {
         if (!key || !Vault.state) { return; }
+        /* Guarda anti-resurreccion: si ya habia un blob y ha desaparecido del
+           disco, alguien lo borro. No se resucita. tamano>0 significa que en
+           algun momento de esta sesion escribimos o abrimos algo; en el primer
+           writeNow de Vault.create el disco esta vacio a proposito y tamano es
+           -1, asi que esa primera escritura no la corta esta guarda. */
+        if (tamano > 0 && be().get(STORE_KEY) === null) {
+            key = null; Vault.state = null;
+            if (Vault.onWiped) { Vault.onWiped(); }
+            return;
+        }
+        /* La escritura de mantenimiento cede ante otra pestana con el arriendo
+           fresco; la de un cambio real, no: toma el arriendo y escribe. */
+        if (mantenimiento && !tenemosVia()) { return; }
+        tomarArriendo();
         var salt = saltOverride || U.fromB64(Vault.state.saltHint);
         var nonce = C.random(12);
         var copy = {};
@@ -226,7 +302,10 @@
         var ct = C.seal(key, nonce, U.fromString('bintio/vault/v1'), plain);
         U.wipe(plain);
         try {
-            var blob = encode(salt, ITERS, nonce, ct);
+            /* Con keyIters, NO con la constante: si la clave en memoria se
+               derivo con otro numero de vueltas (una copia de otra version),
+               escribir 150000 la dejaria inabrible al recargar. */
+            var blob = encode(salt, keyIters, nonce, ct);
             be().set(STORE_KEY, blob);
             apuntar(blob);
             Vault.lastError = null;
@@ -244,6 +323,13 @@
     Vault.saveNow = function () {
         if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
         writeNow(null);
+    };
+    /* La escritura del reloj de mantenimiento (app.js). Va aparte porque es la
+       unica que puede CEDER: no lleva ningun cambio del usuario, asi que si otra
+       pestana esta trabajando, mejor no pisarla. */
+    Vault.saveMaintenance = function () {
+        if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
+        writeNow(null, true);
     };
 
     /* ---------------------------------------------------------------------
@@ -265,6 +351,7 @@
                 be().set(STORE_KEY, limpio);
                 apuntar(limpio);
                 key = k;
+                keyIters = rec.iters;
                 Vault.state = JSON.parse(U.toString(plain));
                 Vault.state.saltHint = U.toB64(rec.salt);
                 cb(null, Vault.state);

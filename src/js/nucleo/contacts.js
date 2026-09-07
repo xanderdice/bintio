@@ -46,9 +46,13 @@
         if (existing) { return { contact: existing, existed: true }; }
         var pk = U.fromHex(pkHex);
         if (pk.length !== 32) { return { error: 'Clave publica invalida' }; }
+        /* El nombre llega de un codigo que escribio otra persona: se limpia
+           aqui, que es la unica puerta de alta, antes de que llegue a ninguna
+           pantalla. Si no queda nada, un nombre sugerido a partir de la clave. */
+        var limpio = U.nombreLimpio(name);
         var contact = {
             pk: pkHex,
-            name: name || V.id.suggestName(pk),
+            name: limpio || V.id.suggestName(pk),
             address: V.id.address(pk),
             fingerprint: V.id.fingerprint(pk),
             verified: false,
@@ -108,6 +112,13 @@
     K.desenlazado = function (contact) {
         contact.mutuo = false;
         contact.unlinked = U.now();
+        /* Quien nos quita ha borrado sus claves de trinquete. Si seguimos
+           sellandole con la ultima que le vimos (ratchet.theirs), calcula un
+           ss3 que el ya no puede reproducir y no abre nada, aunque nos vuelva a
+           anadir: los mensajes se pierden en silencio. Se olvida su clave y a
+           partir de aqui se le sella sin ss3 -el sobre sigue publicando la
+           nuestra, asi que gira su trinquete en cuanto abra uno-. */
+        if (contact.ratchet) { contact.ratchet.theirs = null; }
     };
 
     K.touch = function (pkHex) {

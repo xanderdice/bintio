@@ -189,4 +189,54 @@
     U.rid = function () {
         return V.crypto.randomHex(8);
     };
+
+    /* Un nombre que viene de fuera -de una tarjeta, de una ficha de grupo, de
+       un perfil- lo escribe otra persona, y otra persona puede escribir cosas
+       que no son un nombre: saltos de linea para fabricar un falso aviso del
+       sistema con varios renglones, caracteres de control, marcas bidi que dan
+       la vuelta al texto, invisibles que disfrazan una identidad de otra.
+
+       presenta.js ya RECHAZA una presentacion que traiga eso, porque un
+       remitente honrado nunca lo manda. Pero una tarjeta o un perfil ya se
+       aceptaron -ya hay contacto-, asi que aqui se LIMPIA en vez de rechazar:
+       se quitan esos caracteres, se juntan los espacios y se corta a 40. Lo
+       que queda es texto de una sola linea que no puede hacerse pasar por la
+       voz de la aplicacion. Contra los homoglifos no hay filtro -una A
+       cirilica es una letra de verdad-; contra eso esta la huella, que es lo
+       que se compara y lo que la interfaz pinta al lado del nombre.
+
+       La lista de invisibles es la misma que la del NOMBRE en presenta.js. Si
+       una cambia, la otra tambien: las dos guardan la misma puerta. */
+    var FUERA_NOMBRE = new RegExp(
+        '[\\u0000-\\u001f\\u007f-\\u009f\\u00ad\\u034f\\u061c\\u115f\\u1160' +
+        '\\u17b4\\u17b5\\u180b-\\u180e\\u200b-\\u200f\\u2028-\\u202e' +
+        '\\u2060-\\u2064\\u2066-\\u206f\\u3164\\ufe00-\\ufe0f\\ufeff' +
+        '\\ufff9-\\ufffb\\ufffe\\uffff]', 'g');
+
+    /* Un sustituto suelto -la mitad de un par sin la otra mitad- se cae: no hay
+       UTF-8 valido que lo represente. Se hace por barrido y no con una sola
+       expresion porque ES5 no tiene mirada atras y un sustituto bajo depende
+       de lo que lleve delante. Un par completo (un emoji) se conserva entero. */
+    function sinSueltos(s) {
+        var out = '', i, c, n;
+        for (i = 0; i < s.length; i++) {
+            c = s.charCodeAt(i);
+            if (c >= 0xd800 && c <= 0xdbff) {
+                n = s.charCodeAt(i + 1);
+                if (n >= 0xdc00 && n <= 0xdfff) { out += s.charAt(i) + s.charAt(i + 1); i++; }
+            } else if (c >= 0xdc00 && c <= 0xdfff) {
+                /* sustituto bajo suelto: fuera */
+            } else {
+                out += s.charAt(i);
+            }
+        }
+        return out;
+    }
+
+    U.nombreLimpio = function (name) {
+        var s = String(name === undefined || name === null ? '' : name);
+        s = sinSueltos(s.replace(FUERA_NOMBRE, ''));
+        s = s.replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '');
+        return s.substr(0, 40);
+    };
 })(BINTIO);
